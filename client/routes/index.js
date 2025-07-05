@@ -8,16 +8,17 @@ router.get('/',async function(req, res, next) {
   await indexFun.getLotteries(req,res)
 });
 
+router.post('/api/get-past-lottories',async function(req, res, next) {
+  await indexFun.getPastLotteries(req,res)
+});
+
+
 router.get('/create-dummy-lottories',async function(req, res, next) {
-  try{
-   let savedLottories=await startFun.saveDummyLotteries(req,res)
-   if(!savedLottories)
-    res.send('an error occured')
-   res.json({savedLottories})
-  }catch(err){
-    console.log(err)
-   res.send('an error occured')
-  }
+ try {
+  let savedLotteries = await startFun.saveDummyLotteries(req, res);
+} catch (err) {
+  console.error("ERROR FROM 'startFun.saveDummyLotteries(req,res)' Function : \n", err);
+}
 });
 
 module.exports = router;

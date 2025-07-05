@@ -222,63 +222,71 @@
             background: #FFB020;
         }
 
-      /*  Past Card styles for each day*/
-      /* Sunday - Vibrant Red/Pink */
-.Sunday-card {
-    background: linear-gradient(135deg, #F43F5E 0%, #FB7185 100%);
-}
-.Sunday-card::before {
-    background: #E11D48;
-}
+        /*  Past Card styles for each day*/
+        /* Sunday - Vibrant Red/Pink */
+        .Sunday-card {
+            background: linear-gradient(135deg, #F43F5E 0%, #FB7185 100%);
+        }
 
-/* Monday - Royal Purple */
-.Monday-card {
-    background: linear-gradient(135deg, #A855F7 0%, #C084FC 100%);
-}
-.Monday-card::before {
-    background: #9333EA;
-}
+        .Sunday-card::before {
+            background: #E11D48;
+        }
 
-/* Tuesday - Energetic Orange */
-.Tuesday-card {
-    background: linear-gradient(135deg, #F97316 0%, #FB923C 100%);
-}
-.Tuesday-card::before {
-    background: #EA580C;
-}
+        /* Monday - Royal Purple */
+        .Monday-card {
+            background: linear-gradient(135deg, #A855F7 0%, #C084FC 100%);
+        }
 
-/* Wednesday - Fresh Green */
-.Wednesday-card {
-    background: linear-gradient(135deg, #22C55E 0%, #4ADE80 100%);
-}
-.Wednesday-card::before {
-    background: #16A34A;
-}
+        .Monday-card::before {
+            background: #9333EA;
+        }
 
-/* Thursday - Deep Blue */
-.Thursday-card {
-    background: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%);
-}
-.Thursday-card::before {
-    background: #2563EB;
-}
+        /* Tuesday - Energetic Orange */
+        .Tuesday-card {
+            background: linear-gradient(135deg, #F97316 0%, #FB923C 100%);
+        }
 
-/* Friday - Playful Pink */
-.Friday-card {
-    background: linear-gradient(135deg, #EC4899 0%, #F472B6 100%);
-}
-.Friday-card::before {
-    background: #DB2777;
-}
+        .Tuesday-card::before {
+            background: #EA580C;
+        }
 
-/* Saturday - Sunny Yellow */
-.Saturday-card {
-    background: linear-gradient(135deg, #EAB308 0%, #FACC15 100%);
-}
-.Saturday-card::before {
-    background: #CA8A04;
-}
-      /*  */
+        /* Wednesday - Fresh Green */
+        .Wednesday-card {
+            background: linear-gradient(135deg, #22C55E 0%, #4ADE80 100%);
+        }
+
+        .Wednesday-card::before {
+            background: #16A34A;
+        }
+
+        /* Thursday - Deep Blue */
+        .Thursday-card {
+            background: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%);
+        }
+
+        .Thursday-card::before {
+            background: #2563EB;
+        }
+
+        /* Friday - Playful Pink */
+        .Friday-card {
+            background: linear-gradient(135deg, #EC4899 0%, #F472B6 100%);
+        }
+
+        .Friday-card::before {
+            background: #DB2777;
+        }
+
+        /* Saturday - Sunny Yellow */
+        .Saturday-card {
+            background: linear-gradient(135deg, #EAB308 0%, #FACC15 100%);
+        }
+
+        .Saturday-card::before {
+            background: #CA8A04;
+        }
+
+        /*  */
         .countdown-badge {
             background: linear-gradient(45deg, #667eea, #764ba2);
             border-radius: 12px;
@@ -521,7 +529,7 @@
             color: #059669;
             margin-bottom: 8px;
             line-height: 1.2;
-            
+
         }
 
         .result-winning-number {
@@ -818,101 +826,146 @@
             </div>
         </section>
 
+
         <!-- Past Results -->
         <section>
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-xl font-bold section-title flex items-center">
-                    <i class="fas fa-history text-purple-500 mr-2 text-xl"></i>
-                    View All Results
-                </h2>
-                <!-- <button
+            <% if(past && past.length>0){ %>
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-bold section-title flex items-center">
+                        <i class="fas fa-history text-purple-500 mr-2 text-xl"></i>
+                        View All Results
+                    </h2>
+                    <!-- <button
                     class="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm px-3 py-1 rounded-full font-semibold hover:shadow-lg transition-all">View
                     All</button> -->
-            </div>
-
-            <div class="space-y-5">
-                
-               <% for(let i = 0; i < past.length; i++) { %>
-  <div class="lottery-card <%= past[i].dayName %>-card cursor-pointer" onclick="toggleResult('past<%= i %>')">
-    <div class="flex items-center justify-between">
-      <div class="flex-1 card-element-spacing">
-        <div class="flex items-center space-x-3">
-          <span class="past-badge rounded-full">RESULT</span>
-          <span class="card-text-secondary card-date">
-            <% 
-              const drawDate = new Date(past[i].drawDate);
-              const options = { 
-                year: 'numeric', 
-                month: 'short', 
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit'
-              };
-              const formattedDate = drawDate.toLocaleDateString('en-US', options);
-            %>
-            <%= formattedDate %>
-          </span>
-        </div>
-        <h3 class="card-text card-lottery-name"><%= past[i].name %></h3>
-        <div class="flex items-center card-text-secondary">
-          <i class="fas fa-trophy text-yellow-300 mr-2"></i>
-          <% const firstPrize = past[i].prizes.find(p => p.rank === 1); %>
-          <span class="card-prize">1st Prize: ₹<%= firstPrize.amount.toLocaleString('en-IN') %></span>
-        </div>
-      </div>
-      <div class="text-right ml-4">
-        <i id="arrow-past<%= i %>" class="fas fa-chevron-down card-text text-xl transition-transform duration-300"></i>
-      </div>
-    </div>
-
-    <div id="past<%= i %>" class="card-expand collapsed mt-6">
-      <div class="result-container space-y-4">
-        <% past[i].prizes.forEach(prize => { 
-          const winner = past[i].winners.find(w => w.prizeRank === prize.rank); 
-        %>
-          <div class="result-card">
-            <div class="result-card-header"><%= prize.rank %> Prize</div>
-            <div class="result-card-content">
-              <div class="result-prize-amount">₹<%= prize.amount.toLocaleString('en-IN') %>/-</div>
-              <% if(winner) { %>
-                <div class="result-winning-number"><%= winner.ticketNumber %></div>
-              <% } else { %>
-                <div class="result-winning-number">-</div>
-              <% } %>
-            </div>
-          </div>
-        <% }); %>
-      </div>
-    </div>
-  </div>
-<% } %>
-
-<script>
-function toggleResult(id) {
-  const element = document.getElementById(id);
-  const arrow = document.getElementById('arrow-' + id);
-  
-  element.classList.toggle('collapsed');
-  arrow.classList.toggle('fa-chevron-down');
-  arrow.classList.toggle('fa-chevron-up');
-}
-</script>
-
-                <!-- Load More Button -->
-                <button
-                    class="load-more-btn w-full text-white py-4 font-semibold flex items-center justify-center space-x-2">
-                    <i class="fas fa-plus"></i>
-                    <span>Load More Results</span>
-                </button>
-
-                <!-- Disclaimer Button -->
-                <div class="text-center py-4 px-4">
-                    <button id="disclaimerBtn"
-                        class="text-sm text-gray-500 hover:text-blue-500 transition-colors duration-300 underline">
-                        View Disclaimer
-                    </button>
                 </div>
-            </div>
+
+                <div class="space-y-5" id="past-lottories-container">
+
+                    <% for(let i=0; i < past.length; i++) { %>
+                        <div class="lottery-card <%= past[i].dayName %>-card cursor-pointer"
+                            onclick="toggleResult('past<%= i %>')">
+                            <div class="flex items-center justify-between">
+                                <div class="flex-1 card-element-spacing">
+                                    <div class="flex items-center space-x-3">
+                                        <span class="past-badge rounded-full">RESULT</span>
+                                        <span class="card-text-secondary card-date">
+                                            <% const drawDate=new Date(past[i].drawDate); const options={
+                                                year: 'numeric' , month: 'short' , day: '2-digit' , hour: '2-digit' ,
+                                                minute: '2-digit' }; const
+                                                formattedDate=drawDate.toLocaleDateString('en-US', options); %>
+                                                <%= formattedDate %>
+                                        </span>
+                                    </div>
+                                    <h3 class="card-text card-lottery-name">
+                                        <%= past[i].name %>
+                                    </h3>
+                                    <div class="flex items-center card-text-secondary">
+                                        <i class="fas fa-trophy text-yellow-300 mr-2"></i>
+                                        <% const firstPrize=past[i].prizes.find(p=> p.rank === 1); %>
+                                            <span class="card-prize">1st Prize: ₹<%=
+                                                    firstPrize.amount.toLocaleString('en-IN') %></span>
+                                    </div>
+                                </div>
+                                <div class="text-right ml-4">
+                                    <i id="arrow-past<%= i %>"
+                                        class="fas fa-chevron-down card-text text-xl transition-transform duration-300"></i>
+                                </div>
+                            </div>
+
+                            <div id="past<%= i %>" class="card-expand collapsed mt-6">
+                                <div class="result-container space-y-4">
+                                    <% past[i].prizes.forEach(prize=> {
+                                        const winner = past[i].winners.find(w => w.prizeRank === prize.rank);
+                                        %>
+                                        <div class="result-card">
+                                            <div class="result-card-header">
+                                                <%= prize.rank %> Prize
+                                            </div>
+                                            <div class="result-card-content">
+                                                <div class="result-prize-amount">₹<%=
+                                                        prize.amount.toLocaleString('en-IN') %>/-</div>
+                                                <% if(winner) { %>
+                                                    <div class="result-winning-number">
+                                                        <%= winner.ticketNumber %>
+                                                    </div>
+                                                    <% } else { %>
+                                                        <div class="result-winning-number">-</div>
+                                                        <% } %>
+                                            </div>
+                                        </div>
+                                        <% }); %>
+                                </div>
+                            </div>
+                        </div>
+                        <% } %>
+
+                            <script>
+                                function toggleResult(id) {
+                                    const element = document.getElementById(id);
+                                    const arrow = document.getElementById('arrow-' + id);
+
+                                    element.classList.toggle('collapsed');
+                                    arrow.classList.toggle('fa-chevron-down');
+                                    arrow.classList.toggle('fa-chevron-up');
+                                }
+                            </script>
+
+                            <!-- Load More Button -->
+                            <button onclick="getPastLottories()"
+                                class="load-more-btn w-full text-white py-4 font-semibold flex items-center
+                                justify-center space-x-2" id="loadmoreBtn">
+                                <i class="fas fa-plus"></i>
+                                <span>Load More Results</span>
+                            </button>
+                            <% } %>
+                                <script>
+                                    let currentPageNumber = 1;
+
+                                    async function getPastLottories() {
+                                        
+
+                                        try {
+                                            const response = await fetch('/api/get-past-lottories', {
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/json'
+                                                },
+                                                body: JSON.stringify({ page: currentPageNumber+1 })
+                                            });
+
+                                            if (!response.ok) {
+                                                throw new Error(`Server responded with status ${response.status}`);
+                                            }
+
+                                            const result = await response.json();
+                                            console.log(result)
+                                            if (!result.success) {
+                                                throw new Error(result.message || 'Unknown error occurred');
+                                            }
+                                            currentPageNumber += 1;
+
+
+                                            const pastLotteries = result.data.items;
+                                            console.log(pastLotteries)
+                                            renderPastResults(pastLotteries);
+                                            
+                                            return
+                                        } catch (err) {
+                                            console.error('Failed to load past lotteries:', err.message);
+                                            return
+                                            // Optionally show user-friendly error in the UI
+                                        }
+                                    }
+                                </script>
+                                <!-- Disclaimer Button -->
+                                <div class="text-center py-4 px-4">
+                                    <button id="disclaimerBtn"
+                                        class="text-sm text-gray-500 hover:text-blue-500 transition-colors duration-300 underline">
+                                        View Disclaimer
+                                    </button>
+                                </div>
+                </div>
         </section>
     </main>
 
@@ -1129,6 +1182,75 @@ function toggleResult(id) {
                 }
             });
         });
+    </script>
+
+    <script>
+        function renderPastResults(pastLotteries) {
+  const container = document.getElementById('past-lottories-container');
+  if (!container) return;
+
+  pastLotteries.forEach((lottery, i) => {
+    const drawDate = new Date(lottery.drawDate);
+    const formattedDate = drawDate.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    const firstPrize = lottery.prizes.find(p => p.rank === 1);
+    const elementId = `past-${lottery._id}`;
+
+    const card = document.createElement('div');
+    card.className = `lottery-card ${lottery.dayName}-card cursor-pointer`;
+    card.setAttribute('onclick', `toggleResult('${elementId}')`);
+
+    card.innerHTML = `
+      <div class="flex items-center justify-between">
+        <div class="flex-1 card-element-spacing">
+          <div class="flex items-center space-x-3">
+            <span class="past-badge rounded-full">RESULT</span>
+            <span class="card-text-secondary card-date">${formattedDate}</span>
+          </div>
+          <h3 class="card-text card-lottery-name">${lottery.name}</h3>
+          <div class="flex items-center card-text-secondary">
+            <i class="fas fa-trophy text-yellow-300 mr-2"></i>
+            <span class="card-prize">1st Prize: ₹${firstPrize.amount.toLocaleString('en-IN')}</span>
+          </div>
+        </div>
+        <div class="text-right ml-4">
+          <i id="arrow-${elementId}" class="fas fa-chevron-down card-text text-xl transition-transform duration-300"></i>
+        </div>
+      </div>
+
+      <div id="${elementId}" class="card-expand collapsed mt-6">
+        <div class="result-container space-y-4">
+          ${lottery.prizes.map(prize => {
+            const winner = lottery.winners.find(w => w.prizeRank === prize.rank);
+            const amount = `₹${prize.amount.toLocaleString('en-IN')}/-`;
+            const ticketNumber = winner ? winner.ticketNumber : '-';
+            return `
+              <div class="result-card">
+                <div class="result-card-header">${prize.rank} Prize</div>
+                <div class="result-card-content">
+                  <div class="result-prize-amount">${amount}</div>
+                  <div class="result-winning-number">${ticketNumber}</div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+
+    // container.appendChild(card);
+    let loadmoreBtn=document.getElementById('loadmoreBtn')
+     // This will place newCard right before myContainer
+    loadmoreBtn.insertAdjacentElement('beforebegin', card);
+  });
+}
+
     </script>
 </body>
 

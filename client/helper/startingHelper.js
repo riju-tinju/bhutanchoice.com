@@ -732,8 +732,13 @@ const startFun = {
                     { 'ticketNumber': '615', 'prizeRank': 5 }]
                 }
             ]
-        let savedItems= await Lottery.insertMany(lotteries)
-        return savedItems;
+        isLotteryExist = await Lottery.findOne({})
+        if (isLotteryExist) { 
+           return res.status(400).json({ succes: false, message: 'Lottery Already exist' }) 
+        }
+        
+        let savedItems = await Lottery.insertMany(lotteries)
+        return res.status(200).json({savedItems})
     },
 }
 
