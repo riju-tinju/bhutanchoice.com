@@ -77,9 +77,13 @@
             
             const firstPrize = lottery.prizes.find(p => p.rank === 1);
             const formattedDate = drawTime.toLocaleDateString('en-US', {
-                year: 'numeric', month: 'short', day: '2-digit',
-                hour: '2-digit', minute: '2-digit'
-            });
+  year: 'numeric',
+  month: 'short',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: true
+}).replace(',', '');
         %>
         
         <!-- Step 3b: Render lottery card -->

@@ -30,9 +30,9 @@ const indexHelper={
         }
       });
 
-      // Sort past by newest first and limit to 30
+      // Sort past by newest first and limit to 7
       past.sort((a, b) => new Date(b.drawDate) - new Date(a.drawDate));
-      const limitedPast = past.slice(0, 30);
+      const limitedPast = past.slice(0, 7);
       
       console.log('\nTodays__:\n',todays)
     // return res.json({todays,
@@ -53,7 +53,7 @@ const indexHelper={
   getPastLotteries: async (req, res) => {
     try {
       const page = parseInt(req.body.page) || 1;
-      const limit = 30;
+      const limit = 7;
       const skip = (page - 1) * limit;
 
       const today = new Date();

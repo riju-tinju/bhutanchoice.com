@@ -669,11 +669,19 @@
                                     <div class="flex items-center flex-wrap"  style="row-gap: 9px; column-gap: 20px;">
                                         <span class="past-badge rounded-full">RESULT</span>
                                         <span class="card-text-secondary card-date">
-                                            <% const drawDate=new Date(past[i].drawDate); const options={
-                                                year: 'numeric' , month: 'short' , day: '2-digit' , hour: '2-digit' ,
-                                                minute: '2-digit' }; const
-                                                formattedDate=drawDate.toLocaleDateString('en-US', options); %>
-                                                <%= formattedDate %>
+                                            <%
+const drawDate = new Date(past[i].drawDate);
+const day = drawDate.getDate();
+const month = drawDate.toLocaleString('en-US', { month: 'long' });
+const year = drawDate.getFullYear();
+let hours = drawDate.getHours();
+const minutes = drawDate.getMinutes();
+const ampm = hours >= 12 ? 'PM' : 'AM';
+hours = hours % 12;
+hours = hours ? hours : 12; // Convert 0 to 12
+const formattedDate = `${day} ${month} ${year} ${hours}.${minutes.toString().padStart(2, '0')} ${ampm}`;
+%>
+<%= formattedDate %>
                                         </span>
                                     </div>
                                     <h3 class="card-text card-lottery-name">
