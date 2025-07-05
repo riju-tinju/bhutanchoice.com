@@ -35,10 +35,14 @@ const indexHelper={
       const limitedPast = past.slice(0, 30);
       
       console.log('\nTodays__:\n',todays)
-    //   return res.json({limitedPast})
+    // return res.json({todays,
+    //       upcoming,
+    //       past: limitedPast})
+    let filteredUpcoming=[]
+     filteredUpcoming.push(upcoming[0])
       return res.render('index',{
           todays,
-          upcoming,
+          upcoming:filteredUpcoming,
           past: limitedPast
         })     
     } catch (err) {
