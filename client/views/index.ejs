@@ -14,6 +14,11 @@
             font-family: 'Poppins', sans-serif;
         }
 
+        /* Remove default tap highlight on mobile for all elements */
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
         body {
             background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
             min-height: 100vh;
@@ -912,8 +917,7 @@
                             </script>
 
                             <!-- Load More Button -->
-                            <button onclick="getPastLottories()"
-                                class="load-more-btn w-full text-white py-4 font-semibold flex items-center
+                            <button onclick="getPastLottories()" class="load-more-btn w-full text-white py-4 font-semibold flex items-center
                                 justify-center space-x-2" id="loadmoreBtn">
                                 <i class="fas fa-plus"></i>
                                 <span>Load More Results</span>
@@ -923,7 +927,7 @@
                                     let currentPageNumber = 1;
 
                                     async function getPastLottories() {
-                                        
+
 
                                         try {
                                             const response = await fetch('/api/get-past-lottories', {
@@ -931,7 +935,7 @@
                                                 headers: {
                                                     'Content-Type': 'application/json'
                                                 },
-                                                body: JSON.stringify({ page: currentPageNumber+1 })
+                                                body: JSON.stringify({ page: currentPageNumber + 1 })
                                             });
 
                                             if (!response.ok) {
@@ -949,7 +953,7 @@
                                             const pastLotteries = result.data.items;
                                             console.log(pastLotteries)
                                             renderPastResults(pastLotteries);
-                                            
+
                                             return
                                         } catch (err) {
                                             console.error('Failed to load past lotteries:', err.message);
@@ -1186,27 +1190,27 @@
 
     <script>
         function renderPastResults(pastLotteries) {
-  const container = document.getElementById('past-lottories-container');
-  if (!container) return;
+            const container = document.getElementById('past-lottories-container');
+            if (!container) return;
 
-  pastLotteries.forEach((lottery, i) => {
-    const drawDate = new Date(lottery.drawDate);
-    const formattedDate = drawDate.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+            pastLotteries.forEach((lottery, i) => {
+                const drawDate = new Date(lottery.drawDate);
+                const formattedDate = drawDate.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
 
-    const firstPrize = lottery.prizes.find(p => p.rank === 1);
-    const elementId = `past-${lottery._id}`;
+                const firstPrize = lottery.prizes.find(p => p.rank === 1);
+                const elementId = `past-${lottery._id}`;
 
-    const card = document.createElement('div');
-    card.className = `lottery-card ${lottery.dayName}-card cursor-pointer`;
-    card.setAttribute('onclick', `toggleResult('${elementId}')`);
+                const card = document.createElement('div');
+                card.className = `lottery-card ${lottery.dayName}-card cursor-pointer`;
+                card.setAttribute('onclick', `toggleResult('${elementId}')`);
 
-    card.innerHTML = `
+                card.innerHTML = `
       <div class="flex items-center justify-between">
         <div class="flex-1 card-element-spacing">
           <div class="flex items-center space-x-3">
@@ -1227,10 +1231,10 @@
       <div id="${elementId}" class="card-expand collapsed mt-6">
         <div class="result-container space-y-4">
           ${lottery.prizes.map(prize => {
-            const winner = lottery.winners.find(w => w.prizeRank === prize.rank);
-            const amount = `₹${prize.amount.toLocaleString('en-IN')}/-`;
-            const ticketNumber = winner ? winner.ticketNumber : '-';
-            return `
+                    const winner = lottery.winners.find(w => w.prizeRank === prize.rank);
+                    const amount = `₹${prize.amount.toLocaleString('en-IN')}/-`;
+                    const ticketNumber = winner ? winner.ticketNumber : '-';
+                    return `
               <div class="result-card">
                 <div class="result-card-header">${prize.rank} Prize</div>
                 <div class="result-card-content">
@@ -1239,17 +1243,17 @@
                 </div>
               </div>
             `;
-          }).join('')}
+                }).join('')}
         </div>
       </div>
     `;
 
-    // container.appendChild(card);
-    let loadmoreBtn=document.getElementById('loadmoreBtn')
-     // This will place newCard right before myContainer
-    loadmoreBtn.insertAdjacentElement('beforebegin', card);
-  });
-}
+                // container.appendChild(card);
+                let loadmoreBtn = document.getElementById('loadmoreBtn')
+                // This will place newCard right before myContainer
+                loadmoreBtn.insertAdjacentElement('beforebegin', card);
+            });
+        }
 
     </script>
 </body>
