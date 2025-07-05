@@ -12,7 +12,7 @@
         <% upcoming.forEach((lottery, index) => { 
             // Step 4a: Determine status and countdown
             const isFirst = index === 0;
-            const status = isFirst ? "NEXT" : "UPCOMING";
+            const status = isFirst ? "NEXT DRAW" : "UPCOMING";
             const badgeClass = isFirst ? "next-draw-badge" : "upcoming-badge";
             
             const firstPrize = lottery.prizes.find(p => p.rank === 1);
