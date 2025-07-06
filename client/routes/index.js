@@ -3,6 +3,10 @@ var router = express.Router();
 var startFun= require("../helper/startingHelper")
 var indexFun= require("../helper/indexHelper")
 
+router.get('/time',async function(req, res, next) {
+  res.json({date: new Date()})
+});
+
 /* GET home page. */
 router.get('/',async function(req, res, next) {
   await indexFun.getLotteries(req,res)

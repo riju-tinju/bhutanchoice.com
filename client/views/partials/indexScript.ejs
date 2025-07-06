@@ -1,12 +1,16 @@
 <script>
-    const utcDate = new Date(); // Current UTC time
-const istDate = utcDate.toLocaleString('en-US', { 
-    timeZone: 'Asia/Kolkata',
-    hour12: false 
-});
+    function convertUTCtoIST(utcDate) {
+    // IST is UTC+5:30, so add 5 hours and 30 minutes
+    const istOffset = 5.5 * 60 * 60 * 1000; // 5.5 hours in milliseconds
+    const istTime = new Date(utcDate.getTime() + istOffset);
+    return istTime;
+}
 
-console.log(`UTC Time: ${utcDate.toISOString()}`);
-console.log(`IST Time: ${istDate}`);
+const utcNow = new Date();
+const istNow = convertUTCtoIST(utcNow);
+
+console.log(`UTC Time: ${utcNow.toISOString()}`);
+console.log(`IST Time: ${istNow}`);
     // Step 5a: Countdown management
 function updateCountdowns() {
     // Update today's lotteries countdowns
@@ -18,10 +22,8 @@ function updateCountdowns() {
     
     // Update first upcoming lottery countdown
     <% if (upcoming && upcoming.length > 0) { %>
-        updateSingleCountdown('upcoming-countdown0', '<%= upcoming[0].drawDate.toLocaleString('en-US', { 
-    timeZone: 'Asia/Kolkata',
-    hour12: false 
-}) %>');
+
+        updateSingleCountdown('upcoming-countdown0', '<%= upcoming[0].drawDate %>');
     <% } %>
 }
 
