@@ -890,74 +890,74 @@ const formattedDate = `${day} ${month} ${year} ${hours}.${minutes.toString().pad
                 if (arrow) arrow.style.transform = 'rotate(0deg)';
             }
         }
+        // // Countdown timers
+        // function updateCountdown(elementPrefix, targetDate) {
+        //     const now = new Date().getTime();
+        //     const distance = targetDate - now;
 
-        // Countdown timers
-        function updateCountdown(elementPrefix, targetDate) {
-            const now = new Date().getTime();
-            const distance = targetDate - now;
+        //     if (distance > 0) {
+        //         const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        //         const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        //         const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        //         const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-            if (distance > 0) {
-                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        //         const daysEl = document.getElementById(elementPrefix + '-days');
+        //         const hoursEl = document.getElementById(elementPrefix + '-hours');
+        //         const minutesEl = document.getElementById(elementPrefix + '-minutes');
+        //         const secondsEl = document.getElementById(elementPrefix + '-seconds');
 
-                const daysEl = document.getElementById(elementPrefix + '-days');
-                const hoursEl = document.getElementById(elementPrefix + '-hours');
-                const minutesEl = document.getElementById(elementPrefix + '-minutes');
-                const secondsEl = document.getElementById(elementPrefix + '-seconds');
+        //         if (daysEl) daysEl.textContent = days.toString().padStart(2, '0');
+        //         if (hoursEl) hoursEl.textContent = hours.toString().padStart(2, '0');
+        //         if (minutesEl) minutesEl.textContent = minutes.toString().padStart(2, '0');
+        //         if (secondsEl) secondsEl.textContent = seconds.toString().padStart(2, '0');
+        //     }
+        // }
 
-                if (daysEl) daysEl.textContent = days.toString().padStart(2, '0');
-                if (hoursEl) hoursEl.textContent = hours.toString().padStart(2, '0');
-                if (minutesEl) minutesEl.textContent = minutes.toString().padStart(2, '0');
-                if (secondsEl) secondsEl.textContent = seconds.toString().padStart(2, '0');
-            }
-        }
+        // // Initialize countdowns
+        // const tomorrow = new Date();
+        // tomorrow.setDate(tomorrow.getDate() + 1);
+        // tomorrow.setHours(14, 0, 0, 0);
 
-        // Initialize countdowns
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        tomorrow.setHours(14, 0, 0, 0);
+        // const dayAfter = new Date();
+        // dayAfter.setDate(dayAfter.getDate() + 2);
+        // dayAfter.setHours(14, 0, 0, 0);
 
-        const dayAfter = new Date();
-        dayAfter.setDate(dayAfter.getDate() + 2);
-        dayAfter.setHours(14, 0, 0, 0);
+        // const threeDaysLater = new Date();
+        // threeDaysLater.setDate(threeDaysLater.getDate() + 3);
+        // threeDaysLater.setHours(14, 0, 0, 0);
 
-        const threeDaysLater = new Date();
-        threeDaysLater.setDate(threeDaysLater.getDate() + 3);
-        threeDaysLater.setHours(14, 0, 0, 0);
+        // // Today's results countdown targets
+        // const resultTime1 = new Date();
+        // resultTime1.setHours(resultTime1.getHours() + 2, 30, 45, 0);
 
-        // Today's results countdown targets
-        const resultTime1 = new Date();
-        resultTime1.setHours(resultTime1.getHours() + 2, 30, 45, 0);
+        // const resultTime2 = new Date();
+        // resultTime2.setHours(resultTime2.getHours() + 7, 0, 0, 0);
 
-        const resultTime2 = new Date();
-        resultTime2.setHours(resultTime2.getHours() + 7, 0, 0, 0);
+        // const resultTime3 = new Date();
+        // resultTime3.setDate(resultTime3.getDate() + 1);
+        // resultTime3.setHours(0, 0, 0, 0);
 
-        const resultTime3 = new Date();
-        resultTime3.setDate(resultTime3.getDate() + 1);
-        resultTime3.setHours(0, 0, 0, 0);
+        // // Update countdowns every second
+        // setInterval(() => {
+        //     // Upcoming lotteries
+        //     updateCountdown('countdown1', tomorrow.getTime());
+        //     updateCountdown('countdown2', dayAfter.getTime());
+        //     updateCountdown('countdown3', threeDaysLater.getTime());
 
-        // Update countdowns every second
-        setInterval(() => {
-            // Upcoming lotteries
-            updateCountdown('countdown1', tomorrow.getTime());
-            updateCountdown('countdown2', dayAfter.getTime());
-            updateCountdown('countdown3', threeDaysLater.getTime());
+        //     // Today's results
+        //     updateCountdown('result-countdown1', resultTime1.getTime());
+        //     updateCountdown('result-countdown2', resultTime2.getTime());
+        //     updateCountdown('result-countdown3', resultTime3.getTime());
+        // }, 1000);
 
-            // Today's results
-            updateCountdown('result-countdown1', resultTime1.getTime());
-            updateCountdown('result-countdown2', resultTime2.getTime());
-            updateCountdown('result-countdown3', resultTime3.getTime());
-        }, 1000);
+        // // Initial countdown update
+        // updateCountdown('countdown1', tomorrow.getTime());
+        // updateCountdown('countdown2', dayAfter.getTime());
+        // updateCountdown('countdown3', threeDaysLater.getTime());
+        // updateCountdown('result-countdown1', resultTime1.getTime());
+        // updateCountdown('result-countdown2', resultTime2.getTime());
+        // updateCountdown('result-countdown3', resultTime3.getTime());
 
-        // Initial countdown update
-        updateCountdown('countdown1', tomorrow.getTime());
-        updateCountdown('countdown2', dayAfter.getTime());
-        updateCountdown('countdown3', threeDaysLater.getTime());
-        updateCountdown('result-countdown1', resultTime1.getTime());
-        updateCountdown('result-countdown2', resultTime2.getTime());
-        updateCountdown('result-countdown3', resultTime3.getTime());
 
         // Add bounce effect to cards when they appear
         window.addEventListener('load', function () {
