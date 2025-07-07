@@ -33,9 +33,9 @@
             const badgeClass = isFirst ? "next-draw-badge" : "upcoming-badge";
             
             const firstPrize = lottery.prizes.find(p => p.rank === 1);
-            const drawDate = new Date(lottery.drawDate);
+            const drawDate = new Date(lottery.drawDate.toISOString());
             <!-- const drawDate = new Date(past[i].drawDate); -->
-            const formattedDate = drawTime.toLocaleDateString('en-IN', { // 'en-IN' for India English locale
+            const formattedDate = drawDate.toLocaleDateString('en-IN', { // 'en-IN' for India English locale
   year: 'numeric',
   month: 'short',
   day: '2-digit',
