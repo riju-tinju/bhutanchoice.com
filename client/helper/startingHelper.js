@@ -1126,7 +1126,7 @@ const startFun = {
                 },
                 {
                     'name': 'Monday Choice Weekly Lottery (MOC-6th Draw)',
-                    'drawDate': '2025-07-07T09:00:00',
+                    'drawDate': '2025-07-07T14:30:00',
                     'prizes': [{ 'rank': 1, 'amount': 100000 },
                     { 'rank': 2, 'amount': 10000 },
                     { 'rank': 3, 'amount': 5000 },
