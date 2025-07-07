@@ -635,7 +635,7 @@
       box-shadow: 0 8px 25px rgba(107, 114, 128, 0.4);
     }
 
-    /* Enhanced Modal styles */
+    /* Modal styles */
     .modal {
       display: none;
       position: fixed;
@@ -652,60 +652,27 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
     }
 
     .modal-content {
       background: white;
       border-radius: 16px;
-      max-width: 700px;
-      width: 100%;
-      max-height: 90vh;
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
       overflow-y: auto;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-      position: relative;
     }
 
     .modal-header {
       background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
       color: white;
-      padding: 24px;
+      padding: 20px;
       border-radius: 16px 16px 0 0;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-
-    .modal-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin: 0;
     }
 
     .modal-body {
       padding: 24px;
-    }
-
-    .form-section {
-      margin-bottom: 32px;
-      padding: 20px;
-      background: #F8FAFC;
-      border-radius: 12px;
-      border: 1px solid #E2E8F0;
-    }
-
-    .form-section-title {
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: #374151;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-    }
-
-    .form-section-title i {
-      margin-right: 10px;
-      color: #3B82F6;
     }
 
     .form-group {
@@ -717,32 +684,27 @@
       margin-bottom: 8px;
       font-weight: 600;
       color: #374151;
-      font-size: 0.95rem;
     }
 
     .form-input {
       width: 100%;
-      padding: 12px 16px;
+      padding: 12px;
       border: 2px solid #E5E7EB;
       border-radius: 8px;
       font-size: 1rem;
-      transition: all 0.3s ease;
-      font-family: inherit;
+      transition: border-color 0.3s ease;
     }
 
     .form-input:focus {
       outline: none;
       border-color: #3B82F6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
 
     .form-actions {
       display: flex;
       gap: 12px;
       justify-content: flex-end;
-      margin-top: 32px;
-      padding-top: 20px;
-      border-top: 1px solid #E5E7EB;
+      margin-top: 24px;
     }
 
     .btn {
@@ -752,7 +714,6 @@
       font-weight: 600;
       cursor: pointer;
       transition: all 0.3s ease;
-      font-size: 0.95rem;
     }
 
     .btn-primary {
@@ -760,191 +721,51 @@
       color: white;
     }
 
-    .btn-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-    }
-
     .btn-secondary {
       background: #E5E7EB;
       color: #374151;
     }
 
-    .btn-secondary:hover {
-      background: #D1D5DB;
+    .btn:hover {
       transform: translateY(-1px);
     }
 
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    /* Enhanced Prize Item Design */
     .prize-item {
       display: flex;
-      align-items: center;
+      flex-wrap: wrap;
       gap: 12px;
-      margin-bottom: 16px;
-      padding: 16px;
-      background: white;
-      border-radius: 12px;
-      border: 2px solid #E5E7EB;
-      transition: all 0.3s ease;
-    }
-
-    .prize-item:hover {
-      border-color: #3B82F6;
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
-    }
-
-    .prize-rank-display {
-      background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
-      color: white;
-      padding: 8px 16px;
+      align-items: center;
+      margin-bottom: 12px;
+      padding: 12px;
+      background: #F9FAFB;
       border-radius: 8px;
-      font-weight: 700;
-      font-size: 0.9rem;
-      min-width: 80px;
-      text-align: center;
-      flex-shrink: 0;
     }
 
-    .prize-amount-input {
+    .prize-item input {
       flex: 1;
-      padding: 10px 14px;
-      border: 2px solid #E5E7EB;
-      border-radius: 8px;
-      font-size: 1rem;
-      transition: all 0.3s ease;
-    }
-
-    .prize-amount-input:focus {
-      outline: none;
-      border-color: #3B82F6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      padding: 8px;
+      border: 1px solid #E5E7EB;
+      border-radius: 4px;
     }
 
     .remove-prize {
-      background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+      background: #EF4444;
       color: white;
       border: none;
-      border-radius: 8px;
-      padding: 8px 12px;
+      border-radius: 4px;
+      padding: 6px 12px;
       cursor: pointer;
       font-size: 0.875rem;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      flex-shrink: 0;
-    }
-
-    .remove-prize:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
     }
 
     .add-prize {
-      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+      background: #10B981;
       color: white;
       border: none;
       border-radius: 8px;
-      padding: 12px 24px;
+      padding: 10px 20px;
       cursor: pointer;
       font-weight: 600;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .add-prize:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-    }
-
-    /* Winner Item Design */
-    .winner-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
-      padding: 16px;
-      background: white;
-      border-radius: 12px;
-      border: 2px solid #E5E7EB;
-      transition: all 0.3s ease;
-    }
-
-    .winner-item:hover {
-      border-color: #059669;
-      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.1);
-    }
-
-    .winner-rank-display {
-      background: linear-gradient(135deg, #059669 0%, #047857 100%);
-      color: white;
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-weight: 700;
-      font-size: 0.9rem;
-      min-width: 80px;
-      text-align: center;
-      flex-shrink: 0;
-    }
-
-    .winner-ticket-input {
-      flex: 1;
-      padding: 10px 14px;
-      border: 2px solid #E5E7EB;
-      border-radius: 8px;
-      font-size: 1rem;
-      transition: all 0.3s ease;
-      font-family: "ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New", "monospace";
-      letter-spacing: 1px;
-    }
-
-    .winner-ticket-input:focus {
-      outline: none;
-      border-color: #059669;
-      box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
-    }
-
-    .remove-winner {
-      background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 8px 12px;
-      cursor: pointer;
-      font-size: 0.875rem;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      flex-shrink: 0;
-    }
-
-    .remove-winner:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-    }
-
-    .add-winner {
-      background: linear-gradient(135deg, #059669 0%, #047857 100%);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 12px 24px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .add-winner:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
     }
 
     /* Toast notification */
@@ -973,94 +794,53 @@
       background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
     }
 
-    /* Grid Layout for Form */
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-
-    .form-grid-full {
-      grid-column: span 2;
-    }
-
     /* Mobile Responsive Design */
     @media (max-width: 768px) {
       .lottery-card {
-        padding: 20px !important;
+        padding: 24px !important;
       }
 
       .result-container {
-        padding: 16px !important;
+        padding: 20px !important;
       }
 
       .countdown-badge {
-        min-width: 40px;
-        min-height: 40px;
-        font-size: 0.9rem;
+        min-width: 45px;
+        min-height: 45px;
+        font-size: 1rem;
+      }
+
+      .countdown-container {
+        padding: 14px;
       }
 
       .card-lottery-name {
-        font-size: 1.25rem;
+        font-size: 1.375rem;
       }
 
       .card-date {
-        font-size: 0.9rem;
+        font-size: 1.1rem;
       }
 
       .card-prize {
+        font-size: 1.075rem;
+      }
+
+      .result-prize-amount {
         font-size: 1rem;
+      }
+
+      .result-winning-number {
+        font-size: 1.6rem;
       }
 
       .modal-content {
         width: 95%;
-        max-height: 95vh;
-      }
-
-      .modal-header {
-        padding: 16px;
-      }
-
-      .modal-body {
-        padding: 16px;
       }
 
       .admin-btn {
         padding: 6px 12px;
         font-size: 0.75rem;
-      }
-
-      .form-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .form-grid-full {
-        grid-column: span 1;
-      }
-
-      .prize-item {
-        flex-wrap: wrap;
-      }
-
-      .prize-rank-display {
-        min-width: 60px;
-      }
-
-      .winner-item {
-        flex-wrap: wrap;
-      }
-
-      .winner-rank-display {
-        min-width: 60px;
-      }
-
-      .form-actions {
-        flex-direction: column;
-      }
-
-      .create-btn {
-        padding: 12px 24px;
-        font-size: 1rem;
       }
     }
   </style>
@@ -1087,6 +867,7 @@
         Create New Lottery
       </button>
     </div>
+    
 
     <% 
     // Calculate section order
@@ -1114,8 +895,7 @@
     <%- include('partials/todays-results') %>
     <% } %>
     <%- include('partials/indexScript') %>
-
-  
+    
   </main>
 
   <!-- Settings Button -->
@@ -1123,77 +903,39 @@
     <i class="fas fa-cog"></i>
   </button>
 
-  <!-- Enhanced Create/Edit Lottery Modal -->
+  <!-- Create/Edit Lottery Modal -->
   <div id="lotteryModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2 id="modalTitle" class="modal-title">Create New Lottery</h2>
+        <h2 id="modalTitle">Create New Lottery</h2>
       </div>
       <div class="modal-body">
         <form id="lotteryForm">
-          <!-- Lottery Details Section -->
-          <div class="form-section">
-            <h3 class="form-section-title">
-              <i class="fas fa-info-circle"></i>
-              Lottery Details
-            </h3>
-            
-            <div class="form-grid">
-              <div class="form-group">
-                <label class="form-label">Lottery Name</label>
-                <input type="text" id="lotteryName" class="form-input" required placeholder="e.g., Monday Choice Weekly Lottery">
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">Draw Number</label>
-                <input type="number" id="drawNumber" class="form-input" required min="1" placeholder="e.g., 156">
-              </div>
-
-              <div class="form-group form-grid-full">
-                <label class="form-label">Draw Date & Time</label>
-                <input type="datetime-local" id="drawDate" class="form-input" required>
-              </div>
-            </div>
+          <div class="form-group">
+            <label class="form-label">Lottery Name</label>
+            <input type="text" id="lotteryName" class="form-input" required>
           </div>
 
-          <!-- Prize Structure Section -->
-          <div class="form-section">
-            <h3 class="form-section-title">
-              <i class="fas fa-trophy"></i>
-              Prize Structure
-            </h3>
-            
+          <div class="form-group">
+            <label class="form-label">Draw Number</label>
+            <input type="number" id="drawNumber" class="form-input" required min="1">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Draw Date & Time</label>
+            <input type="datetime-local" id="drawDate" class="form-input" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Prize Structure</label>
             <div id="prizesContainer">
               <div class="prize-item">
-                <div class="prize-rank-display">1st Prize</div>
-                <input type="number" placeholder="Amount (₹)" class="prize-amount-input" required min="0">
-                <button type="button" class="remove-prize" onclick="removePrize(this)">
-                  <i class="fas fa-trash"></i>
-                </button>
+                <input type="number" placeholder="Rank" class="prize-rank" required min="1">
+                <input type="number" placeholder="Amount" class="prize-amount" required min="0">
+                <button type="button" class="remove-prize" onclick="removePrize(this)">Remove</button>
               </div>
             </div>
-            
-            <button type="button" class="add-prize" onclick="addPrize()">
-              <i class="fas fa-plus"></i>
-              Add Prize
-            </button>
-          </div>
-
-          <!-- Winners Section -->
-          <div class="form-section">
-            <h3 class="form-section-title">
-              <i class="fas fa-crown"></i>
-              Winners (Optional)
-            </h3>
-            
-            <div id="winnersContainer">
-              <!-- Winners will be added dynamically -->
-            </div>
-            
-            <button type="button" class="add-winner" onclick="addWinner()">
-              <i class="fas fa-plus"></i>
-              Add Winner
-            </button>
+            <button type="button" class="add-prize" onclick="addPrize()">Add Prize</button>
           </div>
 
           <div class="form-actions">
@@ -1210,8 +952,6 @@
 
   <script>
     let currentEditId = null;
-    let prizeCounter = 1;
-    let winnerCounter = 1;
 
     // Toggle result expansion
     function toggleResult(resultId) {
@@ -1289,6 +1029,7 @@
         if (result.success) {
           showToast('Lottery created successfully!', 'success');
           closeModal();
+          // Refresh page or update UI
           setTimeout(() => {
             window.location.reload();
           }, 1500);
@@ -1320,6 +1061,7 @@
         if (result.success) {
           showToast('Lottery updated successfully!', 'success');
           closeModal();
+          // Refresh page or update UI
           setTimeout(() => {
             window.location.reload();
           }, 1500);
@@ -1350,6 +1092,7 @@
 
         if (result.success) {
           showToast('Lottery deleted successfully!', 'success');
+          // Refresh page or update UI
           setTimeout(() => {
             window.location.reload();
           }, 1500);
@@ -1390,25 +1133,15 @@
       document.getElementById('lotteryForm').reset();
       currentEditId = null;
 
-      // Reset counters
-      prizeCounter = 1;
-      winnerCounter = 1;
-
-      // Clear and setup default prize
+      // Clear prizes container and add default prize
       const prizesContainer = document.getElementById('prizesContainer');
       prizesContainer.innerHTML = `
-        <div class="prize-item">
-          <div class="prize-rank-display">1st Prize</div>
-          <input type="number" placeholder="Amount (₹)" class="prize-amount-input" required min="0">
-          <button type="button" class="remove-prize" onclick="removePrize(this)">
-            <i class="fas fa-trash"></i>
-          </button>
-        </div>
-      `;
-
-      // Clear winners container
-      const winnersContainer = document.getElementById('winnersContainer');
-      winnersContainer.innerHTML = '';
+                <div class="prize-item">
+                    <input type="number" placeholder="Rank" class="prize-rank" required min="1">
+                    <input type="number" placeholder="Amount" class="prize-amount" required min="0">
+                    <button type="button" class="remove-prize" onclick="removePrize(this)">Remove</button>
+                </div>
+            `;
 
       // Load auto-complete data
       const autoCompleteData = await fetchAutoComplete();
@@ -1445,45 +1178,20 @@
       // Fill prizes
       const prizesContainer = document.getElementById('prizesContainer');
       prizesContainer.innerHTML = '';
-      prizeCounter = 0;
 
       if (lotteryData.prizes && lotteryData.prizes.length > 0) {
         lotteryData.prizes.forEach(prize => {
-          prizeCounter++;
           const prizeDiv = document.createElement('div');
           prizeDiv.className = 'prize-item';
           prizeDiv.innerHTML = `
-            <div class="prize-rank-display">${getRankDisplay(prizeCounter)}</div>
-            <input type="number" placeholder="Amount (₹)" class="prize-amount-input" required min="0" value="${prize.amount}">
-            <button type="button" class="remove-prize" onclick="removePrize(this)">
-              <i class="fas fa-trash"></i>
-            </button>
-          `;
+                        <input type="number" placeholder="Rank" class="prize-rank" required min="1" value="${prize.rank}">
+                        <input type="number" placeholder="Amount" class="prize-amount" required min="0" value="${prize.amount}">
+                        <button type="button" class="remove-prize" onclick="removePrize(this)">Remove</button>
+                    `;
           prizesContainer.appendChild(prizeDiv);
         });
       } else {
         addPrize();
-      }
-
-      // Fill winners
-      const winnersContainer = document.getElementById('winnersContainer');
-      winnersContainer.innerHTML = '';
-      winnerCounter = 0;
-
-      if (lotteryData.winners && lotteryData.winners.length > 0) {
-        lotteryData.winners.forEach(winner => {
-          winnerCounter++;
-          const winnerDiv = document.createElement('div');
-          winnerDiv.className = 'winner-item';
-          winnerDiv.innerHTML = `
-            <div class="winner-rank-display">${getRankDisplay(winnerCounter)}</div>
-            <input type="text" placeholder="Ticket Number" class="winner-ticket-input" value="${winner.ticketNumber}">
-            <button type="button" class="remove-winner" onclick="removeWinner(this)">
-              <i class="fas fa-trash"></i>
-            </button>
-          `;
-          winnersContainer.appendChild(winnerDiv);
-        });
       }
 
       document.getElementById('lotteryModal').classList.add('show');
@@ -1496,17 +1204,14 @@
 
     // Prize Management
     function addPrize() {
-      prizeCounter++;
       const prizesContainer = document.getElementById('prizesContainer');
       const prizeDiv = document.createElement('div');
       prizeDiv.className = 'prize-item';
       prizeDiv.innerHTML = `
-        <div class="prize-rank-display">${getRankDisplay(prizeCounter)}</div>
-        <input type="number" placeholder="Amount (₹)" class="prize-amount-input" required min="0">
-        <button type="button" class="remove-prize" onclick="removePrize(this)">
-          <i class="fas fa-trash"></i>
-        </button>
-      `;
+                <input type="number" placeholder="Rank" class="prize-rank" required min="1">
+                <input type="number" placeholder="Amount" class="prize-amount" required min="0">
+                <button type="button" class="remove-prize" onclick="removePrize(this)">Remove</button>
+            `;
       prizesContainer.appendChild(prizeDiv);
     }
 
@@ -1514,56 +1219,9 @@
       const prizesContainer = document.getElementById('prizesContainer');
       if (prizesContainer.children.length > 1) {
         button.parentElement.remove();
-        updatePrizeRanks();
       } else {
         showToast('At least one prize is required', 'error');
       }
-    }
-
-    function updatePrizeRanks() {
-      const prizeItems = document.querySelectorAll('.prize-item');
-      prizeCounter = 0;
-      prizeItems.forEach(item => {
-        prizeCounter++;
-        item.querySelector('.prize-rank-display').textContent = getRankDisplay(prizeCounter);
-      });
-    }
-
-    // Winner Management
-    function addWinner() {
-      winnerCounter++;
-      const winnersContainer = document.getElementById('winnersContainer');
-      const winnerDiv = document.createElement('div');
-      winnerDiv.className = 'winner-item';
-      winnerDiv.innerHTML = `
-        <div class="winner-rank-display">${getRankDisplay(winnerCounter)}</div>
-        <input type="text" placeholder="Ticket Number" class="winner-ticket-input">
-        <button type="button" class="remove-winner" onclick="removeWinner(this)">
-          <i class="fas fa-trash"></i>
-        </button>
-      `;
-      winnersContainer.appendChild(winnerDiv);
-    }
-
-    function removeWinner(button) {
-      button.parentElement.remove();
-      updateWinnerRanks();
-    }
-
-    function updateWinnerRanks() {
-      const winnerItems = document.querySelectorAll('.winner-item');
-      winnerCounter = 0;
-      winnerItems.forEach(item => {
-        winnerCounter++;
-        item.querySelector('.winner-rank-display').textContent = getRankDisplay(winnerCounter);
-      });
-    }
-
-    // Helper Functions
-    function getRankDisplay(rank) {
-      const suffixes = ['th', 'st', 'nd', 'rd'];
-      const v = rank % 100;
-      return rank + (suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0]) + ' Prize';
     }
 
     // Form Submission
@@ -1574,30 +1232,18 @@
         name: document.getElementById('lotteryName').value,
         drawNumber: parseInt(document.getElementById('drawNumber').value),
         drawDate: new Date(document.getElementById('drawDate').value).toISOString(),
-        prizes: [],
-        winners: []
+        prizes: []
       };
 
       // Collect prizes
       const prizeItems = document.querySelectorAll('.prize-item');
-      prizeItems.forEach((item, index) => {
-        const amount = parseInt(item.querySelector('.prize-amount-input').value);
-        if (amount) {
+      prizeItems.forEach(item => {
+        const rank = parseInt(item.querySelector('.prize-rank').value);
+        const amount = parseInt(item.querySelector('.prize-amount').value);
+        if (rank && amount) {
           formData.prizes.push({
-            rank: index + 1,
-            amount: amount
-          });
-        }
-      });
-
-      // Collect winners
-      const winnerItems = document.querySelectorAll('.winner-item');
-      winnerItems.forEach((item, index) => {
-        const ticketNumber = item.querySelector('.winner-ticket-input').value.trim();
-        if (ticketNumber) {
-          formData.winners.push({
-            ticketNumber: ticketNumber,
-            prizeRank: index + 1
+            rank,
+            amount
           });
         }
       });
