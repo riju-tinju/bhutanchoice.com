@@ -39,7 +39,11 @@ const indexHelper = {
       //       upcoming,
       //       past: limitedPast})
       let filteredUpcoming = []
-      filteredUpcoming.push(upcoming[0])
+      if (upcoming.length > 0) filteredUpcoming.push(upcoming[0])
+      
+      // return res.json({todays,
+      //       upcoming: filteredUpcoming || [],
+      //       past: limitedPast})
       return res.render('index', {
         todays,
         upcoming: filteredUpcoming,

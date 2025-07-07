@@ -1,4 +1,18 @@
-
+<% if (!upcoming || upcoming.length === 0) { %>
+    <section>
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-bold section-title flex items-center">
+                <i class="fas fa-clock text-orange-500 mr-2 text-xl"></i>
+                Upcoming Lottery
+            </h2>
+        </div>
+        <div class="text-center py-8">
+            <p class="text-gray-500">No upcoming lotteries found</p>
+        </div>
+    </section>
+<% } else { %>
+    <!-- Your existing code for when there are upcoming lotteries -->
+       
 <!-- partials/upcoming-lotteries.ejs -->
 <% if (upcoming && upcoming.length > 0) { %>
 <section>
@@ -101,3 +115,6 @@ const formattedDate = `${day} ${month} ${year} ${hours}.${minutes.toString().pad
     </div>
 </section>
 <% } %>
+    <!-- ... -->
+<% } %>
+
