@@ -15,7 +15,7 @@ function updateCountdowns() {
     // Update first upcoming lottery countdown
     <% if (upcoming && upcoming.length > 0) { %>
 
-        updateSingleCountdown('upcoming-countdown0', '<%= upcoming[0].drawDate.toISOString() %>');
+        updateSingleCountdown('upcoming-countdown0', '<%= upcoming[0].drawDate %>');
     <% } %>
    
 
