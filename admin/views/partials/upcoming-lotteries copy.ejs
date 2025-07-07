@@ -35,16 +35,15 @@
             const firstPrize = lottery.prizes.find(p => p.rank === 1);
             const drawDate = new Date(lottery.drawDate);
             <!-- const drawDate = new Date(past[i].drawDate); -->
-const day = drawDate.getDate();
-const month = drawDate.toLocaleString('en-US', { month: 'long' });
-const year = drawDate.getFullYear();
-let hours = drawDate.getHours();
-const minutes = drawDate.getMinutes();
-const ampm = hours >= 12 ? 'PM' : 'AM';
-hours = hours % 12;
-hours = hours ? hours : 12; // Convert 0 to 12
-const formattedDate = `${day} ${month} ${year} ${hours}.${minutes.toString().padStart(2, '0')} ${ampm}`;
-%>
+            const formattedDate = drawTime.toLocaleDateString('en-IN', { // 'en-IN' for India English locale
+  year: 'numeric',
+  month: 'short',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: true,
+  timeZone: 'Asia/Kolkata' // Specify the timezone for India Standard Time
+}).replace(',', '');
         %>
         
         <div class="lottery-card <%=lottery.dayName %>-card cursor-pointer" onclick="toggleResult('upcoming<%= index %>')">
