@@ -1,0 +1,86 @@
+<script>
+   
+    // Step 5a: Countdown management
+function updateCountdowns() {
+    // Update today's lotteries countdowns
+    <% if (todays) { %>
+    <% todays.forEach((lottery, index) => { %>
+        updateSingleCountdown('today-countdown<%= index %>', '<%= lottery.drawDate %>');
+    <% }); %>
+    <% } %>
+    
+    // Update first upcoming lottery countdown
+    // <% if (upcoming && upcoming.length > 0) { %>
+
+    //     updateSingleCountdown('upcoming-countdown0', '<%= upcoming[0].drawDate %>');
+    // <% } %>
+
+    <% if (upcoming && upcoming.length > 0) { %>
+    <% 
+        const modifiedDate = new Date(upcoming[0].drawDate);
+        modifiedDate.setHours(modifiedDate.getHours() + 5);
+        modifiedDate.setMinutes(modifiedDate.getMinutes() + 30);
+    %>
+    updateSingleCountdown('upcoming-countdown0', '<%= modifiedDate.toISOString() %>');
+<% } %>
+    
+}
+
+function updateSingleCountdown(prefix, targetDateStr) {
+    const now = new Date().getTime();
+    const targetDate = new Date(targetDateStr).getTime();
+    const distance = targetDate - now;
+
+    if (distance > 0) {
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        const daysEl = document.getElementById(prefix + '-days');
+        const hoursEl = document.getElementById(prefix + '-hours');
+        const minutesEl = document.getElementById(prefix + '-minutes');
+        const secondsEl = document.getElementById(prefix + '-seconds');
+
+        if (daysEl) daysEl.textContent = days.toString().padStart(2, '0');
+        if (hoursEl) hoursEl.textContent = hours.toString().padStart(2, '0');
+        if (minutesEl) minutesEl.textContent = minutes.toString().padStart(2, '0');
+        if (secondsEl) secondsEl.textContent = seconds.toString().padStart(2, '0');
+    }
+}
+
+// Step 5b: Refresh results function
+async function refreshResults(lotteryId) {
+    const button = document.getElementById(`refresh-${lotteryId}`);
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Refreshing...';
+    
+    try {
+        const response = await fetch('/api/refresh-results', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ lotteryId })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // Reload page to show updated results
+            window.location.reload();
+        } else {
+            throw new Error(result.message || 'Failed to refresh');
+        }
+    } catch (error) {
+        console.error('Refresh failed:', error);
+        button.innerHTML = '<i class="fas fa-exclamation-triangle mr-1"></i>Try Again';
+        button.disabled = false;
+    }
+}
+
+// Step 5c: Initialize
+setInterval(updateCountdowns, 1000);
+updateCountdowns(); // Initial call
+
+</script>

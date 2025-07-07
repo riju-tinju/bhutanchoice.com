@@ -1112,7 +1112,7 @@ const startFun = {
                 },
                 {
                     'name': 'Sunday Choice Weekly Lottery (SUC-6th Draw)',
-                    'drawDate': '2025-07-06T09:00:00+05:30',
+                    'drawDate': '2025-07-06T09:00:00',
                     'prizes': [{ 'rank': 1, 'amount': 100000 },
                     { 'rank': 2, 'amount': 10000 },
                     { 'rank': 3, 'amount': 5000 },
@@ -1126,7 +1126,7 @@ const startFun = {
                 },
                 {
                     'name': 'Monday Choice Weekly Lottery (MOC-6th Draw)',
-                    'drawDate': '2025-07-07T09:00:00+05:30',
+                    'drawDate': '2025-07-07T09:00:00',
                     'prizes': [{ 'rank': 1, 'amount': 100000 },
                     { 'rank': 2, 'amount': 10000 },
                     { 'rank': 3, 'amount': 5000 },
@@ -1140,7 +1140,7 @@ const startFun = {
                 },
                 {
                     'name': 'Tuesday Choice Weekly Lottery (TUC-6th Draw)',
-                    'drawDate': '2025-07-08T09:00:00+05:30',
+                    'drawDate': '2025-07-08T09:00:00',
                     'prizes': [{ 'rank': 1, 'amount': 100000 },
                     { 'rank': 2, 'amount': 10000 },
                     { 'rank': 3, 'amount': 5000 },

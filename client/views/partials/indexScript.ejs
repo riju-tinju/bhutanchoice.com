@@ -18,8 +18,8 @@ function updateCountdowns() {
     <% if (upcoming && upcoming.length > 0) { %>
     <% 
         const modifiedDate = new Date(upcoming[0].drawDate);
-        modifiedDate.setHours(modifiedDate.getHours() + 5);
-        modifiedDate.setMinutes(modifiedDate.getMinutes() + 30);
+        modifiedDate.setHours(modifiedDate.getHours() - 5);
+        modifiedDate.setMinutes(modifiedDate.getMinutes() - 30);
     %>
     updateSingleCountdown('upcoming-countdown0', '<%= modifiedDate.toISOString() %>');
 <% } %>
