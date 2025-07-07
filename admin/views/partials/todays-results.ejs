@@ -93,7 +93,7 @@
                     <!-- Status badge -->
                     <div class="flex flex-wrap items-center"  style="row-gap: 9px; column-gap: 20px;">
                         <span class="<%= badgeClass %> rounded-full"><%= status %></span>
-                        <span class="card-text-secondary card-date"><%= formattedDate %></span>
+                        <span class="card-text-secondary card-date"><%= lottery.drawDate.toISOString() %></span>
                     </div>
                     
                     <!-- Lottery name -->
