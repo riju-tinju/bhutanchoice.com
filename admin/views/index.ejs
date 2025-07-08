@@ -1471,6 +1471,16 @@
     async function editLottery(id) {
       const lotteryData = await getLotteryById(id);
       if (!lotteryData) return;
+      // custom
+      lotteryData.drawDate=lotteryData.drawDate.toLocaleDateString('en-IN', { // 'en-IN' for India English locale
+  year: 'numeric',
+  month: 'short',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: true,
+  timeZone: 'Asia/Kolkata' // Specify the timezone for India Standard Time
+}).replace(',', '');
 
       document.getElementById('modalTitle').textContent = 'Edit Lottery';
       document.getElementById('submitBtn').textContent = 'Update Lottery';
