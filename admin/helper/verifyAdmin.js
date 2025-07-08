@@ -9,6 +9,7 @@ const verifyAdmin = async (req, res, next) => {
     // }
     // req.session.admin={id:'685dbdec92ae3669fbfb7b01'}// For testing purposes, remove this line in production
     if (req.session.admin && req.session.admin.id) {
+      
       return next(); // Authenticated user
     }
 

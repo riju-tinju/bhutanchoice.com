@@ -428,67 +428,7 @@
   <main class="px-4 py-6 space-y-8 max-w-4xl mx-auto">
     
     <!-- Website Settings Section -->
-    <section class="settings-card">
-      <h2 class="section-title">
-        <i class="fas fa-globe"></i>
-        Website Settings
-      </h2>
-
-      <form id="websiteForm">
-        <!-- Logo Upload -->
-        <div class="form-group">
-          <label class="form-label">
-            <i class="fas fa-image mr-2"></i>
-            Website Logo
-          </label>
-          <div class="logo-upload-area" onclick="document.getElementById('logoInput').click()">
-            <img id="currentLogo" class="current-logo" style="display: none;" alt="Current Logo">
-            <div id="uploadPlaceholder">
-              <i class="fas fa-cloud-upload-alt upload-icon"></i>
-              <div class="upload-text">Click to upload or drag and drop</div>
-              <div class="upload-hint">PNG, JPG, SVG up to 2MB</div>
-            </div>
-            <input type="file" id="logoInput" accept="image/*" style="display: none;">
-          </div>
-        </div>
-
-        <!-- SEO Settings -->
-        <div class="form-grid">
-          <div class="form-group">
-            <label class="form-label">
-              <i class="fas fa-tag mr-2"></i>
-              SEO Title
-            </label>
-            <input type="text" id="seoTitle" class="form-input" placeholder="Enter SEO title" maxlength="60">
-            <div class="text-sm text-gray-500 mt-1" id="titleCounter">0/60 characters</div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">
-              <i class="fas fa-link mr-2"></i>
-              Website URL
-            </label>
-            <input type="url" id="websiteUrl" class="form-input" placeholder="https://example.com" readonly>
-          </div>
-
-          <div class="form-group form-grid-full">
-            <label class="form-label">
-              <i class="fas fa-file-alt mr-2"></i>
-              Meta Description
-            </label>
-            <textarea id="metaDescription" class="form-input form-textarea" placeholder="Enter meta description for search engines" maxlength="160"></textarea>
-            <div class="text-sm text-gray-500 mt-1" id="descCounter">0/160 characters</div>
-          </div>
-        </div>
-
-        <div class="flex justify-end">
-          <button type="submit" class="btn btn-primary" id="saveWebsiteBtn">
-            <i class="fas fa-save"></i>
-            Save Website Settings
-          </button>
-        </div>
-      </form>
-    </section>
+    <!-- Here You can place the metadata setting form using partial metaSettingPartial.ejs -->
 
     <!-- Admin Account Settings Section -->
     <section class="settings-card">
