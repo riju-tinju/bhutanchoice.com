@@ -45,9 +45,9 @@ const indexHelper = {
       //       upcoming: filteredUpcoming || [],
       //       past: limitedPast})
       return res.render('index', {
-        todays,
-        upcoming: filteredUpcoming,
-        past: limitedPast
+        todays : todays || [],
+        upcoming: filteredUpcoming || [],
+        past: limitedPast || [],
       })
     } catch (err) {
       console.error("Error fetching lotteries:", err);
