@@ -43,6 +43,10 @@ const settingHelper = {
                 return res.status(404).json({ success: false, message: 'Admin not found' });
             }
 
+            if(!currentPassword) {
+                return res.status(400).json({ success: false, message: 'Current password is required' });
+            }
+
             // Compare currentPassword with stored hashed password
             const isMatch = await bcrypt.compare(currentPassword, admin.password);
             if (!isMatch) {
