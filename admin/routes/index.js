@@ -30,14 +30,14 @@ router.get('/api/lottery-autocomplete', async function (req, res, next) {
   let response = {
     "success": true,
     "data": {
-      "suggestedName": "Tuesday Choice Weekly Lottery (TUC-7th Draw)",
-      "nextDrawNumber": 7,
-      "suggestedDate": "2025-07-08T14:00:00.000Z",
+      "suggestedName": "",
+      "nextDrawNumber": '',
+      "suggestedDate": "",
       "dayName": "Tuesday",
       "lastLottery": {
-        "name": "Monday Choice Weekly Lottery (MON-6th Draw)",
+        "name": "",
         "drawNumber": 6,
-        "drawDate": "2025-07-07T14:00:00.000Z"
+        "drawDate": ""
       }
     }
   }
