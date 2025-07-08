@@ -61,4 +61,8 @@ router.get('/api/lottery/:id', async function (req, res, next) {
 router.delete('/api/lottery/:id', async function (req, res, next) {
   await indexFun.deleteLottery(req, res)
 })
+
+router.get('/admin-login', function(req, res, next) {
+    res.render('pages/Auth/admin-login', )
+});
 module.exports = router;

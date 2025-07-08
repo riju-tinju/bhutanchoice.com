@@ -4,13 +4,24 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var adminAuthRouter = require('./routes/adminAuth');// custom
 
 require("dotenv").config();// custom
 const db = require("./config/connection");// custom
 db.DBconnect();// custom
 var app = express();
+
+//custom
+const session = require('express-session');
+app.use(session({
+  secret: 'your-secret-key',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false } // set to true only with HTTPS
+}));
 
 
 // view engine setup
@@ -23,7 +34,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
+app.use('/', adminAuthRouter); // custom route for admin authentication
+let verifyAdmin = require("./helper/verifyAdmin");// custom
+app.use('/',verifyAdmin, indexRouter);
 app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
