@@ -1065,47 +1065,47 @@
       }
     }
 
-     /* Mobile Responsive Design */
-        @media (max-width: 768px) {
-            .lottery-card {
-                padding: 24px !important;
-            }
+    /* Mobile Responsive Design */
+    @media (max-width: 768px) {
+      .lottery-card {
+        padding: 24px !important;
+      }
 
-            .result-container {
-                padding: 20px !important;
-            }
+      .result-container {
+        padding: 20px !important;
+      }
 
-            .countdown-badge {
-                min-width: 45px;
-                min-height: 45px;
-                font-size: 1rem;
-            }
+      .countdown-badge {
+        min-width: 45px;
+        min-height: 45px;
+        font-size: 1rem;
+      }
 
-            .countdown-container {
-                padding: 14px;
-            }
+      .countdown-container {
+        padding: 14px;
+      }
 
-            .card-lottery-name {
-                font-size: 1.375rem;
-            }
+      .card-lottery-name {
+        font-size: 1.375rem;
+      }
 
-            .card-date {
-                font-size: 1.1rem;
-            }
+      .card-date {
+        font-size: 1.1rem;
+      }
 
-            .card-prize {
-                font-size: 1.075rem;
-            }
+      .card-prize {
+        font-size: 1.075rem;
+      }
 
-            .result-prize-amount {
-                font-size: 1rem;
-            }
+      .result-prize-amount {
+        font-size: 1rem;
+      }
 
-            .result-winning-number {
-                font-size: 1.6rem;
+      .result-winning-number {
+        font-size: 1.6rem;
 
-            }
-        }
+      }
+    }
   </style>
 </head>
 
@@ -1158,7 +1158,7 @@
     <% } %>
     <%- include('partials/indexScript') %>
 
-      <%- include('partials/past') %>
+    <%- include('partials/past') %>
   </main>
 
   <!-- Settings Button -->
@@ -1180,7 +1180,7 @@
               <i class="fas fa-info-circle"></i>
               Lottery Details
             </h3>
-            
+
             <div class="form-grid">
               <div class="form-group">
                 <label class="form-label">Lottery Name</label>
@@ -1205,7 +1205,7 @@
               <i class="fas fa-trophy"></i>
               Prize Structure
             </h3>
-            
+
             <div id="prizesContainer">
               <div class="prize-item">
                 <div class="prize-rank-display">1st Prize</div>
@@ -1215,7 +1215,7 @@
                 </button>
               </div>
             </div>
-            
+
             <button type="button" class="add-prize" onclick="addPrize()">
               <i class="fas fa-plus"></i>
               Add Prize
@@ -1228,11 +1228,11 @@
               <i class="fas fa-crown"></i>
               Winners (Optional)
             </h3>
-            
+
             <div id="winnersContainer">
               <!-- Winners will be added dynamically -->
             </div>
-            
+
             <button type="button" class="add-winner" onclick="addWinner()">
               <i class="fas fa-plus"></i>
               Add Winner
@@ -1472,6 +1472,7 @@
       const lotteryData = await getLotteryById(id);
       if (!lotteryData) return;
 
+
       document.getElementById('modalTitle').textContent = 'Edit Lottery';
       document.getElementById('submitBtn').textContent = 'Update Lottery';
       currentEditId = id;
@@ -1480,17 +1481,21 @@
       document.getElementById('lotteryName').value = lotteryData.name || '';
       document.getElementById('drawNumber').value = lotteryData.drawNumber || '';
 
+      // if (lotteryData.drawDate) {
+      //   const date = new Date(lotteryData.drawDate);
+      //   document.getElementById('drawDate').value = date.toISOString().slice(0, 16);
+      // }
       if (lotteryData.drawDate) {
-        const date = new Date(lotteryData.drawDate);
-        document.getElementById('drawDate').value = date.toLocaleDateString('en-IN', { // 'en-IN' for India English locale
-  year: 'numeric',
-  month: 'short',
-  day: '2-digit',
-  hour: '2-digit',
-  minute: '2-digit',
-  hour12: true,
-  timeZone: 'Asia/Kolkata' // Specify the timezone for India Standard Time
-}).replace(',', '');
+        const utcDate = new Date(lotteryData.drawDate);
+
+        // Convert to IST by adding 5.5 hours (19800 seconds)
+        const istOffset = 5.5 * 60 * 60 * 1000;
+        const istDate = new Date(utcDate.getTime() + istOffset);
+
+        // Format for input[type="datetime-local"]
+        const formattedIST = istDate.toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
+
+        document.getElementById('drawDate').value = formattedIST;
       }
 
       // Fill prizes
