@@ -25,7 +25,6 @@ router.get('/create-dummy-lottories', async function (req, res, next) {
   }
 });
 
-
 router.get('/api/lottery-autocomplete', async function (req, res, next) {
   let response = {
     "success": true,
