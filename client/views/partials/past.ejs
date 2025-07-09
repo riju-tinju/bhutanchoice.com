@@ -31,14 +31,14 @@ const minutes = drawDate.getMinutes();
 const ampm = hours >= 12 ? 'PM' : 'AM';
 hours = hours % 12;
 hours = hours ? hours : 12; // Convert 0 to 12
-const formattedDate = drawDate.toLocaleDateString('en-IN', { // 'en-IN' for India English locale
+const formattedDate = drawDate.toLocaleDateString('en-BT', { // 'en-IN' for India English locale
   year: 'numeric',
   month: 'short',
   day: '2-digit',
   hour: '2-digit',
   minute: '2-digit',
   hour12: true,
-  timeZone: 'Asia/Kolkata' // Specify the timezone for India Standard Time
+  timeZone: 'Asia/Thimphu' // Specify the timezone for India Standard Time
 }).replace(',', '');
 %>
 <%= formattedDate %>

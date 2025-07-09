@@ -1107,6 +1107,9 @@
       }
     }
   </style>
+  <!-- Adding Moment.js for Date Convertion Management -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.34/moment-timezone-with-data.min.js"></script>
 </head>
 
 <body>
@@ -1481,15 +1484,12 @@
       document.getElementById('lotteryName').value = lotteryData.name || '';
       document.getElementById('drawNumber').value = lotteryData.drawNumber || '';
 
-      // if (lotteryData.drawDate) {
-      //   const date = new Date(lotteryData.drawDate);
-      //   document.getElementById('drawDate').value = date.toISOString().slice(0, 16);
-      // }
+
       if (lotteryData.drawDate) {
         const utcDate = new Date(lotteryData.drawDate);
 
         // Convert to IST by adding 5.5 hours (19800 seconds)
-        const istOffset = 5.5 * 60 * 60 * 1000;
+        const istOffset = 6 * 60 * 60 * 1000;
         const istDate = new Date(utcDate.getTime() + istOffset);
 
         // Format for input[type="datetime-local"]
@@ -1626,10 +1626,28 @@
     document.getElementById('lotteryForm').addEventListener('submit', function(e) {
       e.preventDefault();
 
+      //Date convertion before sending to server
+      const selectedDateTimeLocalString = document.getElementById('drawDate').value; // e.g., "2025-07-09T09:00"
+
+      let drawDateUTC;
+
+      if (selectedDateTimeLocalString) {
+        // Step 1: Parse the string *as if it's already in Bhutan Time (BTT)*
+        const intendedBTTMoment = moment.tz(selectedDateTimeLocalString, 'YYYY-MM-DDTHH:mm', 'Asia/Thimphu');
+
+        // Step 2: Convert this Bhutan Time moment to UTC
+        drawDateUTC = intendedBTTMoment.utc().toISOString();
+        // Example: "2025-07-09T09:00" BTT → "2025-07-09T03:00:00.000Z" UTC
+      } else {
+        console.error("Draw Date/Time is required.");
+        return; // Stop execution if no input
+      }
+
       const formData = {
         name: document.getElementById('lotteryName').value,
         drawNumber: parseInt(document.getElementById('drawNumber').value),
-        drawDate: new Date(document.getElementById('drawDate').value).toISOString(),
+        // drawDate: new Date(document.getElementById('drawDate').value).toISOString(),
+        drawDate: drawDateUTC, // Use the converted UTC date
         prizes: [],
         winners: []
       };
