@@ -2,11 +2,12 @@ const moment = require('moment-timezone');
 const Lottery = require('../model/lotterySchema'); // Your model
 
 const indexHelper={
- getLotteries1: async (req, res) => {
+ getLotteries: async (req, res) => {
     try {
       const allLotteries = await Lottery.find({});
 
-      const today = new Date();
+      // const today = new Date();
+      const today = moment().tz('Asia/Thimphu').toDate();
         console.log("Today:", today);
       today.setHours(0, 0, 0, 0); // Start of today
       const tomorrow = new Date(today);
