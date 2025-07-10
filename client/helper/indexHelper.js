@@ -2,7 +2,7 @@ const moment = require('moment-timezone');
 const Lottery = require('../model/lotterySchema'); // Your model
 
 const indexHelper={
- getLotteries: async (req, res) => {
+ getLotteries1: async (req, res) => {
     try {
       const allLotteries = await Lottery.find({});
 
@@ -52,13 +52,14 @@ const indexHelper={
       return res.status(500).json({ success: false, message: 'An error occurred while fetching lotteries.' });
     }
   },
-  getPastLotteries1: async (req, res) => {
+  getPastLotteries: async (req, res) => {
     try {
       const page = parseInt(req.body.page) || 1;
       const limit = 7;
       const skip = (page - 1) * limit;
 
-      const today = new Date();
+      // const today = new Date();
+      const today = moment().tz('Asia/Thimphu').toDate();
       today.setHours(0, 0, 0, 0); // Start of today
 
       // Fetch total count (optional, for frontend pagination)
