@@ -318,7 +318,8 @@
         .live-badge {
             background: linear-gradient(45deg, #10B981, #34D399);
             color: white;
-            animation: pulse 2s infinite;
+            /* animation: pulse 2s infinite; */
+             animation: blink-badge .6s ease-in-out infinite;
             font-size: 0.875rem;
             font-weight: 800;
             padding: 6px 12px;
@@ -341,6 +342,28 @@
             font-weight: 800;
             padding: 6px 12px;
         }
+
+
+
+        @keyframes blink-badge {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+        background: white;
+        color: red;
+        box-shadow: 0 0 0 rgba(16, 185, 129, 0);
+    }
+    
+    100% {
+        transform: scale(1.03);
+        opacity: 1;
+        background: red;
+        color:  white;
+        box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+    }
+
+}
+
 
         @keyframes pulse {
 

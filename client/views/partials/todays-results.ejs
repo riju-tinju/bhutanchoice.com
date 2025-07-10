@@ -76,15 +76,25 @@
             }
             
             const firstPrize = lottery.prizes.find(p => p.rank === 1);
-            const formattedDate = drawTime.toLocaleDateString('en-BT', { // 'en-BT' for Bhutan English locale
-  year: 'numeric',
-  month: 'short',
-  day: '2-digit',
-  hour: '2-digit',
-  minute: '2-digit',
-  hour12: true,
-  timeZone: 'Asia/Thimphu' // Bhutan uses Asia/Thimphu timezone
-}).replace(',', '');
+            const formatDate = (isoDateString) => {
+    const date = new Date(isoDateString);
+
+    const options = {
+      timeZone: 'Asia/Thimphu',
+      year: 'numeric',
+      month: 'short',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    };
+
+    // Use Intl.DateTimeFormat directly for better control
+    const formatter = new Intl.DateTimeFormat('en-US', options);
+    return formatter.format(date).replace(',', '');
+  };
+
+  const formattedDate = formatDate(lottery.drawDate);
         %>
         
         <!-- Step 3b: Render lottery card -->
