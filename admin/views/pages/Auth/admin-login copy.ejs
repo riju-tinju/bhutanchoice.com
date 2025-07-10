@@ -409,6 +409,24 @@
 </head>
 
 <body>
+  <!-- Header -->
+  <!-- <header class="app-header text-white relative">
+    <div class="px-6 py-5">
+      <div class="flex items-center justify-center">
+        <div class="flex items-center space-x-3">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfvxp4SnnjaYyFQDP8d5D660XMvy4nQfc08ScgqFq3IjufpC1OH-ykrQ6v-SkPsuVCt7w&usqp=CAU" style="height: 34px; width: 34px; border-radius: 50%;" alt="Logo">
+          <h1 class="text-xl font-bold drop-shadow-lg tracking-wide">Bhutan State Lotteries</h1>
+        </div>
+      </div>
+    </div> -->
+    
+    <!-- Back to Site Button -->
+    <!-- <a href="/" class="back-to-site">
+      <i class="fas fa-arrow-left"></i>
+      Back to Site
+    </a>
+  </header> -->
+
   <!-- Login Container -->
   <div class="login-container">
     <div class="login-card bounce-in">
@@ -424,22 +442,22 @@
 
       <form id="loginForm">
         <div class="form-group">
-          <label class="form-label" for="adminEmail">
-            <i class="fas fa-envelope mr-2"></i>
-            Administrator Email
+          <label class="form-label" for="adminName">
+            <i class="fas fa-user mr-2"></i>
+            Administrator Name
           </label>
           <div class="relative">
-            <i class="fas fa-envelope input-icon"></i>
+            <i class="fas fa-user input-icon"></i>
             <input 
-              type="email" 
-              id="adminEmail" 
+              type="text" 
+              id="adminName" 
               class="form-input" 
-              placeholder="Enter your admin email"
+              placeholder="Enter your admin name"
               required
-              autocomplete="email"
+              autocomplete="username"
             >
           </div>
-          <div id="emailError" class="error-message" style="display: none;"></div>
+          <div id="nameError" class="error-message" style="display: none;"></div>
         </div>
 
         <div class="form-group">
@@ -489,12 +507,12 @@
   <script>
     // DOM Elements
     const loginForm = document.getElementById('loginForm');
-    const adminEmail = document.getElementById('adminEmail');
+    const adminName = document.getElementById('adminName');
     const adminPassword = document.getElementById('adminPassword');
     const passwordToggle = document.getElementById('passwordToggle');
     const loginBtn = document.getElementById('loginBtn');
     const loginBtnText = document.getElementById('loginBtnText');
-    const emailError = document.getElementById('emailError');
+    const nameError = document.getElementById('nameError');
     const passwordError = document.getElementById('passwordError');
     const loginError = document.getElementById('loginError');
     const loginSuccess = document.getElementById('loginSuccess');
@@ -527,15 +545,15 @@
     }
 
     // Real-time validation
-    adminEmail.addEventListener('input', function() {
+    adminName.addEventListener('input', function() {
       if (this.value.trim()) {
-        validateInput(this, emailError, 
-          (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
-          'Please enter a valid email address'
+        validateInput(this, nameError, 
+          (value) => value.length >= 2 && /^[a-zA-Z\s]+$/.test(value),
+          'Name must be at least 2 characters and contain only letters'
         );
       } else {
         this.classList.remove('error', 'success');
-        emailError.style.display = 'none';
+        nameError.style.display = 'none';
       }
     });
 
@@ -560,9 +578,9 @@
       loginSuccess.style.display = 'none';
       
       // Validate inputs
-      const isEmailValid = validateInput(adminEmail, emailError,
-        (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
-        'Please enter a valid email address'
+      const isNameValid = validateInput(adminName, nameError,
+        (value) => value.length >= 2 && /^[a-zA-Z\s]+$/.test(value),
+        'Name must be at least 2 characters and contain only letters'
       );
       
       const isPasswordValid = validateInput(adminPassword, passwordError,
@@ -570,7 +588,7 @@
         'Password must be at least 4 characters long'
       );
 
-      if (!isEmailValid || !isPasswordValid) {
+      if (!isNameValid || !isPasswordValid) {
         showToast('Please fix the validation errors', 'error');
         return;
       }
@@ -581,7 +599,7 @@
       try {
         // Prepare login data
         const loginData = {
-          email: adminEmail.value.trim(),
+          name: adminName.value.trim(),
           password: adminPassword.value.trim()
         };
 
@@ -655,7 +673,7 @@
     // Error message mapping
     function getErrorMessage(error) {
       const errorMap = {
-        'Invalid credentials': 'Invalid email or password. Please check your credentials.',
+        'Invalid credentials': 'Invalid name or password. Please check your credentials.',
         'Unauthorized': 'Access denied. Please contact system administrator.',
         'Too many attempts': 'Too many login attempts. Please try again later.',
         'Server error': 'Server temporarily unavailable. Please try again later.',
@@ -695,8 +713,8 @@
       localStorage.removeItem('admin_token');
       sessionStorage.removeItem('admin_token');
       
-      // Focus on email input
-      adminEmail.focus();
+      // Focus on name input
+      adminName.focus();
     });
 
     // Keyboard shortcuts
@@ -709,7 +727,7 @@
     });
 
     // Prevent form submission on Enter in input fields (except password)
-    adminEmail.addEventListener('keydown', function(e) {
+    adminName.addEventListener('keydown', function(e) {
       if (e.key === 'Enter') {
         e.preventDefault();
         adminPassword.focus();

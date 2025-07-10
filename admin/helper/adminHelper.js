@@ -37,10 +37,10 @@ const adminHelper = {
   },
   loginAdmin: async (req, res) => {
     try {
-      const { name, password } = req.body;
+      const {email, password } = req.body;
 
       // Check if admin with this name exists
-      const admin = await Admin.findOne({ name });
+      const admin = await Admin.findOne({ email });
       if (!admin) {
         return res.status(401).json({ success: false, message: 'Invalid name or password.' });
       }
