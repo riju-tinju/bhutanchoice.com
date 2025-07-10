@@ -47,6 +47,38 @@ function updateSingleCountdown(prefix, targetDateStr) {
 }
 
 // Step 5b: Refresh results function
+// async function refreshResults(lotteryId) {
+//     const button = document.getElementById(`refresh-${lotteryId}`);
+//     button.disabled = true;
+//     button.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Refreshing...';
+    
+//     try {
+//         const response = await fetch('/api/refresh-results', {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json'
+//             },
+//             body: JSON.stringify({ lotteryId })
+//         });
+        
+//         const result = await response.json();
+        
+//         if (result.success) {
+//             // Reload page to show updated results
+//             // window.location.reload();
+//             return
+//         } else {
+//             throw new Error(result.message || 'Failed to refresh');
+//             button.innerHTML = '<i class="fas fa-exclamation-triangle mr-1"></i>Try Again';
+//             button.disabled = false;
+//         }
+//     } catch (error) {
+//         console.error('Refresh failed:', error);
+//         button.innerHTML = '<i class="fas fa-exclamation-triangle mr-1"></i>Try Again';
+//         button.disabled = false;
+//     }
+// }
+// Step 5b: Refresh results function
 async function refreshResults(lotteryId) {
     const button = document.getElementById(`refresh-${lotteryId}`);
     button.disabled = true;
@@ -64,8 +96,50 @@ async function refreshResults(lotteryId) {
         const result = await response.json();
         
         if (result.success) {
-            // Reload page to show updated results
-            window.location.reload();
+            // Find the lottery card that contains this button
+            const card = button.closest('.lottery-card');
+            
+            // Update the winners in the UI
+            const resultContainer = card.querySelector('.result-container');
+            
+            // Clear existing results
+            resultContainer.innerHTML = '';
+            
+            // Render updated results
+            result.data.prizes.forEach(prize => {
+                const winner = result.data.winners.find(w => w.prizeRank === prize.rank);
+                
+                const resultCard = document.createElement('div');
+                resultCard.className = 'result-card';
+                
+                resultCard.innerHTML = `
+                    <div class="result-card-header">${prize.rank} Prize</div>
+                    <div class="result-card-content">
+                        <div class="result-prize-amount">₹${prize.amount.toLocaleString('en-IN')}/-</div>
+                        <div class="result-winning-number">${
+                            winner ? winner.ticketNumber : '_ _ _ _ _'
+                        }</div>
+                    </div>
+                `;
+                
+                resultContainer.appendChild(resultCard);
+            });
+            
+            // Hide the refresh button if all prizes have winners
+            const allPrizesHaveWinners = result.data.prizes.every(prize => 
+                result.data.winners.some(w => w.prizeRank === prize.rank)
+            );
+            
+            if (allPrizesHaveWinners) {
+                button.style.display = 'none';
+            } else {
+                button.innerHTML = '<i class="fas fa-sync-alt mr-1"></i>Refresh Results';
+                button.disabled = false;
+            }
+            
+            // Show success message
+            showToast('Results refreshed successfully', 'success');
+            
         } else {
             throw new Error(result.message || 'Failed to refresh');
         }
@@ -73,8 +147,26 @@ async function refreshResults(lotteryId) {
         console.error('Refresh failed:', error);
         button.innerHTML = '<i class="fas fa-exclamation-triangle mr-1"></i>Try Again';
         button.disabled = false;
+        
+        // Show error message
+        showToast(error.message || 'Failed to refresh results', 'error');
     }
 }
+
+// Helper function to show toast notifications
+function showToast(message, type) {
+    const toast = document.createElement('div');
+    toast.className = `fixed bottom-4 right-4 px-4 py-2 rounded-md text-white ${
+        type === 'success' ? 'bg-green-500' : 'bg-red-500'
+    }`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+
 
 // Step 5c: Initialize
 setInterval(updateCountdowns, 1000);

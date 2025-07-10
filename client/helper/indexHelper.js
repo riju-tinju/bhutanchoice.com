@@ -91,6 +91,30 @@ const indexHelper={
       console.error("Error in getPastLotteries:", err);
       return res.status(500).json({ success: false, message: 'Failed to fetch past lotteries' });
     }
+  },
+  refreshResults: async (req, res) => {
+    try{
+      const { lotteryId } = req.body;
+      if (!lotteryId) {
+        return res.status(400).json({ success: false, message: 'Lottery ID is required' });
+      }
+
+      // Find the lottery by ID
+      const lottery = await Lottery.findById(lotteryId);
+      if (!lottery) {
+        return res.status(404).json({ success: false, message: 'Lottery not found' });
+      }
+
+     console.log("Refreshing lottery:\n", lottery);
+
+      return res.json({ success: true, message: 'Results refreshed successfully',data: {
+        prizes: lottery.prizes,
+        winners: lottery.winners,
+      } });
+    }catch(err){
+      console.error("Error in refreshResults:", err);
+      return res.status(500).json({ success: false, message: 'Failed to refresh results' });
+    }
   }
 }
 module.exports=indexHelper

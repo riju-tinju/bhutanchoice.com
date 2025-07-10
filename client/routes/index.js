@@ -16,6 +16,10 @@ router.post('/api/get-past-lottories',async function(req, res, next) {
   await indexFun.getPastLotteries(req,res)
 });
 
+router.post('/api/refresh-results',async function(req, res, next) {
+  await indexFun.refreshResults(req,res)
+});
+
 
 router.get('/create-dummy-lottories',async function(req, res, next) {
  try {

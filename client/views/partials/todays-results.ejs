@@ -66,13 +66,13 @@
                 status = "LIVE";
                 badgeClass = "live-badge";
                 showCountdown = false;
-                showRefresh = lottery.winners.length === 0;
+                showRefresh = lottery.winners.length !== lottery.prizes.length ;
             } else {
                 // After +2 hours
                 status = "RESULT";
                 badgeClass = "result-badge";
                 showCountdown = false;
-                showRefresh = lottery.winners.length === 0;
+                showRefresh = false ;
             }
             
             const firstPrize = lottery.prizes.find(p => p.rank === 1);
