@@ -46,7 +46,7 @@ const indexHelper = {
       //       past: limitedPast})
       return res.render('index', {
         todays : todays || [],
-        upcoming: filteredUpcoming || [],
+        upcoming: upcoming || [],
         past: limitedPast || [],
       })
     } catch (err) {
