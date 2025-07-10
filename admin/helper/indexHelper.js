@@ -6,6 +6,7 @@ const indexHelper = {
       const allLotteries = await Lottery.find({});
 
       const today = new Date();
+      console.log("Today:", today);
       today.setHours(0, 0, 0, 0); // Start of today
       const tomorrow = new Date(today);
       tomorrow.setDate(tomorrow.getDate() + 1);
