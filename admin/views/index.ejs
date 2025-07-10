@@ -1134,9 +1134,11 @@
       </button>
     </div>
 
-    <% 
+
+  <% 
     // Calculate section order
     const now = new Date();
+    
     let shouldSwapSections = false;
     
     if (todays && todays.length > 0) {
@@ -1147,7 +1149,10 @@
         });
         shouldSwapSections = anyDrawPassed;
     }
-    %>
+  %>
+
+   
+    <h1><%= now %></h1>
 
     <!-- Conditional section ordering -->
     <% if (!shouldSwapSections) { %>
