@@ -58,7 +58,7 @@
             
             if (now < drawTime) {
                 // Before draw time
-                status = "Today's Next Result";
+                status = "Today";
                 badgeClass = "upcoming-badge";
                 showCountdown = true;
             } else if (hoursAfterDraw <= 2) {
@@ -74,10 +74,10 @@
                 showCountdown = false;
                 showRefresh = false ;
             }
-            
+          
             const firstPrize = lottery.prizes.find(p => p.rank === 1);
             const formatDate = (isoDateString) => {
-    const date = new Date(isoDateString);
+            const date = new Date(isoDateString);
 
     const options = {
       timeZone: 'Asia/Thimphu',
