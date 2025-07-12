@@ -31,7 +31,7 @@ const minutes = drawDate.getMinutes();
 const ampm = hours >= 12 ? 'PM' : 'AM';
 hours = hours % 12;
 hours = hours ? hours : 12; // Convert 0 to 12
-const formattedDate = drawDate.toLocaleDateString('en-BT', { // 'en-IN' for India English locale
+const formattedDate = drawDate.toLocaleDateString('en-GB', { 
   year: 'numeric',
   month: 'short',
   day: '2-digit',
