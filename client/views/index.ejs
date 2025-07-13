@@ -6,16 +6,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Royal Government Of Bhutan</title>
   <meta name="description" content="Check Bhutan Lottery Results live and past records." />
-  <link rel="icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfvxp4SnnjaYyFQDP8d5D660XMvy4nQfc08ScgqFq3IjufpC1OH-ykrQ6v-SkPsuVCt7w&usqp=CAU" />
+  <link rel="icon"
+    href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfvxp4SnnjaYyFQDP8d5D660XMvy4nQfc08ScgqFq3IjufpC1OH-ykrQ6v-SkPsuVCt7w&usqp=CAU" />
 
   <meta property="og:title" content="Royal Government Of Bhutan | Official lottery portel" />
-  <meta property="og:description" content="Official portal for accessing live and past lottery results with complete transparency." />
+  <meta property="og:description"
+    content="Official portal for accessing live and past lottery results with complete transparency." />
   <meta property="og:image" content="https://bhutanlotteryresults.com/images/og.jpg" />
-  <!-- <meta property="og:url" content="https://bhutanlotteryresults.com" /> -->
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
   <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://bhutanlotteryresults.com/" />
+  <meta name="twitter:card" content="summary_large_image" />
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
   <style>
     * {
       font-family: 'Poppins', sans-serif;
@@ -236,9 +242,9 @@
 
     /*  Past Card styles for each day*/
     /* Sunday - Vibrant Red/Pink */
- 
+
     /* Past Card styles for each day */
-     .Sunday-card {
+    .Sunday-card {
       background: linear-gradient(135deg, #D51F48 0%, #EB5A7C 100%);
     }
 
@@ -644,7 +650,9 @@
     <div class="px-6 py-5">
       <div class="flex items-center justify-center">
         <div class="flex items-center space-x-3">
-          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfvxp4SnnjaYyFQDP8d5D660XMvy4nQfc08ScgqFq3IjufpC1OH-ykrQ6v-SkPsuVCt7w&usqp=CAU" style="height: 34px; width: 34px; border-radius: 50%;" alt="">
+          <img
+            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfvxp4SnnjaYyFQDP8d5D660XMvy4nQfc08ScgqFq3IjufpC1OH-ykrQ6v-SkPsuVCt7w&usqp=CAU"
+            style="height: 34px; width: 34px; border-radius: 50%;" alt="">
           <h1 class="text-xl font-bold drop-shadow-lg tracking-wide">Bhutan State Lotteries</h1>
         </div>
       </div>
@@ -653,41 +661,37 @@
 
   <main class="px-4 py-6 space-y-8 max-w-md mx-auto">
 
-    <% 
-    // Calculate section order
-    const now = new Date();
-    let shouldSwapSections = false;
-    
-    if (todays && todays.length > 0) {
-        // Swap if ANY lottery's draw time has passed (no 2-hour delay)
-        const anyDrawPassed = todays.some(lottery => {
-            const drawTime = new Date(lottery.drawDate);
-            return now > drawTime; // Current time is after draw time
-        });
-        shouldSwapSections = anyDrawPassed;
-    }
-    %>
+    <% // Calculate section order const now=new Date(); let shouldSwapSections=false; if (todays && todays.length> 0) {
+      // Swap if ANY lottery's draw time has passed (no 2-hour delay)
+      const anyDrawPassed = todays.some(lottery => {
+      const drawTime = new Date(lottery.drawDate);
+      return now > drawTime; // Current time is after draw time
+      });
+      shouldSwapSections = anyDrawPassed;
+      }
+      %>
 
-  
 
-    <!-- Conditional section ordering -->
-    <% if (!shouldSwapSections) { %>
-    <!-- Original order (before draws) -->
-    <%- include('partials/todays-results') %>
-    
-    <% } else { %>
-    <!-- Swapped order (after draws) -->
-    <%- include('partials/upcoming-lotteries') %>
-    <%- include('partials/todays-results') %>
-    <% } %>
-    <%- include('partials/indexScript') %>
 
-    <%- include('partials/past') %>
+      <!-- Conditional section ordering -->
+      <% if (!shouldSwapSections) { %>
+        <!-- Original order (before draws) -->
+        <%- include('partials/todays-results') %>
+
+          <% } else { %>
+            <!-- Swapped order (after draws) -->
+            <%- include('partials/upcoming-lotteries') %>
+              <%- include('partials/todays-results') %>
+                <% } %>
+                  <%- include('partials/indexScript') %>
+
+                    <%- include('partials/past') %>
 
   </main>
 
   <!-- Disclaimer Modal -->
-  <div id="disclaimerModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+  <div id="disclaimerModal"
+    class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
     <div class="bg-white rounded-2xl max-w-md w-full max-h-[80vh] overflow-y-auto shadow-2xl">
       <!-- Modal Header -->
       <div class="sticky top-0 bg-gradient-to-r from-red-500 to-pink-500 text-white p-4 rounded-t-2xl">
@@ -702,8 +706,7 @@
       </div>
 
       <!-- Modal Content -->
-      <div class="p-6 text-gray-700 leading-relaxed"
-      style="max-height: 60vh;overflow: hidden; overflow-y: auto;">
+      <div class="p-6 text-gray-700 leading-relaxed" style="max-height: 60vh;overflow: hidden; overflow-y: auto;">
         <p class="mb-4">
           We strictly recommend you to please visit and browse this site on your own risk. All the information
           available here is strictly for informational purposes and based on astrology and numerology
@@ -727,7 +730,8 @@
 
       <!-- Modal Footer -->
       <div class="p-4 bg-gray-50 rounded-b-2xl">
-        <button id="closeModalBtn" class="w-full bg-gradient-to-r from-gray-500 to-gray-600 text-white py-3 rounded-xl font-medium hover:from-gray-600 hover:to-gray-700 transition-all duration-300">
+        <button id="closeModalBtn"
+          class="w-full bg-gradient-to-r from-gray-500 to-gray-600 text-white py-3 rounded-xl font-medium hover:from-gray-600 hover:to-gray-700 transition-all duration-300">
           I Understand
         </button>
       </div>
@@ -849,7 +853,7 @@
 
 
     // Add bounce effect to cards when they appear
-    window.addEventListener('load', function() {
+    window.addEventListener('load', function () {
       const cards = document.querySelectorAll('.lottery-card');
       cards.forEach((card, index) => {
         setTimeout(() => {
@@ -859,14 +863,14 @@
     });
 
     // Disclaimer Modal Functionality
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       const disclaimerBtn = document.getElementById('disclaimerBtn');
       const disclaimerModal = document.getElementById('disclaimerModal');
       const closeModal = document.getElementById('closeModal');
       const closeModalBtn = document.getElementById('closeModalBtn');
 
       // Show modal
-      disclaimerBtn.addEventListener('click', function() {
+      disclaimerBtn.addEventListener('click', function () {
         disclaimerModal.classList.remove('hidden');
         document.body.style.overflow = 'hidden'; // Prevent background scroll
       });
@@ -884,14 +888,14 @@
       closeModalBtn.addEventListener('click', hideModal);
 
       // Close modal when clicking outside
-      disclaimerModal.addEventListener('click', function(e) {
+      disclaimerModal.addEventListener('click', function (e) {
         if (e.target === disclaimerModal) {
           hideModal();
         }
       });
 
       // Close modal with Escape key
-      document.addEventListener('keydown', function(e) {
+      document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && !disclaimerModal.classList.contains('hidden')) {
           hideModal();
         }
@@ -942,10 +946,10 @@
       <div id="${elementId}" class="card-expand collapsed mt-6">
         <div class="result-container space-y-4">
           ${lottery.prizes.map(prize => {
-                    const winner = lottery.winners.find(w => w.prizeRank === prize.rank);
-                    const amount = `₹${prize.amount.toLocaleString('en-IN')}/-`;
-                    const ticketNumber = winner ? winner.ticketNumber : '-';
-                    return `
+          const winner = lottery.winners.find(w => w.prizeRank === prize.rank);
+          const amount = `₹${prize.amount.toLocaleString('en-IN')}/-`;
+          const ticketNumber = winner ? winner.ticketNumber : '-';
+          return `
               <div class="result-card">
                 <div class="result-card-header">${prize.rank} Prize</div>
                 <div class="result-card-content">
@@ -954,7 +958,7 @@
                 </div>
               </div>
             `;
-                }).join('')}
+        }).join('')}
         </div>
       </div>
     `;
