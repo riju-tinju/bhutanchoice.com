@@ -32,6 +32,26 @@
     transform: none;
 }
 
+.infinite-underline {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  background: linear-gradient(90deg, #6366f1 0%, #a855f7 50%, #6366f1 100%);
+  background-size: 200% 100%;
+  animation: moveUnderline 2s linear infinite;
+}
+
+@keyframes moveUnderline {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
 </style>
 
 <!-- partials/todays-results.ejs -->
@@ -160,7 +180,9 @@
                             <% if (winner) { %>
                             <div class="result-winning-number"><%= winner.ticketNumber %></div>
                             <% } else { %>
-                            <div class="result-winning-number">_ _ _ _ _</div>
+                            <div class="result-winning-number underline-animated" >
+
+                            </div>
                             <% } %>
                         </div>
                     </div>
