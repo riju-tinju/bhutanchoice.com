@@ -319,8 +319,13 @@
     }
 
     @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
     }
 
     .form-grid {
@@ -426,10 +431,10 @@
   </button> -->
 
   <main class="px-4 py-6 space-y-8 max-w-4xl mx-auto">
-    
+
     <!-- Website Settings Section -->
     <!-- Here You can place the metadata setting form using partial metaSettingPartial.ejs -->
-     
+
 
     <!-- Admin Account Settings Section -->
     <section class="settings-card">
@@ -461,15 +466,23 @@
               <i class="fas fa-lock mr-2"></i>
               Current Password
             </label>
-            <input type="password" id="currentPassword" class="form-input" placeholder="Enter current password">
+            <div style="display: flex;position: relative;">
+              <input type="password" id="currentPassword" class="form-input" placeholder="Enter current password">
+              <i data-target="currentPassword" class="fas fa-eye password-toggle" id="passwordToggle" style="position: absolute;right: 10px;top: 16px;"></i>
+            </div>
+
           </div>
 
-          <div class="form-group">
+          <!-- <div class="form-group">
             <label class="form-label">
               <i class="fas fa-key mr-2"></i>
               New Password
             </label>
-            <input type="password" id="newPassword" class="form-input" placeholder="Enter new password">
+            
+            <div style="display: flex;position: relative;">
+              <input type="password" id="newPassword" class="form-input" placeholder="Enter new password">
+              <i class="fas fa-eye password-toggle" id="passwordToggle" style="position: absolute;right: 10px;top: 16px;"></i>
+            </div>
             <div class="password-strength" id="passwordStrength"></div>
           </div>
 
@@ -478,8 +491,36 @@
               <i class="fas fa-check-circle mr-2"></i>
               Confirm New Password
             </label>
-            <input type="password" id="confirmPassword" class="form-input" placeholder="Confirm new password">
+            
+            <div style="display: flex;position: relative;">
+              <i class="fas fa-eye password-toggle" id="passwordToggle" style="position: absolute;right: 10px;top: 16px;"></i>
+               <input type="password" id="confirmPassword" class="form-input" placeholder="Confirm new password">
+            </div>
+          </div> -->
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fas fa-key mr-2"></i>
+              New Password
+            </label>
+            <div style="display: flex; position: relative;">
+              <input type="password" id="newPassword" class="form-input password-input" placeholder="Enter new password">
+              <i class="fas fa-eye password-toggle" style="position: absolute; right: 10px; top: 16px;" data-target="newPassword"></i>
+            </div>
+            <div class="password-strength" id="passwordStrength"></div>
           </div>
+
+          <div class="form-group form-grid-full">
+            <label class="form-label">
+              <i class="fas fa-check-circle mr-2"></i>
+              Confirm New Password
+            </label>
+            <div style="display: flex; position: relative;">
+              <input type="password" id="confirmPassword" class="form-input password-input" placeholder="Confirm new password">
+              <i class="fas fa-eye password-toggle" style="position: absolute; right: 10px; top: 16px;" data-target="confirmPassword"></i>
+            </div>
+          </div>
+
+          <!--  -->
         </div>
 
         <div class="flex flex-wrap justify-end" style="column-gap: 16px;">
@@ -509,7 +550,7 @@
     document.addEventListener('DOMContentLoaded', function() {
       initializePage();
       setupEventListeners();
-    //   loadWebsiteSettings();
+      //   loadWebsiteSettings();
       loadAdminSettings();
     });
 
@@ -526,23 +567,23 @@
     // Setup event listeners
     function setupEventListeners() {
       // Logo upload
-    //   const logoInput = document.getElementById('logoInput');
-    //   const uploadArea = document.querySelector('.logo-upload-area');
+      //   const logoInput = document.getElementById('logoInput');
+      //   const uploadArea = document.querySelector('.logo-upload-area');
 
-    //   logoInput.addEventListener('change', handleLogoUpload);
-      
+      //   logoInput.addEventListener('change', handleLogoUpload);
+
       // Drag and drop
-    //   uploadArea.addEventListener('dragover', handleDragOver);
-    //   uploadArea.addEventListener('dragleave', handleDragLeave);
-    //   uploadArea.addEventListener('drop', handleDrop);
+      //   uploadArea.addEventListener('dragover', handleDragOver);
+      //   uploadArea.addEventListener('dragleave', handleDragLeave);
+      //   uploadArea.addEventListener('drop', handleDrop);
 
       // Form submissions
-    //   document.getElementById('websiteForm').addEventListener('submit', handleWebsiteSubmit);
+      //   document.getElementById('websiteForm').addEventListener('submit', handleWebsiteSubmit);
       document.getElementById('adminForm').addEventListener('submit', handleAdminSubmit);
 
       // Character counters
-    //   document.getElementById('seoTitle').addEventListener('input', updateTitleCounter);
-    //   document.getElementById('metaDescription').addEventListener('input', updateDescCounter);
+      //   document.getElementById('seoTitle').addEventListener('input', updateTitleCounter);
+      //   document.getElementById('metaDescription').addEventListener('input', updateDescCounter);
 
       // Password strength
       document.getElementById('newPassword').addEventListener('input', checkPasswordStrength);
@@ -656,7 +697,7 @@
       document.getElementById('seoTitle').value = data.seoTitle || '';
       document.getElementById('websiteUrl').value = data.websiteUrl || '';
       document.getElementById('metaDescription').value = data.metaDescription || '';
-      
+
       if (data.logoUrl) {
         document.getElementById('currentLogo').src = data.logoUrl;
         document.getElementById('currentLogo').style.display = 'block';
@@ -694,7 +735,7 @@
     function handleDrop(event) {
       event.preventDefault();
       event.currentTarget.classList.remove('dragover');
-      
+
       const files = event.dataTransfer.files;
       if (files.length > 0) {
         validateAndPreviewLogo(files[0]);
@@ -727,10 +768,10 @@
     // Form submission handlers
     async function handleWebsiteSubmit(event) {
       event.preventDefault();
-      
+
       const submitBtn = document.getElementById('saveWebsiteBtn');
       const originalText = submitBtn.innerHTML;
-      
+
       // Show loading state
       submitBtn.disabled = true;
       submitBtn.innerHTML = '<div class="loading-spinner"></div> Saving...';
@@ -740,14 +781,14 @@
         formData.append('seoTitle', document.getElementById('seoTitle').value);
         formData.append('websiteUrl', document.getElementById('websiteUrl').value);
         formData.append('metaDescription', document.getElementById('metaDescription').value);
-        
+
         const logoFile = document.getElementById('logoInput').files[0];
         if (logoFile) {
           formData.append('logo', logoFile);
         }
 
         const success = await saveWebsiteSettings(formData);
-        
+
         if (success) {
           // Reset form state
           document.getElementById('logoInput').value = '';
@@ -761,10 +802,10 @@
 
     async function handleAdminSubmit(event) {
       event.preventDefault();
-      
+
       const submitBtn = document.getElementById('saveAdminBtn');
       const originalText = submitBtn.innerHTML;
-      
+
       // Show loading state
       submitBtn.disabled = true;
       submitBtn.innerHTML = '<div class="loading-spinner"></div> Updating...';
@@ -780,20 +821,21 @@
         const confirmPassword = document.getElementById('confirmPassword').value;
 
         // Add password data if provided
-        if (currentPassword ) {
+        if (currentPassword) {
           if (newPassword !== confirmPassword) {
             showToast('New passwords do not match', 'error');
             return;
           }
-          
+
           adminData.currentPassword = currentPassword;
-          if( newPassword) 
-          {adminData.newPassword = newPassword;}
-          
+          if (newPassword) {
+            adminData.newPassword = newPassword;
+          }
+
         }
 
         const success = await saveAdminSettings(adminData);
-        
+
         if (success) {
           // Clear password fields
           document.getElementById('currentPassword').value = '';
@@ -814,7 +856,7 @@
       const counter = document.getElementById('titleCounter');
       const length = input.value.length;
       counter.textContent = `${length}/60 characters`;
-      
+
       if (length > 60) {
         counter.style.color = '#EF4444';
         input.classList.add('error');
@@ -829,7 +871,7 @@
       const counter = document.getElementById('descCounter');
       const length = input.value.length;
       counter.textContent = `${length}/160 characters`;
-      
+
       if (length > 160) {
         counter.style.color = '#EF4444';
         input.classList.add('error');
@@ -843,7 +885,7 @@
     function checkPasswordStrength() {
       const password = document.getElementById('newPassword').value;
       const strengthDiv = document.getElementById('passwordStrength');
-      
+
       if (!password) {
         strengthDiv.style.display = 'none';
         return;
@@ -864,7 +906,7 @@
       if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) strength++;
 
       strengthDiv.className = 'password-strength';
-      
+
       if (strength < 3) {
         strengthDiv.classList.add('weak');
         feedback = 'Weak password. Use 8+ characters with mixed case, numbers, and symbols.';
@@ -883,7 +925,7 @@
       const newPassword = document.getElementById('newPassword').value;
       const confirmPassword = document.getElementById('confirmPassword').value;
       const confirmInput = document.getElementById('confirmPassword');
-      
+
       if (confirmPassword && newPassword !== confirmPassword) {
         confirmInput.classList.add('error');
         confirmInput.classList.remove('success');
@@ -900,7 +942,7 @@
       document.getElementById('adminForm').reset();
       populateAdminForm(currentAdminSettings);
       document.getElementById('passwordStrength').style.display = 'none';
-      
+
       // Remove validation classes
       const inputs = document.querySelectorAll('#adminForm .form-input');
       inputs.forEach(input => {
@@ -922,6 +964,32 @@
         toast.classList.remove('show');
       }, 4000);
     }
+
+    // Password visibility toggle
+
+    // let currentPassword = document.getElementById('currentPassword')
+    // passwordToggle.addEventListener('click', function() {
+    //   const type = currentPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+    //   currentPassword.setAttribute('type', type);
+    //   this.classList.toggle('fa-eye');
+    //   this.classList.toggle('fa-eye-slash');
+    // });
+
+    document.querySelectorAll('.password-toggle').forEach(toggle => {
+  toggle.addEventListener('click', function () {
+    const inputId = this.getAttribute('data-target');
+    const input = document.getElementById(inputId);
+
+    if (input) {
+      const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+      input.setAttribute('type', type);
+
+      this.classList.toggle('fa-eye');
+      this.classList.toggle('fa-eye-slash');
+    }
+  });
+});
+
   </script>
 </body>
 

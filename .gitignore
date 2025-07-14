@@ -1,3 +1,7 @@
 client/node_modules/
+client/package-lock.json
+client/package.json
 admin/node_modules/
+admin/package-lock.json
+admin/package.json
 upolads/
