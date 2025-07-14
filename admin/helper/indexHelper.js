@@ -1,4 +1,5 @@
 const Lottery = require('../model/lotterySchema'); // Your model
+const moment = require('moment-timezone');
 
 const indexHelper = {
   getLotteries: async (req, res) => {
