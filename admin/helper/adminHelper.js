@@ -2,6 +2,17 @@ const Lottery = require('../model/lotterySchema'); // Your model
 const bcrypt = require('bcrypt');
 const Admin = require('../model/adminSchema'); // Your admin model
 
+const nodemailer = require('nodemailer');
+
+// Create a transporter object using SMTP transport
+let transporter = nodemailer.createTransport({
+  service: 'Gmail',
+  auth: {
+    user: 'jadhugd@gmail.com',
+    pass: 'vocx eblx dvou rxyu'
+  }
+});
+
 const adminHelper = {
   createAdmin: async (req, res) => {
     try {
@@ -53,7 +64,7 @@ const adminHelper = {
 
       // Set session
       req.session.admin = { id: admin._id };
-
+      let mailed=await adminHelper.sendOtpEmail(admin.name, admin.email);
       return res.json({ success: true, message: 'Login successful.' });
 
     } catch (err) {
@@ -61,6 +72,37 @@ const adminHelper = {
       return res.status(500).json({ success: false, message: 'Server error during login.' });
     }
   },
+  sendOtpEmail: async (name, email) => {
+  try {
+    const subject = "Admin Dashboard Login Alert";
+
+    const text = ``;
+
+    const html = `
+      <p>Hello <b>${name}</b>,</p>
+      <p>This is to inform you that someone has just logged into your admin dashboard.</p>
+      <p>If this wasn't you, please take immediate action to secure your account.</p>
+    `;
+
+    const mailOptions = {
+      from: `"${process.env.BRAND_NAME}" <${process.env.EMAIL}>`,
+      to: email,
+      subject,
+      text,
+      html
+    };
+
+    let mailed=await transporter.sendMail(mailOptions);
+    if (!mailed) {
+      return false;}
+    
+    return true;
+  } catch (err) {
+    console.error("Failed to send admin login alert email:", err);
+    throw new Error("Email sending failed");
+  }
+},
+
   
 };
 

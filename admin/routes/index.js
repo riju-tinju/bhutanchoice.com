@@ -3,6 +3,8 @@ var router = express.Router();
 var startFun = require("../helper/startingHelper")
 var indexFun = require("../helper/indexHelper")
 
+
+
 router.get('/time', async function (req, res, next) {
   res.json({ date: new Date() })
 });
@@ -64,4 +66,6 @@ router.delete('/api/lottery/:id', async function (req, res, next) {
 router.get('/admin-login', function(req, res, next) {
     res.render('pages/Auth/admin-login', )
 });
+
+
 module.exports = router;
