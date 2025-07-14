@@ -7,6 +7,10 @@ const lotterySchema = new Schema({
     required: [true, 'Lottery name is required'],
     trim: true
   },
+  name2: {
+    type: String,
+    trim: true
+  },
   drawNumber: {
     type: Number,
     required: [true, 'Draw number is required'],

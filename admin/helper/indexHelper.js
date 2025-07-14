@@ -92,15 +92,17 @@ const indexHelper = {
   },
   createLottery: async (req, res) => {
     try {
-      const { name, drawNumber, drawDate, prizes } = req.body;
+      console.log("Creating lottery with data:", req.body);
+      const { name,name2, drawNumber, drawDate, prizes } = req.body;
 
       // Optional: Validate incoming data manually if needed
-      if (!name || !drawNumber || !drawDate || !Array.isArray(prizes)) {
+      if (!name || !name2 || !drawNumber || !drawDate || !Array.isArray(prizes)) {
         return res.status(400).json({ success: false, message: 'Invalid input data' });
       }
 
       const newLottery = new Lottery({
         name,
+        name2,
         drawNumber,
         drawDate,
         prizes,
@@ -122,7 +124,7 @@ const indexHelper = {
   updateLottery: async (req, res) => {
     try {
       const lotteryId = req.params.id;
-      const { name, drawNumber, drawDate, prizes, winners } = req.body;
+      const { name,name2, drawNumber, drawDate, prizes, winners } = req.body;
 
       if (!lotteryId) {
         return res.status(400).json({ success: false, message: 'Lottery ID is required' });
@@ -131,6 +133,7 @@ const indexHelper = {
       const updateData = {};
 
       if (name) updateData.name = name;
+      if (name2) updateData.name2 = name2;
       if (drawNumber) updateData.drawNumber = drawNumber;
       if (drawDate) updateData.drawDate = drawDate;
       if (prizes) updateData.prizes = prizes;
@@ -167,7 +170,7 @@ const indexHelper = {
         return res.status(400).json({ success: false, message: 'Lottery ID is required' });
       }
 
-      const lottery = await Lottery.findById(id).select('_id name drawNumber drawDate prizes winners');
+      const lottery = await Lottery.findById(id).select('_id name name2 drawNumber drawDate prizes winners');
 
       if (!lottery) {
         return res.status(404).json({ success: false, message: 'Lottery not found' });

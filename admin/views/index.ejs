@@ -1268,6 +1268,11 @@
               </div>
 
               <div class="form-group">
+                <label class="form-label">Name 2</label>
+                <input type="text" id="lotteryName2" class="form-input" required placeholder="e.g., (MOC-12th Draw)">
+              </div>
+
+              <div class="form-group">
                 <label class="form-label">Draw Number</label>
                 <input type="number" id="drawNumber" class="form-input" required min="1" placeholder="e.g., 156">
               </div>
@@ -1559,6 +1564,7 @@
 
       // Fill form with existing data
       document.getElementById('lotteryName').value = lotteryData.name || '';
+      document.getElementById('lotteryName2').value = lotteryData.name2 || '';
       document.getElementById('drawNumber').value = lotteryData.drawNumber || '';
 
 
@@ -1722,6 +1728,7 @@
 
       const formData = {
         name: document.getElementById('lotteryName').value,
+        name2: document.getElementById('lotteryName2').value || '',
         drawNumber: parseInt(document.getElementById('drawNumber').value),
         // drawDate: new Date(document.getElementById('drawDate').value).toISOString(),
         drawDate: drawDateUTC, // Use the converted UTC date
