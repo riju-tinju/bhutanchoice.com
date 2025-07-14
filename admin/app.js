@@ -36,7 +36,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', adminAuthRouter); // custom route for admin authentication
 let verifyAdmin = require("./helper/verifyAdmin");// custom
-app.use('/', verifyAdmin, indexRouter);//verifyAdmin,
+app.use('/', indexRouter);//verifyAdmin,
 app.use('/', settingsRouter);
 
 // catch 404 and forward to error handler
