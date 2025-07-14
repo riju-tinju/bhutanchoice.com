@@ -98,7 +98,7 @@ const formattedDate = drawDate.toLocaleDateString('en-GB', { // 'en-IN' for Indi
                         <div class="result-card-header"><%= prize.rank %> Prize</div>
                         <div class="result-card-content">
                             <div class="result-prize-amount">₹<%= prize.amount.toLocaleString('en-IN') %>/-</div>
-                            <div class="result-winning-number">_ _ _ _ _</div>
+                            <div class="result-winning-number result-winning-number_if_no_results underline-animated"></div>
                         </div>
                     </div>
                     <% }); %>
