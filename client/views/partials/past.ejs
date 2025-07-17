@@ -132,7 +132,7 @@ const formattedDate = drawDate.toLocaleDateString('en-GB', { // 'en-IN' for Indi
           currentPageNumber += 1;
 
 
-          const pastLotteries = result.data.items;
+          const pastLotteries = result.items;
           console.log(pastLotteries)
           renderPastResults(pastLotteries);
 

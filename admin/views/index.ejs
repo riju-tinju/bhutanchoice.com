@@ -1809,6 +1809,74 @@
       });
     });
   </script>
+
+  <script>
+    function renderPastResults(pastLotteries) {
+      const container = document.getElementById('past-lottories-container');
+      if (!container) return;
+
+      pastLotteries.forEach((lottery, i) => {
+        const drawDate = new Date(lottery.drawDate);
+        const formattedDate = drawDate.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+
+        const firstPrize = lottery.prizes.find(p => p.rank === 1);
+        const elementId = `past-${lottery._id}`;
+
+        const card = document.createElement('div');
+        card.className = `lottery-card ${lottery.dayName}-card cursor-pointer`;
+        card.setAttribute('onclick', `toggleResult('${elementId}')`);
+
+        card.innerHTML = `
+      <div class="flex items-center justify-between">
+        <div class="flex-1 card-element-spacing">
+          <div class="flex flex-wrap items-center"  style="row-gap: 9px; column-gap: 20px;">
+            <span class="past-badge rounded-full">RESULT</span>
+            <span class="card-text-secondary card-date">${formattedDate}</span>
+          </div>
+          <h3 class="card-text card-lottery-name">${lottery.name}</h3>
+          <div class="flex items-center card-text-secondary">
+            <i class="fas fa-trophy text-yellow-300 mr-2"></i>
+            <span class="card-prize">1st Prize: ₹${firstPrize.amount.toLocaleString('en-IN')}</span>
+          </div>
+        </div>
+        <div class="text-right ml-4">
+          <i id="arrow-${elementId}" class="fas fa-chevron-down card-text text-xl transition-transform duration-300"></i>
+        </div>
+      </div>
+
+      <div id="${elementId}" class="card-expand collapsed mt-6">
+        <div class="result-container space-y-4">
+          ${lottery.prizes.map(prize => {
+                    const winner = lottery.winners.find(w => w.prizeRank === prize.rank);
+                    const amount = `₹${prize.amount.toLocaleString('en-IN')}/-`;
+                    const ticketNumber = winner ? winner.ticketNumber : '-';
+                    return `
+              <div class="result-card">
+                <div class="result-card-header">${prize.rank} Prize</div>
+                <div class="result-card-content">
+                  <div class="result-prize-amount">${amount}</div>
+                  <div class="result-winning-number">${ticketNumber}</div>
+                </div>
+              </div>
+            `;
+                }).join('')}
+        </div>
+      </div>
+    `;
+
+        // container.appendChild(card);
+        let loadmoreBtn = document.getElementById('loadmoreBtn')
+        // This will place newCard right before myContainer
+        loadmoreBtn.insertAdjacentElement('beforebegin', card);
+      });
+    }
+  </script>
 </body>
 
 </html>
