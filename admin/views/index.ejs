@@ -1822,7 +1822,9 @@
           month: 'short',
           day: '2-digit',
           hour: '2-digit',
-          minute: '2-digit'
+          minute: '2-digit',
+          hour12: true,
+          timeZone: 'Asia/Thimphu'
         });
 
         const firstPrize = lottery.prizes.find(p => p.rank === 1);
@@ -1839,7 +1841,7 @@
             <span class="past-badge rounded-full">RESULT</span>
             <span class="card-text-secondary card-date">${formattedDate}</span>
           </div>
-          <h3 class="card-text card-lottery-name">${lottery.name}</h3>
+          <h3 class="card-text card-lottery-name">${lottery.name}<br>${lottery.name2}</h3>
           <div class="flex items-center card-text-secondary">
             <i class="fas fa-trophy text-yellow-300 mr-2"></i>
             <span class="card-prize">1st Prize: ₹${firstPrize.amount.toLocaleString('en-IN')}</span>
