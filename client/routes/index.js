@@ -20,7 +20,6 @@ router.post('/api/refresh-results',async function(req, res, next) {
   await indexFun.refreshResults(req,res)
 });
 
-
 router.get('/create-dummy-lottories',async function(req, res, next) {
  try {
   let savedLotteries = await startFun.saveDummyLotteries(req, res);
