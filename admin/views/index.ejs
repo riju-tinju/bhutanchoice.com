@@ -1856,12 +1856,13 @@
                     const winner = lottery.winners.find(w => w.prizeRank === prize.rank);
                     const amount = `₹${prize.amount.toLocaleString('en-IN')}/-`;
                     const ticketNumber = winner ? winner.ticketNumber : '';
+                    const noResultsClass = winner ? '' : 'result-winning-number_if_no_results underline-animated';
                     return `
               <div class="result-card">
                 <div class="result-card-header">${prize.rank} Prize</div>
                 <div class="result-card-content">
                   <div class="result-prize-amount">${amount}</div>
-                  <div class="result-winning-number">${ticketNumber}</div>
+                  <div class="result-winning-number ${noResultsClass}">${ticketNumber}</div>
                 </div>
               </div>
             `;
