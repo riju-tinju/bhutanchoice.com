@@ -83,11 +83,11 @@ const indexHelper = {
 
       // Sort past by newest first and limit to 7
       past.sort((a, b) => new Date(b.drawDate) - new Date(a.drawDate));
-      const limitedPast = past.slice(0, 7);
-
+      const limitedPast = past.slice(0, 5);
+      
       let filteredUpcoming = [];
       if (upcoming.length > 0) filteredUpcoming.push(upcoming[0]);
-
+     
       return res.render('index', {
         todays,
         upcoming: filteredUpcoming,
