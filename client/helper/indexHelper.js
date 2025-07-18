@@ -148,7 +148,7 @@ const indexHelper = {
   getPastLotteries: async (req, res) => {
     try {
       const page = parseInt(req.body.page) || 1; // Default to page 1 if not provided
-      const limit = 7;
+      const limit = 5;
       const skip = (page - 1) * limit;
 
       // Get current Bhutan date
