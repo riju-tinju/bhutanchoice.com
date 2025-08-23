@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bhutan Lottery - Time Zone Reference</title>
+</head>
+<body>
+    <!-- <h1>Bhutan Lottery Time Zone Reference</h1>
+    <p>Comparing time zones for your lottery website</p>
+    
+    <h2>Which Time Zone Should You Use?</h2>
+    <p>Your lottery site is focused on Bhutan lottery results, but most of your customers are in Dubai.</p>
+    
+    <h3>Recommendation</h3>
+    <p>For a Bhutan lottery site with mostly Dubai customers, we recommend displaying times in both Bhutan time (BTT) and Dubai time (GST).</p> -->
+    
+    <h2>Time Zone Data from Backend</h2>
+    
+    <table border="1">
+        <tr>
+            <th>Time Zone</th>
+            <th>Current Time</th>
+        </tr>
+        <tr>
+            <td>Normal Time from Backend</td>
+            <td><%= timeObj.normalTimeFromBackend %></td>
+        </tr>
+        <tr>
+            <td>Bhutan Time (BTT)</td>
+            <td><%= timeObj.bhutanTime %></td>
+        </tr>
+        <tr>
+            <td>Indian Time (IST)</td>
+            <td><%= timeObj.indianTime %></td>
+        </tr>
+        <tr>
+            <td>Dubai Time (GST)</td>
+            <td><%= timeObj.dubaiTime %></td>
+        </tr>
+        <tr>
+            <td>UTC Time</td>
+            <td><%= timeObj.utcTime %></td>
+        </tr>
+    </table>
+    
+    <h2>Frontend Time Detection</h2>
+    
+    <table border="1">
+        <tr>
+            <th>Time Zone</th>
+            <th>Current Time</th>
+        </tr>
+        <tr>
+            <td>Your Local Time (Browser Detection)</td>
+            <td id="local-time">Loading...</td>
+        </tr>
+        <tr>
+            <td>UTC Time (Browser Calculation)</td>
+            <td id="utc-frontend">Loading...</td>
+        </tr>
+    </table>
+    
+    <!-- <h2>Next Draw Information</h2>
+    <p>The next lottery draw will be on Saturday at 8:00 PM Bhutan Time (BTT).</p>
+    <p>That corresponds to 6:00 PM in Dubai (GST).</p> -->
+    
+    <script>
+        // Function to update frontend times
+        function updateFrontendTimes() {
+            const now = new Date();
+            
+            // Local time
+            document.getElementById('local-time').textContent = now.toString();
+            
+            // UTC time
+            document.getElementById('utc-frontend').textContent = now.toUTCString();
+        }
+        
+        // Update initially
+        updateFrontendTimes();
+        
+        // Update every minute
+        setInterval(updateFrontendTimes, 60000);
+    </script>
+</body>
+</html>
