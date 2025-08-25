@@ -104,18 +104,24 @@ const formattedDate = drawDate.toLocaleDateString('en-GB', {
                <%= formattedTime %>
              </div>
              <div class="result-card-content">
-               <div class="result-prize-amount">A B C</div>
+               <div class="result-prize-amount">A  B  C  D  E</div>
 
                <div class="winning-numbers-container">
-        <%  winner.winNumbers.forEach(winNumber => { %>
+                <div class="winning-number-item">
+                <div class="winning-number" data-ticket-number="<%= winner.winNumbers[0].ticketNumber %>">
+                     <%= winner.winNumbers[0].ticketNumber %>
+                  </div>
+                </div>
+        <!-- <%  winner.winNumbers.forEach(winNumber => { %>
           <div class="winning-number-item">
-            <div class="winning-number" data-ticket-number="<%= winNumber.ticketNumber %>">
+            <div class="winning-number" data-ticket-number="<%= winNumber.ticketNumber %>"> -->
               <!-- The actual number will be hidden by JavaScript and replaced with animation -->
-              <%= winNumber.ticketNumber %>
+              <!-- <%= winNumber.ticketNumber %>
             </div>
            
           </div>
-        <% }); %>
+        <% }); %> -->
+        
 </div>
               <!--  -->
                
