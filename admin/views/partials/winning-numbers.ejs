@@ -1,0 +1,177 @@
+<style>
+  /* Animation styles for winning numbers */
+  .winning-numbers-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 15px 0;
+  }
+  
+  .winning-number {
+    display: flex;
+    justify-content: center;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    padding: 5px;
+    margin: 5px;
+  }
+  
+  .digit-container {
+    position: relative;
+    height: 60px;
+    width: 45px;
+    overflow: hidden;
+    perspective: 400px;
+  }
+  
+  .digit-stack {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    transform-style: preserve-3d;
+    transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  
+  .digit {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+    width: 100%;
+    height: 60px;
+    background: linear-gradient(to bottom, #f9f9f9, #fff);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .digit:last-child {
+    border-bottom: none;
+  }
+  
+  .ticket-label {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 5px;
+  }
+  
+  /* Style for collapsed content */
+  .result-content.collapsed {
+    display: none;
+  }
+  
+  .result-content:not(.collapsed) {
+    display: block;
+  }
+</style>
+
+<script>
+  // Modified toggleResult function to handle animation
+  function toggleResult(id) {
+    const element = document.getElementById(id);
+    const arrow = document.getElementById('arrow-' + id);
+    
+    // Toggle visibility
+    element.classList.toggle('collapsed');
+    arrow.classList.toggle('fa-chevron-down');
+    arrow.classList.toggle('fa-chevron-up');
+    
+    // If expanding, trigger animation
+    if (!element.classList.contains('collapsed')) {
+      // Small delay to allow DOM to update
+      setTimeout(() => {
+        animateWinningNumbers(id);
+      }, 50);
+    }
+  }
+  
+  // Initialize animation for a specific card
+  function animateWinningNumbers(cardId) {
+    const container = document.getElementById(cardId);
+    const winningNumberElements = container.querySelectorAll('.winning-number');
+    
+    // Animate each winning number
+    winningNumberElements.forEach((element, index) => {
+      const ticketNumber = element.getAttribute('data-ticket-number') || element.textContent.trim();
+      initializeTicketNumber(element, ticketNumber);
+      
+      // Animate with a slight delay between numbers
+      setTimeout(() => {
+        animateTicketNumber(element, ticketNumber);
+      }, index * 200);
+    });
+  }
+  
+  // Initialize a ticket number display
+  function initializeTicketNumber(container, ticketNumber) {
+    container.innerHTML = '';
+    
+    // Use actual ticket number length (no padding)
+    const actualNumber = ticketNumber.toString();
+    
+    // Create a digit container for each digit
+    for (let i = 0; i < actualNumber.length; i++) {
+      const digitContainer = document.createElement('div');
+      digitContainer.className = 'digit-container';
+      
+      const digitStack = document.createElement('div');
+      digitStack.className = 'digit-stack';
+      
+      // Create 15 digits (0-9 plus some extra for smooth animation)
+      for (let j = 0; j < 15; j++) {
+        const digit = document.createElement('div');
+        digit.className = 'digit';
+        digit.textContent = j % 10; // This will create numbers 0-9, then 0-4 again
+        digitStack.appendChild(digit);
+      }
+      
+      digitContainer.appendChild(digitStack);
+      container.appendChild(digitContainer);
+      
+      // Set initial position
+      digitStack.style.transform = 'translateY(0px)';
+    }
+  }
+
+  // Animate a ticket number with random effects
+  function animateTicketNumber(container, ticketNumber) {
+    const actualNumber = ticketNumber.toString();
+    const digitStacks = container.querySelectorAll('.digit-stack');
+    
+    // Animate each digit
+    for (let i = 0; i < actualNumber.length; i++) {
+      const targetDigit = parseInt(actualNumber[i]);
+      const digitStack = digitStacks[i];
+      
+      // Calculate how far to move the stack
+      const randomCycles = 20 + Math.floor(Math.random() * 10); // Random number of cycles
+      const finalPosition = targetDigit * 60; // Each digit is 60px tall
+      
+      // Start with a fast random animation
+      let currentPosition = 0;
+      const randomInterval = setInterval(() => {
+        currentPosition += 60;
+        digitStack.style.transform = `translateY(-${currentPosition}px)`;
+        
+        // When we've done enough random cycles, go to the target
+        if (currentPosition >= randomCycles * 60) {
+          clearInterval(randomInterval);
+          
+          // Now smoothly animate to the final position
+          setTimeout(() => {
+            digitStack.style.transition = 'transform 0.8s cubic-bezier(0.19, 1, 0.22, 1)';
+            digitStack.style.transform = `translateY(-${finalPosition}px)`;
+          }, 50);
+        }
+      }, 80 - (i * 10)); // Different speed for each digit position
+    }
+  }
+</script>

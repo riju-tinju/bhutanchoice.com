@@ -1,4 +1,6 @@
- <!-- Past Results -->
+<%- include('./winning-numbers') %>
+
+<!-- Past Results -->
  <section>
    <% if(past && past.length>0){ %>
    <div class="flex items-center justify-between mb-6">
@@ -46,11 +48,7 @@ const formattedDate = drawDate.toLocaleDateString('en-GB', {
            <h3 class="card-text card-lottery-name">
              <%= past[i].name %><br><%= past[i].name2 || '' %>
            </h3>
-           <!-- <div class="flex items-center card-text-secondary">
-             <i class="fas fa-trophy text-yellow-300 mr-2"></i>
-             <% const firstPrize=past[i].prizes.find(p=> p.rank === 1); %>
-             <span class="card-prize">1st Prize: ₹<%=firstPrize.amount.toLocaleString('en-IN') %></span>
-           </div> -->
+           
            <!-- priZe listing -->
            <% past[i].prizes.forEach(prize => { %>
            <div class="flex items-center card-text-secondary">
@@ -88,27 +86,7 @@ const formattedDate = drawDate.toLocaleDateString('en-GB', {
 
        <div id="past<%= i %>" class="card-expand collapsed mt-6">
          <div class="result-container space-y-4">
-           <!-- <% past[i].prizes.forEach(prize=> {
-                                        const winner = past[i].winners.find(w => w.prizeRank === prize.rank);
-                                        %>
-           <div class="result-card">
-             <div class="result-card-header">
-               <%= prize.rank %> Prize
-             </div>
-             <div class="result-card-content">
-               <div class="result-prize-amount">₹<%=
-                                                        prize.amount.toLocaleString('en-IN') %>/-</div>
-               <% if(winner) { %>
-               <div class="result-winning-number">
-                 <%= winner.ticketNumber %>
-               </div>
-               <% } else { %>
-               <div class="result-winning-number result-winning-number_if_no_results underline-animated"></div>
-               <% } %>
-             </div>
-           </div>
-           <% }); %> -->
-
+           
            <!-- result card loop -->
            <% past[i].winners.forEach(winner => { %>
            <% 
@@ -127,7 +105,21 @@ const formattedDate = drawDate.toLocaleDateString('en-GB', {
              </div>
              <div class="result-card-content">
                <div class="result-prize-amount">A B C</div>
-               <% if(winner.winNumbers && winner.winNumbers.length > 0) { %>
+
+               <div class="winning-numbers-container">
+        <%  winner.winNumbers.forEach(winNumber => { %>
+          <div class="winning-number-item">
+            <div class="winning-number" data-ticket-number="<%= winNumber.ticketNumber %>">
+              <!-- The actual number will be hidden by JavaScript and replaced with animation -->
+              <%= winNumber.ticketNumber %>
+            </div>
+           
+          </div>
+        <% }); %>
+</div>
+              <!--  -->
+               
+               <!-- <% if(winner.winNumbers && winner.winNumbers.length > 0) { %>
                <div class="result-winning-numbers">
                  <% winner.winNumbers.forEach(winNumber => { %>
                  <div class="winning-number">
@@ -137,7 +129,7 @@ const formattedDate = drawDate.toLocaleDateString('en-GB', {
                </div>
                <% } else { %>
                <div class="result-winning-number result-winning-number_if_no_results underline-animated"></div>
-               <% } %>
+               <% } %> -->
              </div>
            </div>
            <% }); %>
@@ -146,17 +138,6 @@ const formattedDate = drawDate.toLocaleDateString('en-GB', {
        </div>
      </div>
      <% } %>
-
-     <script>
-       function toggleResult(id) {
-         const element = document.getElementById(id);
-         const arrow = document.getElementById('arrow-' + id);
-
-         element.classList.toggle('collapsed');
-         arrow.classList.toggle('fa-chevron-down');
-         arrow.classList.toggle('fa-chevron-up');
-       }
-     </script>
 
      <!-- Load More Button -->
      <button onclick="getPastLottories()" class="load-more-btn w-full text-white py-4 font-semibold flex items-center
