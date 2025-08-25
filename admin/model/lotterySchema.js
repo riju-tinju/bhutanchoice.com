@@ -36,8 +36,17 @@ const lotterySchema = new Schema({
   }],
   
   winners: [{
-    ticketNumber: String,
-    prizeRank: Number
+    resultTime:{
+      type: Date,
+      default: Date.now
+    },
+    winNumbers: [
+      {
+       prizeRank: Number,
+       ticketNumber: String,
+      }
+    ],
+    
   }],
   
   createdAt: {

@@ -51,11 +51,27 @@ const formattedDate = drawDate.toLocaleDateString('en-GB', { // 'en-IN' for Indi
                     
                     <h3 class="card-text card-lottery-name"><%= lottery.name %><br><%= lottery.name2 || '' %></h3>
                     
-                    <div class="flex items-center card-text-secondary">
+                    <!-- <div class="flex items-center card-text-secondary">
                         <i class="fas fa-trophy text-yellow-300 mr-2"></i>
                         <span class="card-prize">1st Prize: ₹<%= firstPrize.amount.toLocaleString('en-IN') %></span>
-                    </div>
-
+                    </div> -->
+                    <!-- priZe listing -->
+           <% lottery.prizes.forEach(prize => { %>
+           <div class="flex items-center card-text-secondary">
+             <i class="fas fa-trophy text-yellow-300 mr-2"></i>
+             <span class="card-prize">
+               <% 
+               let rankStatus= 'th';
+                if(prize.rank === 1) rankStatus = 'st';
+                else if(prize.rank === 2) rankStatus = 'nd';
+                else if(prize.rank === 3) rankStatus = 'rd';
+                else rankStatus = 'th';
+               %>
+               <%= prize.rank %><%= rankStatus %> Prize: ₹<%= prize.amount.toLocaleString('en-IN') %>
+             </span><br>
+           </div>
+           <% }); %>
+           <!--  -->
                     <!-- Step 4b: Only first lottery gets countdown -->
                     <% if (isFirst) { %>
                     <div class="countdown-container">

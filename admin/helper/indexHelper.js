@@ -90,22 +90,22 @@ const indexHelper = {
       return res.status(500).json({ success: false, message: 'Failed to fetch past lotteries' });
     }
   },
-  getPastLotteries: async(req, res) => {
+  getPastLotteries: async (req, res) => {
     try {
       const page = parseInt(req.body.page) || 1; // Default to page 1 if not provided
       const limit = 7;
       const skip = (page - 1) * limit;
-  
+
       // Get current Bhutan date
       const today = moment().tz("Asia/Thimphu").startOf('day');
-  
+
       // Get all past lotteries (drawDate before today)
       const allPastLotteries = await Lottery.find({
         drawDate: { $lt: today.toDate() }
       }).sort({ drawDate: -1 }) // Sort by newest first
         .skip(skip)
         .limit(limit);
-  
+
       // Add weekday name
       const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
       const items = allPastLotteries.map(lottery => {
@@ -113,7 +113,7 @@ const indexHelper = {
         const dayName = weekdays[drawDate.day()];
         return { ...lottery._doc, dayName };
       });
-  
+
       return res.status(200).json({ success: true, items });
     } catch (err) {
       console.error("Error fetching past lotteries:", err);
@@ -123,20 +123,47 @@ const indexHelper = {
   createLottery: async (req, res) => {
     try {
       console.log("Creating lottery with data:", req.body);
-      const { name,name2, drawNumber, drawDate, prizes } = req.body;
+      const { name, name2, drawNumber, drawDate, prizes, winners } = req.body;
 
-      // Optional: Validate incoming data manually if needed
-      if (!name || !name2 || !drawNumber || !drawDate || !Array.isArray(prizes)) {
-        return res.status(400).json({ success: false, message: 'Invalid input data' });
+      // Validate required fields
+      if (!name || !drawNumber || !drawDate || !Array.isArray(prizes)) {
+        return res.status(400).json({ success: false, message: 'Invalid input data. Name, drawNumber, drawDate, and prizes are required.' });
+      }
+
+      // Validate prizes array structure
+      for (const prize of prizes) {
+        if (!prize.rank || !prize.amount) {
+          return res.status(400).json({ success: false, message: 'Each prize must have rank and amount.' });
+        }
+      }
+
+      // Validate winners array structure if provided
+      if (winners && Array.isArray(winners)) {
+        for (const winner of winners) {
+          if (!winner.resultTime) {
+            return res.status(400).json({ success: false, message: 'Each winner entry must have a resultTime.' });
+          }
+          if (winner.winNumbers && Array.isArray(winner.winNumbers)) {
+            for (const winNumber of winner.winNumbers) {
+              if (!winNumber.prizeRank || !winNumber.ticketNumber) {
+                return res.status(400).json({ success: false, message: 'Each winNumber must have prizeRank and ticketNumber.' });
+              }
+              // Validate ticketNumber is exactly 3 digits
+              if (!/^\d{3}$/.test(winNumber.ticketNumber)) {
+                return res.status(400).json({ success: false, message: 'Ticket numbers must be exactly 3 digits.' });
+              }
+            }
+          }
+        }
       }
 
       const newLottery = new Lottery({
         name,
-        name2,
+        name2: name2 || '', // Make name2 optional with default value
         drawNumber,
         drawDate,
         prizes,
-        winners: [] // initialize as empty array
+        winners: winners || [] // Use provided winners or initialize as empty array
       });
 
       const savedLottery = await newLottery.save();
@@ -148,13 +175,13 @@ const indexHelper = {
       });
     } catch (err) {
       console.error("Error in createLottery:", err);
-      return res.status(500).json({ success: false, message: 'Failed to create lottery' });
+      return res.status(500).json({ success: false, message: 'Failed to create lottery', error: err.message });
     }
   },
-  updateLottery: async (req, res) => {
+  updateLottery1: async (req, res) => {
     try {
       const lotteryId = req.params.id;
-      const { name,name2, drawNumber, drawDate, prizes, winners } = req.body;
+      const { name, name2, drawNumber, drawDate, prizes, winners } = req.body;
 
       if (!lotteryId) {
         return res.status(400).json({ success: false, message: 'Lottery ID is required' });
@@ -192,6 +219,88 @@ const indexHelper = {
       return res.status(500).json({ success: false, message: 'Failed to update lottery' });
     }
   },
+  updateLottery: async (req, res) => {
+    try {
+      const lotteryId = req.params.id;
+      const { name, name2, drawNumber, drawDate, prizes, winners } = req.body;
+
+      if (!lotteryId) {
+        return res.status(400).json({ success: false, message: 'Lottery ID is required' });
+      }
+
+      // Check if lottery exists
+      const existingLottery = await Lottery.findById(lotteryId);
+      if (!existingLottery) {
+        return res.status(404).json({ success: false, message: 'Lottery not found' });
+      }
+
+      const updateData = {};
+
+      if (name !== undefined) updateData.name = name;
+      if (name2 !== undefined) updateData.name2 = name2;
+      if (drawNumber !== undefined) updateData.drawNumber = drawNumber;
+      if (drawDate !== undefined) updateData.drawDate = drawDate;
+
+      // Validate prizes array structure if provided
+      if (prizes !== undefined) {
+        if (!Array.isArray(prizes)) {
+          return res.status(400).json({ success: false, message: 'Prizes must be an array.' });
+        }
+        for (const prize of prizes) {
+          if (!prize.rank || !prize.amount) {
+            return res.status(400).json({ success: false, message: 'Each prize must have rank and amount.' });
+          }
+        }
+        updateData.prizes = prizes;
+      }
+
+      // Validate winners array structure if provided
+      if (winners !== undefined) {
+        if (!Array.isArray(winners)) {
+          return res.status(400).json({ success: false, message: 'Winners must be an array.' });
+        }
+        for (const winner of winners) {
+          if (!winner.resultTime) {
+            return res.status(400).json({ success: false, message: 'Each winner entry must have a resultTime.' });
+          }
+          if (winner.winNumbers && Array.isArray(winner.winNumbers)) {
+            for (const winNumber of winner.winNumbers) {
+              if (!winNumber.prizeRank || !winNumber.ticketNumber) {
+                return res.status(400).json({ success: false, message: 'Each winNumber must have prizeRank and ticketNumber.' });
+              }
+              // Validate ticketNumber is exactly 3 digits
+              if (!/^\d{3}$/.test(winNumber.ticketNumber)) {
+                return res.status(400).json({ success: false, message: 'Ticket numbers must be exactly 3 digits.' });
+              }
+            }
+          }
+        }
+        updateData.winners = winners;
+      }
+
+      updateData.updatedAt = new Date();
+
+      const updatedLottery = await Lottery.findByIdAndUpdate(
+        lotteryId,
+        { $set: updateData },
+        { new: true, runValidators: true }
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: 'Lottery updated successfully',
+        data: updatedLottery
+      });
+
+    } catch (err) {
+      console.error("Error in updateLottery:", err);
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to update lottery',
+        error: err.message
+      });
+    }
+  },
   getLottery: async (req, res) => {
     try {
       const { id } = req.params;
@@ -217,30 +326,30 @@ const indexHelper = {
     }
   },
   deleteLottery: async (req, res) => {
-  try {
-    const { id } = req.params;
+    try {
+      const { id } = req.params;
 
-    if (!id) {
-      return res.status(400).json({ success: false, message: 'Lottery ID is required' });
+      if (!id) {
+        return res.status(400).json({ success: false, message: 'Lottery ID is required' });
+      }
+
+      const deletedLottery = await Lottery.findByIdAndDelete(id);
+
+      if (!deletedLottery) {
+        return res.status(404).json({ success: false, message: 'Lottery not found or already deleted' });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: 'Lottery deleted successfully',
+        // data: deletedLottery
+      });
+
+    } catch (err) {
+      console.error("Error in deleteLottery:", err);
+      return res.status(500).json({ success: false, message: 'Failed to delete lottery' });
     }
-
-    const deletedLottery = await Lottery.findByIdAndDelete(id);
-
-    if (!deletedLottery) {
-      return res.status(404).json({ success: false, message: 'Lottery not found or already deleted' });
-    }
-
-    return res.status(200).json({
-      success: true,
-      message: 'Lottery deleted successfully',
-      // data: deletedLottery
-    });
-
-  } catch (err) {
-    console.error("Error in deleteLottery:", err);
-    return res.status(500).json({ success: false, message: 'Failed to delete lottery' });
-  }
-},
+  },
 
 
 }

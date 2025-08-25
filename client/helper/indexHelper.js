@@ -88,6 +88,9 @@ const indexHelper = {
       let filteredUpcoming = [];
       if (upcoming.length > 0) filteredUpcoming.push(upcoming[0]);
      
+      console.log('\nTodays__:\n', todays)
+      console.log('\nUpcoming__:\n', filteredUpcoming)
+      console.log('\nPast__:\n', limitedPast)
       return res.render('index', {
         todays,
         upcoming: filteredUpcoming,

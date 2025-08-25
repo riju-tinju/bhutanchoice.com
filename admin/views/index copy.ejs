@@ -220,7 +220,7 @@
     }
 
     /* Past Card styles for each day */
-    .Sunday-card {
+     .Sunday-card {
       background: linear-gradient(135deg, #D51F48 0%, #EB5A7C 100%);
     }
 
@@ -581,58 +581,55 @@
       background-color: #d9daeb63;
       padding: 0px 12px;
     } */
-
-
-    .result-winning-number_if_no_results {
-      min-height: 36px;
-      min-width: 90px;
+    
+    
+ .result-winning-number_if_no_results{
+       min-height: 36px;
+       min-width: 90px;
     }
 
-    .result-winning-number {
-      position: relative;
-      display: inline-block;
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #374151;
-      font-family: "ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New", "monospace";
-      letter-spacing: 2px;
-      border: 3px solid rgb(229, 229, 229);
-      border-radius: 6px;
-      background-color: #d9daeb63;
-      padding: 6px 28px;
-      overflow: hidden;
-    }
+  .result-winning-number {
+  position: relative;
+  display: inline-block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #374151;
+  font-family: "ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New", "monospace";
+  letter-spacing: 2px;
+  border: 3px solid rgb(229, 229, 229);
+  border-radius: 6px;
+  background-color: #d9daeb63;
+  padding: 6px 28px;
+  overflow: hidden;
+}
 
-    .underline-animated::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      height: 3px;
-      width: 100%;
-      background: linear-gradient(90deg, #ff8a00, #e52e71, #9b59b6);
-      transform: scaleX(0);
-      transform-origin: left;
-      animation: animateUnderline 1.6s ease-in-out infinite alternate;
-    }
+.underline-animated::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  background: linear-gradient(90deg, #ff8a00, #e52e71, #9b59b6);
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: animateUnderline 1.6s ease-in-out infinite alternate;
+}
 
-    @keyframes animateUnderline {
-      0% {
-        transform: scaleX(0);
-        transform-origin: left;
-      }
-
-      50% {
-        transform: scaleX(.4);
-      }
-
-      100% {
-
-        transform-origin: right;
-      }
-    }
-
-    /* animation end */
+@keyframes animateUnderline {
+  0% {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  50%{
+    transform: scaleX(.4);
+  }
+  100% {
+    
+    transform-origin: right;
+  }
+}
+/* animation end */
 
     .result-location {
       font-size: 0.9rem;
@@ -1212,7 +1209,7 @@
     </div>
 
 
-    <% 
+  <% 
     // Calculate section order
     const now = new Date();
     
@@ -1246,19 +1243,96 @@
   </main>
 
   <!-- Settings Button -->
-  <script>
-    // Settings Function
-    function goToSettings() {
-      alert('settings page is under construction')
-      window.location.href = '/setting';
-    }
-  </script>
   <button onclick="goToSettings()" class="settings-btn">
     <i class="fas fa-cog"></i>
   </button>
 
   <!-- Enhanced Create/Edit Lottery Modal -->
-  <%- include('partials/Edit-create-extention') %>
+  <div id="lotteryModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle" class="modal-title">Create New Lottery</h2>
+      </div>
+      <div class="modal-body">
+        <form id="lotteryForm">
+          <!-- Lottery Details Section -->
+          <div class="form-section">
+            <h3 class="form-section-title">
+              <i class="fas fa-info-circle"></i>
+              Lottery Details
+            </h3>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Lottery Name</label>
+                <input type="text" id="lotteryName" class="form-input" required placeholder="e.g., Monday Choice Weekly Lottery">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Name 2</label>
+                <input type="text" id="lotteryName2" class="form-input" required placeholder="e.g., (MOC-12th Draw)">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Draw Number</label>
+                <input type="number" id="drawNumber" class="form-input" required min="1" placeholder="e.g., 156">
+              </div>
+
+              <div class="form-group form-grid-full">
+                <label class="form-label">Draw Date & Time</label>
+                <input type="datetime-local" id="drawDate" class="form-input" required>
+              </div>
+            </div>
+          </div>
+
+          <!-- Prize Structure Section -->
+          <div class="form-section">
+            <h3 class="form-section-title">
+              <i class="fas fa-trophy"></i>
+              Prize Structure
+            </h3>
+
+            <div id="prizesContainer">
+              <div class="prize-item">
+                <div class="prize-rank-display">1st Prize</div>
+                <input type="number" placeholder="Amount (₹)" class="prize-amount-input" required min="0">
+                <button type="button" class="remove-prize" onclick="removePrize(this)">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+
+            <button type="button" class="add-prize" onclick="addPrize()">
+              <i class="fas fa-plus"></i>
+              Add Prize
+            </button>
+          </div>
+
+          <!-- Winners Section -->
+          <div class="form-section">
+            <h3 class="form-section-title">
+              <i class="fas fa-crown"></i>
+              Winners (Optional)
+            </h3>
+
+            <div id="winnersContainer">
+              <!-- Winners will be added dynamically -->
+            </div>
+
+            <button type="button" class="add-winner" onclick="addWinner()">
+              <i class="fas fa-plus"></i>
+              Add Winner
+            </button>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="submitBtn">Create Lottery</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 
   <!-- Toast Notification -->
   <div id="toast" class="toast"></div>
@@ -1303,6 +1377,327 @@
       }
     }
 
+    // API Functions
+    async function fetchAutoComplete() {
+      try {
+        const response = await fetch('/api/lottery-autocomplete');
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.message || 'Failed to fetch auto-complete data');
+        }
+
+        if (result.success) {
+          return result.data;
+        } else {
+          throw new Error(result.message || 'Auto-complete failed');
+        }
+      } catch (error) {
+        console.error('Auto-complete error:', error);
+        showToast('Failed to load auto-complete data: ' + error.message, 'error');
+        return null;
+      }
+    }
+
+    async function createLottery(lotteryData) {
+      try {
+        const response = await fetch('/api/lottery', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(lotteryData)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.message || 'Failed to create lottery');
+        }
+
+        if (result.success) {
+          showToast('Lottery created successfully!', 'success');
+          closeModal();
+          setTimeout(() => {
+            window.location.reload();
+          }, 1500);
+        } else {
+          throw new Error(result.message || 'Create lottery failed');
+        }
+      } catch (error) {
+        console.error('Create lottery error:', error);
+        showToast('Failed to create lottery: ' + error.message, 'error');
+      }
+    }
+
+    async function updateLottery(id, lotteryData) {
+      try {
+        const response = await fetch(`/api/lottery/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(lotteryData)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.message || 'Failed to update lottery');
+        }
+
+        if (result.success) {
+          showToast('Lottery updated successfully!', 'success');
+          closeModal();
+          setTimeout(() => {
+            window.location.reload();
+          }, 1500);
+        } else {
+          throw new Error(result.message || 'Update lottery failed');
+        }
+      } catch (error) {
+        console.error('Update lottery error:', error);
+        showToast('Failed to update lottery: ' + error.message, 'error');
+      }
+    }
+
+    async function deleteLottery(id) {
+      if (!confirm('Are you sure you want to delete this lottery? This action cannot be undone.')) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/lottery/${id}`, {
+          method: 'DELETE'
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.message || 'Failed to delete lottery');
+        }
+
+        if (result.success) {
+          showToast('Lottery deleted successfully!', 'success');
+          setTimeout(() => {
+            window.location.reload();
+          }, 1500);
+        } else {
+          throw new Error(result.message || 'Delete lottery failed');
+        }
+      } catch (error) {
+        console.error('Delete lottery error:', error);
+        showToast('Failed to delete lottery: ' + error.message, 'error');
+      }
+    }
+
+    async function getLotteryById(id) {
+      try {
+        const response = await fetch(`/api/lottery/${id}`);
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.message || 'Failed to fetch lottery');
+        }
+
+        if (result.success) {
+          return result.data;
+        } else {
+          throw new Error(result.message || 'Fetch lottery failed');
+        }
+      } catch (error) {
+        console.error('Fetch lottery error:', error);
+        showToast('Failed to load lottery data: ' + error.message, 'error');
+        return null;
+      }
+    }
+
+    // Modal Functions
+    async function openCreateModal() {
+      document.getElementById('modalTitle').textContent = 'Create New Lottery';
+      document.getElementById('submitBtn').textContent = 'Create Lottery';
+      document.getElementById('lotteryForm').reset();
+      currentEditId = null;
+
+      // Reset counters
+      prizeCounter = 1;
+      winnerCounter = 1;
+
+      // Clear and setup default prize
+      const prizesContainer = document.getElementById('prizesContainer');
+      prizesContainer.innerHTML = `
+        <div class="prize-item">
+          <div class="prize-rank-display">1st Prize</div>
+          <input type="number" placeholder="Amount (₹)" class="prize-amount-input" required min="0">
+          <button type="button" class="remove-prize" onclick="removePrize(this)">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      `;
+
+      // Clear winners container
+      const winnersContainer = document.getElementById('winnersContainer');
+      winnersContainer.innerHTML = '';
+
+      // Load auto-complete data
+      const autoCompleteData = await fetchAutoComplete();
+      if (autoCompleteData) {
+        document.getElementById('lotteryName').value = autoCompleteData.suggestedName || '';
+        document.getElementById('drawNumber').value = autoCompleteData.nextDrawNumber || '';
+
+        if (autoCompleteData.suggestedDate) {
+          const date = new Date(autoCompleteData.suggestedDate);
+          document.getElementById('drawDate').value = date.toISOString().slice(0, 16);
+        }
+      }
+
+      document.getElementById('lotteryModal').classList.add('show');
+    }
+
+    async function editLottery(id) {
+      const lotteryData = await getLotteryById(id);
+      if (!lotteryData) return;
+
+
+      document.getElementById('modalTitle').textContent = 'Edit Lottery';
+      document.getElementById('submitBtn').textContent = 'Update Lottery';
+      currentEditId = id;
+
+      // Fill form with existing data
+      document.getElementById('lotteryName').value = lotteryData.name || '';
+      document.getElementById('lotteryName2').value = lotteryData.name2 || '';
+      document.getElementById('drawNumber').value = lotteryData.drawNumber || '';
+
+
+      if (lotteryData.drawDate) {
+        const utcDate = new Date(lotteryData.drawDate);
+
+        // Convert to IST by adding 5.5 hours (19800 seconds)
+        const istOffset = 6 * 60 * 60 * 1000;
+        const istDate = new Date(utcDate.getTime() + istOffset);
+
+        // Format for input[type="datetime-local"]
+        const formattedIST = istDate.toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
+
+        document.getElementById('drawDate').value = formattedIST;
+      }
+
+      // Fill prizes
+      const prizesContainer = document.getElementById('prizesContainer');
+      prizesContainer.innerHTML = '';
+      prizeCounter = 0;
+
+      if (lotteryData.prizes && lotteryData.prizes.length > 0) {
+        lotteryData.prizes.forEach(prize => {
+          prizeCounter++;
+          const prizeDiv = document.createElement('div');
+          prizeDiv.className = 'prize-item';
+          prizeDiv.innerHTML = `
+            <div class="prize-rank-display">${getRankDisplay(prizeCounter)}</div>
+            <input type="number" placeholder="Amount (₹)" class="prize-amount-input" required min="0" value="${prize.amount}">
+            <button type="button" class="remove-prize" onclick="removePrize(this)">
+              <i class="fas fa-trash"></i>
+            </button>
+          `;
+          prizesContainer.appendChild(prizeDiv);
+        });
+      } else {
+        addPrize();
+      }
+
+      // Fill winners
+      const winnersContainer = document.getElementById('winnersContainer');
+      winnersContainer.innerHTML = '';
+      winnerCounter = 0;
+
+      if (lotteryData.winners && lotteryData.winners.length > 0) {
+        lotteryData.winners.forEach(winner => {
+          winnerCounter++;
+          const winnerDiv = document.createElement('div');
+          winnerDiv.className = 'winner-item';
+          winnerDiv.innerHTML = `
+            <div class="winner-rank-display">${getRankDisplay(winnerCounter)}</div>
+            <input type="text" placeholder="Ticket Number" class="winner-ticket-input" value="${winner.ticketNumber}">
+            <button type="button" class="remove-winner" onclick="removeWinner(this)">
+              <i class="fas fa-trash"></i>
+            </button>
+          `;
+          winnersContainer.appendChild(winnerDiv);
+        });
+      }
+
+      document.getElementById('lotteryModal').classList.add('show');
+    }
+
+    function closeModal() {
+      document.getElementById('lotteryModal').classList.remove('show');
+      currentEditId = null;
+    }
+
+    // Prize Management
+    function addPrize() {
+      prizeCounter++;
+      const prizesContainer = document.getElementById('prizesContainer');
+      const prizeDiv = document.createElement('div');
+      prizeDiv.className = 'prize-item';
+      prizeDiv.innerHTML = `
+        <div class="prize-rank-display">${getRankDisplay(prizeCounter)}</div>
+        <input type="number" placeholder="Amount (₹)" class="prize-amount-input" required min="0">
+        <button type="button" class="remove-prize" onclick="removePrize(this)">
+          <i class="fas fa-trash"></i>
+        </button>
+      `;
+      prizesContainer.appendChild(prizeDiv);
+    }
+
+    function removePrize(button) {
+      const prizesContainer = document.getElementById('prizesContainer');
+      if (prizesContainer.children.length > 1) {
+        button.parentElement.remove();
+        updatePrizeRanks();
+      } else {
+        showToast('At least one prize is required', 'error');
+      }
+    }
+
+    function updatePrizeRanks() {
+      const prizeItems = document.querySelectorAll('.prize-item');
+      prizeCounter = 0;
+      prizeItems.forEach(item => {
+        prizeCounter++;
+        item.querySelector('.prize-rank-display').textContent = getRankDisplay(prizeCounter);
+      });
+    }
+
+    // Winner Management
+    function addWinner() {
+      winnerCounter++;
+      const winnersContainer = document.getElementById('winnersContainer');
+      const winnerDiv = document.createElement('div');
+      winnerDiv.className = 'winner-item';
+      winnerDiv.innerHTML = `
+        <div class="winner-rank-display">${getRankDisplay(winnerCounter)}</div>
+        <input type="text" placeholder="Ticket Number" class="winner-ticket-input">
+        <button type="button" class="remove-winner" onclick="removeWinner(this)">
+          <i class="fas fa-trash"></i>
+        </button>
+      `;
+      winnersContainer.appendChild(winnerDiv);
+    }
+
+    function removeWinner(button) {
+      button.parentElement.remove();
+      updateWinnerRanks();
+    }
+
+    function updateWinnerRanks() {
+      const winnerItems = document.querySelectorAll('.winner-item');
+      winnerCounter = 0;
+      winnerItems.forEach(item => {
+        winnerCounter++;
+        item.querySelector('.winner-rank-display').textContent = getRankDisplay(winnerCounter);
+      });
+    }
 
     // Helper Functions
     function getRankDisplay(rank) {
@@ -1311,6 +1706,79 @@
       return rank + (suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0]) + ' Prize';
     }
 
+    // Form Submission
+    document.getElementById('lotteryForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      //Date convertion before sending to server
+      const selectedDateTimeLocalString = document.getElementById('drawDate').value; // e.g., "2025-07-09T09:00"
+
+      let drawDateUTC;
+
+      if (selectedDateTimeLocalString) {
+        // Step 1: Parse the string *as if it's already in Bhutan Time (BTT)*
+        const intendedBTTMoment = moment.tz(selectedDateTimeLocalString, 'YYYY-MM-DDTHH:mm', 'Asia/Thimphu');
+
+        // Step 2: Convert this Bhutan Time moment to UTC
+        drawDateUTC = intendedBTTMoment.utc().toISOString();
+        // Example: "2025-07-09T09:00" BTT → "2025-07-09T03:00:00.000Z" UTC
+      } else {
+        console.error("Draw Date/Time is required.");
+        return; // Stop execution if no input
+      }
+
+      const formData = {
+        name: document.getElementById('lotteryName').value,
+        name2: document.getElementById('lotteryName2').value || '',
+        drawNumber: parseInt(document.getElementById('drawNumber').value),
+        // drawDate: new Date(document.getElementById('drawDate').value).toISOString(),
+        drawDate: drawDateUTC, // Use the converted UTC date
+        prizes: [],
+        winners: []
+      };
+
+      // Collect prizes
+      const prizeItems = document.querySelectorAll('.prize-item');
+      prizeItems.forEach((item, index) => {
+        const amount = parseInt(item.querySelector('.prize-amount-input').value);
+        if (amount) {
+          formData.prizes.push({
+            rank: index + 1,
+            amount: amount
+          });
+        }
+      });
+
+      // Collect winners
+      const winnerItems = document.querySelectorAll('.winner-item');
+      winnerItems.forEach((item, index) => {
+        const ticketNumber = item.querySelector('.winner-ticket-input').value.trim();
+        if (ticketNumber) {
+          formData.winners.push({
+            ticketNumber: ticketNumber,
+            prizeRank: index + 1
+          });
+        }
+      });
+
+      // Validate
+      if (formData.prizes.length === 0) {
+        showToast('Please add at least one prize', 'error');
+        return;
+      }
+
+      // Submit
+      if (currentEditId) {
+        updateLottery(currentEditId, formData);
+      } else {
+        createLottery(formData);
+      }
+    });
+
+    // Settings Function
+    function goToSettings() {
+      window.location.href = '/setting';
+    }
 
     // Toast Function
     function showToast(message, type) {
@@ -1323,6 +1791,13 @@
         toast.classList.remove('show');
       }, 3000);
     }
+
+    // Close modal when clicking outside
+    document.getElementById('lotteryModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeModal();
+      }
+    });
 
     // Add bounce effect to cards when they appear
     window.addEventListener('load', function() {

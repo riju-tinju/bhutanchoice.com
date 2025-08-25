@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
 const moment = require('moment-timezone');
+var startFun= require("../helper/startingHelper")
+
 
 router.get('/check-time', (req, res) => {
 
@@ -23,6 +25,10 @@ router.get('/check-time', (req, res) => {
     console.error("Error in /check-time route:", err);
   }
 
+})
+
+router.get('/add-dummy-lottery',async (req, res)=>{
+  await startFun.saveDummyLotteries(req, res)
 })
 
 module.exports = router;
