@@ -4,9 +4,9 @@ const Admin = require("../model/adminSchema");
 const verifyAdmin = async (req, res, next) => {
   try {
     console.log(req.session.admin);
-     req.session.admin= {
-      id:'68ab64780b19334de3cec460'
-    }
+    //  req.session.admin= {
+    //   id:'68ab64780b19334de3cec460'
+    // }
     // req.session.admin={id:'685dbdec92ae3669fbfb7b01'}// For testing purposes, remove this line in production
     if (req.session.admin && req.session.admin.id) {
       

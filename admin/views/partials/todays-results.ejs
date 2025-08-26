@@ -50,13 +50,14 @@
     <div class="space-y-6">
         <% todays.forEach((lottery, index) => { 
             // Step 3a: Calculate lottery status
-            const drawTime = new Date(lottery.drawDate.toISOString());
+            const drawTime = new Date(lottery.drawDate);
+            const nextDrawTime = new Date(lottery.nextDrawDate ? lottery : lottery.drawDate);
             const now = new Date();
-            const hoursAfterDraw = (now - drawTime) / (1000 * 60 * 60);
+            const hoursAfterDraw = (now - nextDrawTime) / (1000 * 60 * 60);
             
             let status, badgeClass, showCountdown = false, showRefresh = false;
             
-            if (now < drawTime) {
+            if (now < nextDrawTime) {
                 // Before draw time
                 status = "UPCOMING";
                 badgeClass = "upcoming-badge";
@@ -83,9 +84,11 @@
   hour: '2-digit',
   minute: '2-digit',
   hour12: true,
-  timeZone: 'Asia/Thimphu' // Bhutan uses Asia/Thimphu timezone
+//  timeZone: 'Asia/Thimphu' // Bhutan uses Asia/Thimphu timezone
 }).replace(',', '');
         %>
+
+    
         
         <!-- Step 3b: Render lottery card -->
         <div class="lottery-card <%= lottery.dayName %>-card cursor-pointer" onclick="toggleResult('today<%= index %>')">

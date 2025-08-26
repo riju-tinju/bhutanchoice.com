@@ -8,11 +8,13 @@
     // Update today's lotteries countdowns
     <% if (todays) { %>
     <% todays.forEach((lottery, index) => { %>
-    updateSingleCountdown(
-      'today-countdown<%= index %>',
-      moment('<%= lottery.drawDate %>').tz('Asia/Thimphu').format()
-    );
-    // updateSingleCountdown('today-countdown<%= index %>', '<%= lottery.drawDate %>');
+    // updateSingleCountdown(
+    //   'today-countdown<%= index %>',
+    //   moment('<%= lottery.nextDrawDate %>').tz('Asia/Thimphu').format()
+    // );
+    console.log('Updating countdown for lottery <%= lottery.name %> with nextDrawDate: <%= lottery.nextDrawTime %>');
+    console.log('drawDate:', '<%= lottery.drawDate %>');
+     updateSingleCountdown('today-countdown<%= index %>', '<%= lottery.nextDrawTime %>');
     <% }); %>
     <% } %>
 

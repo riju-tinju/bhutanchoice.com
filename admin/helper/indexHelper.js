@@ -149,8 +149,8 @@ const indexHelper = {
                 return res.status(400).json({ success: false, message: 'Each winNumber must have prizeRank and ticketNumber.' });
               }
               // Validate ticketNumber is exactly 3 digits
-              if (!/^\d{3}$/.test(winNumber.ticketNumber)) {
-                return res.status(400).json({ success: false, message: 'Ticket numbers must be exactly 3 digits.' });
+              if (!/^.{1,5}$/.test(winNumber.ticketNumber)) {
+                return res.status(400).json({ success: false, message: 'Ticket number must have at least one character.' });
               }
             }
           }

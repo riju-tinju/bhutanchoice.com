@@ -1083,8 +1083,8 @@
         let drawDateUTC;
 
         if (selectedDateTimeLocalString) {
-            const intendedBTTMoment = moment.tz(selectedDateTimeLocalString, 'YYYY-MM-DDTHH:mm', 'Asia/Thimphu');
-            drawDateUTC = intendedBTTMoment.utc().toISOString();
+            // const intendedBTTMoment = moment.tz(selectedDateTimeLocalString, 'YYYY-MM-DDTHH:mm', 'Asia/Thimphu');
+            drawDateUTC = selectedDateTimeLocalString//intendedBTTMoment.utc().toISOString();
         } else {
             console.error("Draw Date/Time is required.");
             return;

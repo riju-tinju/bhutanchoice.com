@@ -1212,23 +1212,48 @@
     </div>
 
 
-    <% 
-    // Calculate section order
-    const now = new Date();
+ 
+
+<% 
+    // Calculate section order and next draw times
+    const nowTime = new Date();
     
     let shouldSwapSections = false;
     
     if (todays && todays.length > 0) {
-        // Swap if ANY lottery's draw time has passed (no 2-hour delay)
-        const anyDrawPassed = todays.some(lottery => {
-            const drawTime = new Date(lottery.drawDate);
-            return now > drawTime; // Current time is after draw time
+        // Process each lottery to add nextDrawTime and check result times
+        todays.forEach(lottery => {
+            // Initialize nextDrawTime as null
+            lottery.nextDrawTime = null;
+            
+            if (lottery.winners && lottery.winners.length > 0) {
+                // Find all future result times
+                const futureResultTimes = lottery.winners
+                    .filter(winner => winner.resultTime && winner.resultTime > nowTime)
+                    .map(winner => winner.resultTime)
+                    .sort((a, b) => a - b); // Sort ascending (earliest first)
+                
+                // Set the next draw time if there are future draws
+                if (futureResultTimes.length > 0) {
+                    lottery.nextDrawTime = futureResultTimes[0];
+                }
+                
+                // Check if ALL resultTimes in this lottery have passed
+                const allResultTimesPassed = lottery.winners.every(winner => {
+                    return winner.resultTime && nowTime > winner.resultTime;
+                });
+                
+                // Add this as a property to the lottery object
+                lottery.allResultsPassed = allResultTimesPassed;
+            } else {
+                lottery.allResultsPassed = false;
+            }
         });
-        shouldSwapSections = anyDrawPassed;
+        
+        // Swap sections only if ALL lotteries have all their resultTimes passed
+        shouldSwapSections = todays.every(lottery => lottery.allResultsPassed);
     }
-  %>
-
-
+%>
 
     <!-- Conditional section ordering -->
     <% if (!shouldSwapSections) { %>
