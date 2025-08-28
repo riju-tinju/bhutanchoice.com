@@ -1211,12 +1211,15 @@
       </button>
     </div>
 
-
+<script>
+  console.log("now time with iso: ", new Date().toISOString());
+  console.log("now time without iso: ", new Date());
+</script>
  
 
 <% 
     // Calculate section order and next draw times
-    const nowTime = new Date();
+    const nowTime = new Date()
     
     let shouldSwapSections = false;
     

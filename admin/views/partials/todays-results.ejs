@@ -50,14 +50,15 @@
     <div class="space-y-6">
         <% todays.forEach((lottery, index) => { 
             // Step 3a: Calculate lottery status
+           
             const drawTime = new Date(lottery.drawDate);
-            const nextDrawTime = new Date(lottery.nextDrawDate ? lottery : lottery.drawDate);
+            const nextDrawTime = new Date(lottery.nextDrawTime ? lottery : lottery.nextDrawTime);
             const now = new Date();
-            const hoursAfterDraw = (now - nextDrawTime) / (1000 * 60 * 60);
+            const hoursAfterDraw = (now - drawTime) / (1000 * 60 * 60);
             
             let status, badgeClass, showCountdown = false, showRefresh = false;
             
-            if (now < nextDrawTime) {
+            if (now < drawTime) {
                 // Before draw time
                 status = "UPCOMING";
                 badgeClass = "upcoming-badge";
@@ -88,8 +89,11 @@
 }).replace(',', '');
         %>
 
-    
-        
+<script>
+    let datey = '<%= lottery.nextDrawTime %>';
+    alert("lottery.drawDate: " + datey);
+</script>
+         
         <!-- Step 3b: Render lottery card -->
         <div class="lottery-card <%= lottery.dayName %>-card cursor-pointer" onclick="toggleResult('today<%= index %>')">
             <div class="flex items-center justify-between">

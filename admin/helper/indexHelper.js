@@ -6,8 +6,9 @@ const indexHelper = {
     try {
       const allLotteries = await Lottery.find({});
 
-      // Get Bhutan's current date (00:00:00 of today)
-      const today = moment().tz("Asia/Thimphu").startOf('day');
+      // Get Dubai's current date (00:00:00 of today)
+      const today = moment().tz("Asia/Dubai").startOf('day');
+      console.log("Today's date in Bhutan timezone:", today.toDate());
       const tomorrow = moment(today).add(1, 'day');
 
       const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -17,7 +18,7 @@ const indexHelper = {
       const past = [];
 
       allLotteries.forEach(lottery => {
-        const drawDate = moment(lottery.drawDate).tz("Asia/Thimphu");
+        const drawDate = moment(lottery.drawDate).tz("Asia/Dubai");
         const dayName = weekdays[drawDate.day()];
         const lotteryWithDay = { ...lottery._doc, dayName };
 
@@ -40,7 +41,8 @@ const indexHelper = {
       return res.render('index', {
         todays,
         upcoming: filteredUpcoming,
-        past: limitedPast
+        past: limitedPast,
+        currentDateFromServer: today.toDate(),
       });
 
     } catch (err) {
@@ -97,7 +99,7 @@ const indexHelper = {
       const skip = (page - 1) * limit;
 
       // Get current Bhutan date
-      const today = moment().tz("Asia/Thimphu").startOf('day');
+      const today = moment().tz("Asia/Dubai").startOf('day');
 
       // Get all past lotteries (drawDate before today)
       const allPastLotteries = await Lottery.find({

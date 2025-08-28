@@ -1,78 +1,88 @@
-<%# winning-numbers-animation.ejs - Fixed Vertical Centering %>
+<%# winning-numbers-animation.ejs - Mechanical Counter Style %>
 
 <style>
-  /* Animation styles for winning numbers */
+  /* Mechanical counter animation styles */
   .winning-numbers-container {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 8px;
     margin: 15px 0;
-
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-  border-radius: 6px;
   }
   
   .winning-number {
     display: flex;
     justify-content: center;
+    background: transparent;
+    border-radius: 8px;
+    overflow: hidden;
+    padding: 0;
     margin: 5px;
+    gap: 3px;
   }
   
   .digit-container {
     position: relative;
-    /* width: 60px; */
-    width: 53px;
-    height: 80px;
+    height: 50px;
+    width: 35px;
     overflow: hidden;
-    perspective: 400px;
+    background: linear-gradient(145deg, #c0c0c0, #a8a8a8);
+    border: 2px solid #999;
+    border-radius: 6px;
+    box-shadow: 
+      inset 0 2px 4px rgba(255,255,255,0.3),
+      inset 0 -2px 4px rgba(0,0,0,0.3),
+      0 2px 6px rgba(0,0,0,0.2);
   }
   
   .digit-stack {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
+    top: 2px;
+    left: 2px;
+    width: calc(100% - 4px);
     height: auto;
     transform-style: preserve-3d;
     transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-    z-index: 1;
   }
   
   .digit {
     display: flex;
     justify-content: center;
     align-items: center;
-    /* font-size: 2rem; */
-    font-size: 22px;
+    font-size: 1.4rem;
     font-weight: 700;
     color: #000;
     width: 100%;
-    height: 80px; /* Same as digit-container height */
-    background: transparent;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
+    height: 46px;
+    background: linear-gradient(180deg, #ffffff 0%, #f5f5f5 50%, #e8e8e8 100%);
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.8);
+    box-shadow: 
+      inset 0 1px 2px rgba(255,255,255,0.8),
+      inset 0 -1px 1px rgba(0,0,0,0.1);
   }
   
-  .counter-box-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url('/images/counter-box.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    z-index: 3;
-    pointer-events: none;
+  .digit:last-child {
+    border-bottom: 1px solid #ddd;
   }
   
   .ticket-label {
     text-align: center;
-    font-size: 0.9rem;
+    font-size: 0.75rem;
     color: #666;
     margin-top: 5px;
+    font-weight: 500;
+  }
+  
+  /* Hover effect for mechanical feel */
+  .digit-container:hover {
+    transform: translateY(-1px);
+    box-shadow: 
+      inset 0 2px 4px rgba(255,255,255,0.4),
+      inset 0 -2px 4px rgba(0,0,0,0.4),
+      0 4px 8px rgba(0,0,0,0.3);
   }
   
   /* Style for collapsed content */
@@ -86,7 +96,7 @@
 </style>
 
 <script>
-  // Modified toggleResult function to handle animation
+  // Modified toggleResult function to handle animation every time
   function toggleResult(id) {
     const element = document.getElementById(id);
     const arrow = document.getElementById('arrow-' + id);
@@ -96,7 +106,7 @@
     arrow.classList.toggle('fa-chevron-down');
     arrow.classList.toggle('fa-chevron-up');
     
-    // If expanding, trigger animation
+    // If expanding, trigger animation every time
     if (!element.classList.contains('collapsed')) {
       // Small delay to allow DOM to update
       setTimeout(() => {
@@ -126,7 +136,7 @@
   function initializeTicketNumber(container, ticketNumber) {
     container.innerHTML = '';
     
-    // Use actual ticket number length
+    // Use actual ticket number length (no padding)
     const actualNumber = ticketNumber.toString();
     
     // Create a digit container for each digit
@@ -141,24 +151,19 @@
       for (let j = 0; j < 15; j++) {
         const digit = document.createElement('div');
         digit.className = 'digit';
-        digit.textContent = j % 10;
+        digit.textContent = j % 10; // This will create numbers 0-9, then 0-4 again
         digitStack.appendChild(digit);
       }
       
-      // Add counter box overlay
-      const counterBoxOverlay = document.createElement('div');
-      counterBoxOverlay.className = 'counter-box-overlay';
-      
       digitContainer.appendChild(digitStack);
-      digitContainer.appendChild(counterBoxOverlay);
       container.appendChild(digitContainer);
       
-      // Set initial position - start with first digit centered
+      // Set initial position
       digitStack.style.transform = 'translateY(0px)';
     }
   }
 
-  // Animate a ticket number with random effects
+  // Animate a ticket number with mechanical counter effects
   function animateTicketNumber(container, ticketNumber) {
     const actualNumber = ticketNumber.toString();
     const digitStacks = container.querySelectorAll('.digit-stack');
@@ -168,27 +173,27 @@
       const targetDigit = parseInt(actualNumber[i]);
       const digitStack = digitStacks[i];
       
-      // Calculate how far to move the stack
-      const randomCycles = 20 + Math.floor(Math.random() * 10);
-      const finalPosition = targetDigit * 80; // Each digit is 80px tall (same as container)
+      // Calculate how far to move the stack (each digit is 46px tall)
+      const randomCycles = 15 + Math.floor(Math.random() * 8); // Random number of cycles
+      const finalPosition = targetDigit * 46; // Each digit is 46px tall
       
       // Start with a fast random animation
       let currentPosition = 0;
       const randomInterval = setInterval(() => {
-        currentPosition += 80;
+        currentPosition += 46;
         digitStack.style.transform = `translateY(-${currentPosition}px)`;
         
         // When we've done enough random cycles, go to the target
-        if (currentPosition >= randomCycles * 80) {
+        if (currentPosition >= randomCycles * 46) {
           clearInterval(randomInterval);
           
-          // Now smoothly animate to the final position
+          // Now smoothly animate to the final position with mechanical ease
           setTimeout(() => {
-            digitStack.style.transition = 'transform 0.8s cubic-bezier(0.19, 1, 0.22, 1)';
+            digitStack.style.transition = 'transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
             digitStack.style.transform = `translateY(-${finalPosition}px)`;
           }, 50);
         }
-      }, 80 - (i * 10));
+      }, 70 - (i * 8)); // Different speed for each digit position
     }
   }
 </script>

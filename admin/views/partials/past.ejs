@@ -106,12 +106,12 @@ const formattedDate = drawDate.toLocaleDateString('en-GB', {
              <div class="result-card-content">
                <div class="result-prize-amount">A  B  C  D  E</div>
 
-               <div class="winning-numbers-container">
-                <div class="winning-number-item">
-                <div class="winning-number" data-ticket-number="<%= winner.winNumbers[0].ticketNumber %>">
-                     <%= winner.winNumbers[0].ticketNumber %>
+                 <div class="winning-numbers-container">
+                  <div class="winning-number-item">
+                     <div class="winning-number" data-ticket-number="<%= winner.winNumbers[0].ticketNumber %>">
+                          <%= winner.winNumbers[0].ticketNumber %>
+                     </div>
                   </div>
-                </div>
         <!-- <%  winner.winNumbers.forEach(winNumber => { %>
           <div class="winning-number-item">
             <div class="winning-number" data-ticket-number="<%= winNumber.ticketNumber %>"> -->
