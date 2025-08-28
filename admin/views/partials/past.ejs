@@ -1,5 +1,24 @@
 <%- include('./winning-numbers') %>
+<style>
+  /* Add this to your existing CSS in winning-numbers.ejs */
+.result-prize-amount {
+  display: flex;
+  justify-content: center;
+  gap: 12px; /* Same gap as winning-numbers-container */
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #059669;
+}
 
+.prize-letter {
+  width: 53px; /* Same width as digit-container */
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+</style>
 <!-- Past Results -->
  <section>
    <% if(past && past.length>0){ %>
@@ -88,57 +107,49 @@ const formattedDate = drawDate.toLocaleDateString('en-GB', {
          <div class="result-container space-y-4">
            
            <!-- result card loop -->
-           <% past[i].winners.forEach(winner => { %>
-           <% 
-    // Format the time to 12-hour format with AM/PM
-    const resultTime = new Date(winner.resultTime);
-    const hours = resultTime.getHours();
-    const minutes = resultTime.getMinutes();
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    const formattedHours = hours % 12 || 12;
-    const formattedTime = `${formattedHours}:${minutes.toString().padStart(2, '0')}${ampm}`;
-  %>
+         <!-- result card loop -->
+<% past[i].winners.forEach(winner => { %>
+<% 
+  // Format the time to 12-hour format with AM/PM
+  const resultTime = new Date(winner.resultTime);
+  const hours = resultTime.getHours();
+  const minutes = resultTime.getMinutes();
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  const formattedHours = hours % 12 || 12;
+  const formattedTime = `${formattedHours}:${minutes.toString().padStart(2, '0')}${ampm}`;
+  
+  // Get first ticket number and its length
+  const firstTicketNumber = winner.winNumbers[0].ticketNumber;
+  const ticketLength = firstTicketNumber.toString().length;
+  
+  // Generate letters array based on ticket length
+  const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+  const ticketLetters = letters.slice(0, ticketLength);
+%>
 
-           <div class="result-card">
-             <div class="result-card-header">
-               <%= formattedTime %>
-             </div>
-             <div class="result-card-content">
-               <div class="result-prize-amount">A  B  C  D  E</div>
+<div class="result-card">
+  <div class="result-card-header">
+    <%= formattedTime %>
+  </div>
+  <div class="result-card-content">
+    <div class="result-prize-amount">
+      <% ticketLetters.forEach((letter, index) => { %>
+        <span class="prize-letter"><%= letter %></span>
+      <% }); %>
+    </div>
 
-                 <div class="winning-numbers-container">
-                  <div class="winning-number-item">
-                     <div class="winning-number" data-ticket-number="<%= winner.winNumbers[0].ticketNumber %>">
-                          <%= winner.winNumbers[0].ticketNumber %>
-                     </div>
-                  </div>
-        <!-- <%  winner.winNumbers.forEach(winNumber => { %>
-          <div class="winning-number-item">
-            <div class="winning-number" data-ticket-number="<%= winNumber.ticketNumber %>"> -->
-              <!-- The actual number will be hidden by JavaScript and replaced with animation -->
-              <!-- <%= winNumber.ticketNumber %>
-            </div>
-           
-          </div>
-        <% }); %> -->
-        
+    <div class="winning-numbers-container">
+      <div class="winning-number-item">
+        <div class="winning-number" data-ticket-number="<%= firstTicketNumber %>">
+          <%= firstTicketNumber %>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </div>
-              <!--  -->
-               
-               <!-- <% if(winner.winNumbers && winner.winNumbers.length > 0) { %>
-               <div class="result-winning-numbers">
-                 <% winner.winNumbers.forEach(winNumber => { %>
-                 <div class="winning-number">
-                   <%= winNumber.ticketNumber %>
-                 </div>
-                 <% }); %>
-               </div>
-               <% } else { %>
-               <div class="result-winning-number result-winning-number_if_no_results underline-animated"></div>
-               <% } %> -->
-             </div>
-           </div>
-           <% }); %>
+<% }); %>
+<!-- END Result card loop -->
            <!-- END Result card loop -->
          </div>
        </div>
