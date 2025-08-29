@@ -111,7 +111,7 @@ const indexHelper = {
       // Add weekday name
       const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
       const items = allPastLotteries.map(lottery => {
-        const drawDate = moment(lottery.drawDate).tz("Asia/Thimphu");
+        const drawDate = moment(lottery.drawDate).tz("Asia/Kolkata");
         const dayName = weekdays[drawDate.day()];
         return { ...lottery._doc, dayName };
       });

@@ -7,7 +7,7 @@ const indexHelper = {
       const allLotteries = await Lottery.find({});
 
       // const today = new Date();
-      const today = moment().tz('Asia/Thimphu').toDate();
+      const today = moment().tz('Asia/Kolkata').toDate();
       console.log("Today:", today);
       today.setHours(0, 0, 0, 0); // Start of today
       const tomorrow = new Date(today);
@@ -58,7 +58,7 @@ const indexHelper = {
       const allLotteries = await Lottery.find({});
 
       // Get Bhutan's current date (00:00:00 of today)
-      const today = moment().tz("Asia/Thimphu").startOf('day');
+      const today = moment().tz("Asia/Kolkata").startOf('day');
       const tomorrow = moment(today).add(1, 'day');
 
       const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -68,7 +68,7 @@ const indexHelper = {
       const past = [];
 
       allLotteries.forEach(lottery => {
-        const drawDate = moment(lottery.drawDate).tz("Asia/Thimphu");
+        const drawDate = moment(lottery.drawDate).tz("Asia/Kolkata");
         const dayName = weekdays[drawDate.day()];
         const lotteryWithDay = { ...lottery._doc, dayName };
 
@@ -107,7 +107,7 @@ const indexHelper = {
       const allLotteries = await Lottery.find({});
 
       // Get Bhutan's current date (00:00:00 of today)
-      const today = moment().tz("Asia/Thimphu").startOf('day');
+      const today = moment().tz("Asia/Kolkata").startOf('day');
       const tomorrow = moment(today).add(1, 'day');
 
       const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -117,7 +117,7 @@ const indexHelper = {
       const past = [];
 
       allLotteries.forEach(lottery => {
-        const drawDate = moment(lottery.drawDate).tz("Asia/Thimphu");
+        const drawDate = moment(lottery.drawDate).tz("Asia/Kolkata");
         const dayName = weekdays[drawDate.day()];
         const lotteryWithDay = { ...lottery._doc, dayName };
 
@@ -155,7 +155,7 @@ const indexHelper = {
       const skip = (page - 1) * limit;
 
       // Get current Bhutan date
-      const today = moment().tz("Asia/Thimphu").startOf('day');
+      const today = moment().tz("Asia/Kolkata").startOf('day');
 
       // Get all past lotteries (drawDate before today)
       const allPastLotteries = await Lottery.find({
@@ -167,7 +167,7 @@ const indexHelper = {
       // Add weekday name
       const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
       const items = allPastLotteries.map(lottery => {
-        const drawDate = moment(lottery.drawDate).tz("Asia/Thimphu");
+        const drawDate = moment(lottery.drawDate).tz("Asia/Kolkata");
         const dayName = weekdays[drawDate.day()];
         return { ...lottery._doc, dayName };
       });

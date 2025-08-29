@@ -10,7 +10,7 @@
     <% todays.forEach((lottery, index) => { %>
     // updateSingleCountdown(
     //   'today-countdown<%= index %>',
-    //   moment('<%= lottery.nextDrawDate %>').tz('Asia/Thimphu').format()
+    //   moment('<%= lottery.nextDrawDate %>').tz('Asia/Kolkata').format()
     // );
     console.log('Updating countdown for lottery <%= lottery.name %> with nextDrawDate: <%= lottery.nextDrawTime %>');
     console.log('drawDate:', '<%= lottery.drawDate %>');
@@ -20,7 +20,7 @@
 
     <% if (upcoming) { %>
     <% upcoming.forEach((lottery, index) => { %>
-    updateSingleCountdown('upcoming-countdown<%= index %>',  moment('<%= lottery.drawDate %>').tz('Asia/Thimphu').format());
+    updateSingleCountdown('upcoming-countdown<%= index %>',  moment('<%= lottery.drawDate %>').tz('Asia/Kolkata').format());
     <% }); %>
     <% } %>
 

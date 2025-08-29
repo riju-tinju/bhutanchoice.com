@@ -16,7 +16,7 @@ function updateCountdowns() {
     <% if (upcoming && upcoming.length > 0) { %>
 
        <% upcoming.forEach((lottery, index) => { %>
-          updateSingleCountdown('upcoming-countdown<%= index %>',  moment('<%= lottery.drawDate %>').tz('Asia/Thimphu').format());
+          updateSingleCountdown('upcoming-countdown<%= index %>',  moment('<%= lottery.drawDate %>').tz('Asia/Kolkata').format());
        <% }); %>
     <% } %>
    
