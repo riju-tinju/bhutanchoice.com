@@ -106,8 +106,7 @@ const formattedDate = drawDate.toLocaleDateString('en-GB', {
        <div id="past<%= i %>" class="card-expand collapsed mt-6">
          <div class="result-container space-y-4">
            
-           <!-- result card loop -->
-         <!-- result card loop -->
+<!-- result card loop -->  
 <% past[i].winners.forEach(winner => { %>
 <% 
   // Format the time to 12-hour format with AM/PM
@@ -132,9 +131,29 @@ const formattedDate = drawDate.toLocaleDateString('en-GB', {
     <%= formattedTime %>
   </div>
   <div class="result-card-content">
-    <div class="result-prize-amount">
+    <style>
+      .letter-container{
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        
+      }
+      .letter-box{    
+        width: 45px;
+        height: auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.2rem;
+        font-weight: 900;
+        color:#059669;
+      }
+    </style>
+    <div class="letter-container">
       <% ticketLetters.forEach((letter, index) => { %>
-        <span class="prize-letter"><%= letter %></span>
+        <div class="letter-box">
+        <%= letter %>
+        </div>
       <% }); %>
     </div>
 

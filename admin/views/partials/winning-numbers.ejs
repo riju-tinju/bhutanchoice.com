@@ -1,4 +1,4 @@
-<%# winning-numbers-animation.ejs - Fixed Vertical Centering %>
+<%# winning-numbers-animation.ejs - Fixed Positioning and Animation %>
 
 <style>
   /* Animation styles for winning numbers */
@@ -8,9 +8,8 @@
     flex-wrap: wrap;
     gap: 12px;
     margin: 15px 0;
-
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-  border-radius: 6px;
+    border-radius: 6px;
   }
   
   .winning-number {
@@ -21,16 +20,16 @@
   
   .digit-container {
     position: relative;
-    /* width: 60px; */
-    width: 53px;
-    height: 80px;
+    /* width: 53px; */
+    width: 45px;
+    height: 70px;
     overflow: hidden;
     perspective: 400px;
   }
   
   .digit-stack {
     position: absolute;
-    top: 0;
+    top: 0; /* Back to normal position */
     left: 0;
     width: 100%;
     height: auto;
@@ -43,12 +42,11 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    /* font-size: 2rem; */
     font-size: 22px;
     font-weight: 700;
     color: #000;
     width: 100%;
-    height: 80px; /* Same as digit-container height */
+    height: 70px;
     background: transparent;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
@@ -137,11 +135,11 @@
       const digitStack = document.createElement('div');
       digitStack.className = 'digit-stack';
       
-      // Create 15 digits (0-9 plus some extra for smooth animation)
-      for (let j = 0; j < 15; j++) {
+      // Create 40 digits with random numbers
+      for (let j = 0; j < 40; j++) {
         const digit = document.createElement('div');
         digit.className = 'digit';
-        digit.textContent = j % 10;
+        digit.textContent = Math.floor(Math.random() * 10); // Random numbers 0-9
         digitStack.appendChild(digit);
       }
       
@@ -153,12 +151,12 @@
       digitContainer.appendChild(counterBoxOverlay);
       container.appendChild(digitContainer);
       
-      // Set initial position - start with first digit centered
-      digitStack.style.transform = 'translateY(0px)';
+      // CHANGED: Set initial position high up to start animation from top
+      digitStack.style.transform = 'translateY(-1200px)'; // Start way up high
     }
   }
 
-  // Animate a ticket number with random effects
+  // Animate a ticket number with random effects - TOP TO BOTTOM DIRECTION
   function animateTicketNumber(container, ticketNumber) {
     const actualNumber = ticketNumber.toString();
     const digitStacks = container.querySelectorAll('.digit-stack');
@@ -168,27 +166,35 @@
       const targetDigit = parseInt(actualNumber[i]);
       const digitStack = digitStacks[i];
       
-      // Calculate how far to move the stack
-      const randomCycles = 20 + Math.floor(Math.random() * 10);
-      const finalPosition = targetDigit * 80; // Each digit is 80px tall (same as container)
+      // Calculate animation parameters
+      const randomCycles = 15 + Math.floor(Math.random() * 10);
+      let currentStep = 15; // Start from position 15 (high up)
       
-      // Start with a fast random animation
-      let currentPosition = 0;
+      // Start with fast random animation (top to bottom)
       const randomInterval = setInterval(() => {
-        currentPosition += 80;
-        digitStack.style.transform = `translateY(-${currentPosition}px)`;
+        currentStep--;
+        const currentPosition = currentStep * 70; // Calculate position
+        digitStack.style.transform = `translateY(-${currentPosition}px)`; // CHANGED: Move downward by reducing negative value
         
-        // When we've done enough random cycles, go to the target
-        if (currentPosition >= randomCycles * 80) {
+        // When we've done enough random cycles, prepare for final number
+        if (currentStep <= randomCycles - 15) {
           clearInterval(randomInterval);
           
-          // Now smoothly animate to the final position
+          // Set the target digit at the target position
+          const digits = digitStack.querySelectorAll('.digit');
+          const targetPosition = Math.max(0, currentStep - 1);
+          if (digits[targetPosition]) {
+            digits[targetPosition].textContent = targetDigit;
+          }
+          
+          // Smoothly animate to show the target digit
           setTimeout(() => {
             digitStack.style.transition = 'transform 0.8s cubic-bezier(0.19, 1, 0.22, 1)';
+            const finalPosition = targetPosition * 70;
             digitStack.style.transform = `translateY(-${finalPosition}px)`;
           }, 50);
         }
-      }, 80 - (i * 10));
+      }, 70 - (i * 10)); // Different speed for each digit position
     }
   }
 </script>
