@@ -52,7 +52,7 @@
             // Step 3a: Calculate lottery status
            
             const drawTime = new Date(lottery.drawDate);
-            const nextDrawTime = new Date(lottery.nextDrawTime ? lottery : lottery.nextDrawTime);
+            const nextDrawTime = new Date(lottery.nextDrawTime ? lottery.nextDrawTime : lottery.nextDrawTime);
             const now = new Date();
             const hoursAfterDraw = (now - drawTime) / (1000 * 60 * 60);
             
@@ -85,7 +85,7 @@
   hour: '2-digit',
   minute: '2-digit',
   hour12: true,
-  timeZone: 'Asia/Kolkata' // Bhutan uses Asia/Kolkata timezone
+  timeZone: 'Asia/Kolkata' 
 }).replace(',', '');
         %>
 
