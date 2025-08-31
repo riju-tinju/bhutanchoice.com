@@ -1,4 +1,4 @@
-<%# winning-numbers-animation.ejs - Fixed Positioning and Animation %>
+<%# winning-numbers-animation.ejs - Fixed Positioning, Animation + Audio %>
 
 <style>
   /* Animation styles for winning numbers */
@@ -82,6 +82,9 @@
   }
 </style>
 
+<!-- 🎵 Add your counting audio file -->
+<audio id="count-audio" src="/audio/counting.mp3" preload="auto"></audio>
+
 <script>
   // Toggle result and trigger animation
   function toggleResult(id) {
@@ -104,12 +107,30 @@
     const container = document.getElementById(cardId);
     const winningNumberElements = container.querySelectorAll('.winning-number');
 
-    // All digits start rolling immediately (removed stagger delay)
+    // 🎵 Get audio element
+    const audio = document.getElementById('count-audio');
+
+    // 🎵 Play audio when animation starts
+    if (audio) {
+      audio.currentTime = 0;
+      audio.loop = true; 
+      audio.play();
+    }
+
+    // Animate all digits immediately
     winningNumberElements.forEach((element) => {
       const ticketNumber = element.getAttribute('data-ticket-number') || element.textContent;
       initializeTicketNumber(element, ticketNumber);
       animateTicketNumber(element, ticketNumber);
     });
+
+    // 🎵 Stop audio after rolling ends (4s roll + 0.8s smooth landing)
+    setTimeout(() => {
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+    }, 4800);
   }
 
   // Initialize a ticket number display
@@ -124,8 +145,8 @@
       const digitStack = document.createElement('div');
       digitStack.className = 'digit-stack';
 
-      // Create 40 digits with random numbers
-      for (let j = 0; j < 100; j++) {
+      // Create 100 digits with random numbers
+      for (let j = 0; j < 120; j++) {
         const digit = document.createElement('div');
         digit.className = 'digit';
         digit.textContent = Math.floor(Math.random() * 10); 
@@ -153,8 +174,8 @@
       const targetDigit = parseInt(actualNumber[i]);
       const digitStack = digitStacks[i];
 
-      const stepDelay = 70 - (i * 10); // keep natural speed difference
-      const totalSteps = Math.floor(4000 / stepDelay); // force 4s duration
+      const stepDelay = 70 - (i * 10); 
+      const totalSteps = Math.floor(4000 / stepDelay); // force 4s roll
       let currentStep = totalSteps;
 
       const randomInterval = setInterval(() => {
