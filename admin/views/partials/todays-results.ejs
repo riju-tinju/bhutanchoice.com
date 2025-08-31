@@ -138,10 +138,7 @@
     }).replace(',', '');
 %>
 
-<script>
-    let datey = '<%= lottery.nextDrawTime %>';
-    alert("lottery.drawDate: " + datey);
-</script>
+
          
         <!-- Step 3b: Render lottery card -->
         <div class="lottery-card <%= lottery.dayName %>-card cursor-pointer" onclick="toggleResult('today<%= index %>')">
