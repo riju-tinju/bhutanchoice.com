@@ -49,50 +49,96 @@
 
     <div class="space-y-6">
         <% todays.forEach((lottery, index) => { 
-            // Step 3a: Calculate lottery status
-           
-            const drawTime = new Date(lottery.drawDate);
-            const nextDrawTime = new Date(lottery.nextDrawTime ? lottery.nextDrawTime : lottery.nextDrawTime);
-            const now = new Date();
-            const hoursAfterDraw = (now - drawTime) / (1000 * 60 * 60);
+    const now = new Date();
+    
+    let status, badgeClass, showCountdown = false, showRefresh = false;
+    
+    // Check all resultTimes in winners array for ±1 hour match (LIVE status)
+    const hasLiveResultTime = lottery.winners && lottery.winners.some(winner => {
+        if (winner.resultTime) {
+            const resultTime = new Date(winner.resultTime);
+            const timeDiff = Math.abs(now - resultTime);
+            return timeDiff <= (60 * 60 * 1000); // ±1 hour
+        }
+        return false;
+    });
+    
+    if (hasLiveResultTime) {
+        // Within ±1 hour of any result time - LIVE status
+        status = "LIVE";
+        badgeClass = "live-badge";
+        showCountdown = false;
+        showRefresh = lottery.winners.some(winner => !winner.winNumbers || winner.winNumbers.length === 0);
+    } else {
+        // Check for UPCOMING result times (future result times not within ±1 hour)
+        const hasUpcomingResultTime = lottery.winners && lottery.winners.some(winner => {
+            if (winner.resultTime) {
+                const resultTime = new Date(winner.resultTime);
+                return resultTime > now && Math.abs(now - resultTime) > (60 * 60 * 1000);
+            }
+            return false;
+        });
+        
+        if (hasUpcomingResultTime) {
+            // Future result time exists but not within ±1 hour - UPCOMING status
+            status = "UPCOMING";
+            badgeClass = "upcoming-badge";
+            showCountdown = true;
+            showRefresh = false;
+        } else {
+            // Check if any past result time exists (not within ±1 hour)
+            const hasPastResultTime = lottery.winners && lottery.winners.some(winner => {
+                if (winner.resultTime) {
+                    const resultTime = new Date(winner.resultTime);
+                    return resultTime < now && Math.abs(now - resultTime) > (60 * 60 * 1000);
+                }
+                return false;
+            });
             
-            let status, badgeClass, showCountdown = false, showRefresh = false;
-            
-            if (now < drawTime) {
-                // Before draw time
-                status = "UPCOMING";
-                badgeClass = "upcoming-badge";
-                showCountdown = true;
-            } else if (hoursAfterDraw <= 2) {
-                // Draw time to +2 hours
-                status = "LIVE";
-                badgeClass = "live-badge";
-                showCountdown = false;
-                showRefresh = lottery.winners.length === 0;
-            } else {
-                // After +2 hours
+            if (hasPastResultTime) {
+                // Past result time exists but not within ±1 hour - RESULT status
                 status = "RESULT";
                 badgeClass = "result-badge";
                 showCountdown = false;
-                showRefresh = lottery.winners.length === 0;
+                showRefresh = lottery.winners.some(winner => !winner.winNumbers || winner.winNumbers.length === 0);
+            } else {
+                // No resultTime at all, fallback to drawDate logic
+                const drawTime = new Date(lottery.drawDate);
+                const hoursAfterDraw = (now - drawTime) / (1000 * 60 * 60);
+                
+                if (now < drawTime) {
+                    status = "UPCOMING";
+                    badgeClass = "upcoming-badge";
+                    showCountdown = true;
+                } else if (hoursAfterDraw <= 2) {
+                    status = "LIVE";
+                    badgeClass = "live-badge";
+                    showCountdown = false;
+                    showRefresh = lottery.winners.length === 0;
+                } else {
+                    status = "RESULT";
+                    badgeClass = "result-badge";
+                    showCountdown = false;
+                    showRefresh = lottery.winners.length === 0;
+                }
             }
-            
-            const firstPrize = lottery.prizes.find(p => p.rank === 1);
-            const formattedDate = drawTime.toLocaleDateString('en-GB', { 
-  year: 'numeric',
-  month: 'short',
-  day: '2-digit',
-  hour: '2-digit',
-  minute: '2-digit',
-  hour12: true,
-  timeZone: 'Asia/Kolkata' 
-}).replace(',', '');
-        %>
+        }
+    }
+    
+    const firstPrize = lottery.prizes.find(p => p.rank === 1);
+    const drawTime = new Date(lottery.drawDate);
+    const formattedDate = drawTime.toLocaleDateString('en-GB', { 
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+        timeZone: 'Asia/Kolkata' 
+    }).replace(',', '');
+%>
 
-<script>
-    let datey = '<%= lottery.nextDrawTime %>';
-    alert("lottery.drawDate: " + datey);
-</script>
+
          
         <!-- Step 3b: Render lottery card -->
         <div class="lottery-card <%= lottery.dayName %>-card cursor-pointer" onclick="toggleResult('today<%= index %>')">

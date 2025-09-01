@@ -185,7 +185,6 @@ const formattedDate = drawDate.toLocaleDateString('en-GB', {
               </div>
               <div class="otherPrizeContainer">
                 <% winner.winNumbers.forEach((winNumberObj, index) => { %>
-                <div class="win-items">
                   <% 
                let rankStatus2= 'th';
                 if(winNumberObj.prizeRank === 1) rankStatus2 = 'st';
@@ -193,10 +192,19 @@ const formattedDate = drawDate.toLocaleDateString('en-GB', {
                 else if(winNumberObj.prizeRank === 3) rankStatus2 = 'rd';
                 else rankStatus2 = 'th';
                %>
-             
+              
+               <% if(index === 4) { %>
+                <div class="win-items">
+                  <span class="prize-Rank">5th Prize :   (Single number all series)</span>
+                  <!-- <div class="result-winning-number"><%= winNumberObj.ticketNumber %></div> -->
+                </div>
+                <% }else if(index < 4){ %>
+                <div class="win-items">
                   <span class="prize-Rank"><%= winNumberObj.prizeRank %><%= rankStatus2 %> Prize :</span>
                   <div class="result-winning-number"><%= winNumberObj.ticketNumber %></div>
                 </div>
+                <% } else { %>
+                <% }%>
                 <% }); %>
               </div>
             </div>
