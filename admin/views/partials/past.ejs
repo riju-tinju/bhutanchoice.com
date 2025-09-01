@@ -1,47 +1,82 @@
 <%- include('./winning-numbers') %>
 <style>
   /* Add this to your existing CSS in winning-numbers.ejs */
-.result-prize-amount {
-  display: flex;
-  justify-content: center;
-  gap: 12px; /* Same gap as winning-numbers-container */
-  margin-bottom: 10px;
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #059669;
-}
+  .result-prize-amount {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    /* Same gap as winning-numbers-container */
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #059669;
+  }
 
-.prize-letter {
-  width: 53px; /* Same width as digit-container */
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+  .prize-letter {
+    width: 53px;
+    /* Same width as digit-container */
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
+<style>
+  .letter-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+
+  }
+
+  .letter-box {
+    width: 45px;
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: #059669;
+  }
+</style>
+<style>
+  .otherPrizeContainer {
+    width: 100%;
+    height: auto;
+    padding: 10px 20px 0px 20px;
+  }
+
+  .win-items {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0px;
+  }
 </style>
 <!-- Past Results -->
- <section>
-   <% if(past && past.length>0){ %>
-   <div class="flex items-center justify-between mb-6">
-     <h2 class="text-xl font-bold section-title flex items-center">
-       <i class="fas fa-history text-purple-500 mr-2 text-xl"></i>
-       View All Results
-     </h2>
-     <!-- <button
+<section>
+  <% if(past && past.length>0){ %>
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="text-xl font-bold section-title flex items-center">
+      <i class="fas fa-history text-purple-500 mr-2 text-xl"></i>
+      View All Results
+    </h2>
+    <!-- <button
                     class="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm px-3 py-1 rounded-full font-semibold hover:shadow-lg transition-all">View
                     All</button> -->
-   </div>
+  </div>
 
-   <div class="space-y-5" id="past-lottories-container">
+  <div class="space-y-5" id="past-lottories-container">
 
-     <% for(let i=0; i < past.length; i++) { %>
-     <div class="lottery-card <%= past[i].dayName %>-card cursor-pointer" onclick="toggleResult('past<%= i %>')">
-       <div class="flex items-center justify-between">
-         <div class="flex-1 card-element-spacing">
-           <div class="flex items-center flex-wrap" style="row-gap: 9px; column-gap: 20px;">
-             <span class="past-badge rounded-full">RESULT</span>
-             <span class="card-text-secondary card-date">
-               <%
+    <% for(let i=0; i < past.length; i++) { %>
+    <div class="lottery-card <%= past[i].dayName %>-card cursor-pointer" onclick="toggleResult('past<%= i %>')">
+      <div class="flex items-center justify-between">
+        <div class="flex-1 card-element-spacing">
+          <div class="flex items-center flex-wrap" style="row-gap: 9px; column-gap: 20px;">
+            <span class="past-badge rounded-full">RESULT</span>
+            <span class="card-text-secondary card-date">
+              <%
 const drawDate = new Date(past[i].drawDate);
 const day = drawDate.getDate();
 const month = drawDate.toLocaleString('en-US', { month: 'long' });
@@ -61,54 +96,55 @@ const formattedDate = drawDate.toLocaleDateString('en-GB', {
   timeZone: 'Asia/Kolkata' // Specify the timezone for India Standard Time
 }).replace(',', '');
 %>
-               <%= formattedDate %>
-             </span>
-           </div>
-           <h3 class="card-text card-lottery-name">
-             <%= past[i].name %><br><%= past[i].name2 || '' %>
-           </h3>
-           
-           <!-- priZe listing -->
-           <% past[i].prizes.forEach(prize => { %>
-           <div class="flex items-center card-text-secondary">
-             <i class="fas fa-trophy text-yellow-300 mr-2"></i>
-             <span class="card-prize">
-               <% 
+              <%= formattedDate %>
+            </span>
+          </div>
+          <h3 class="card-text card-lottery-name">
+            <%= past[i].name %><br><%= past[i].name2 || '' %>
+          </h3>
+
+          <!-- priZe listing -->
+          <% past[i].prizes.forEach(prize => { %>
+          <div class="flex items-center card-text-secondary">
+            <i class="fas fa-trophy text-yellow-300 mr-2"></i>
+            <span class="card-prize">
+              <% 
                let rankStatus= 'th';
                 if(prize.rank === 1) rankStatus = 'st';
                 else if(prize.rank === 2) rankStatus = 'nd';
                 else if(prize.rank === 3) rankStatus = 'rd';
                 else rankStatus = 'th';
                %>
-               <%= prize.rank %><%= rankStatus %> Prize: ₹<%= prize.amount.toLocaleString('en-IN') %>
-             </span><br>
-           </div>
-           <% }); %>
-           <!--  -->
-         </div>
-         <div class="text-right ml-4">
-           <i id="arrow-past<%= i %>" class="fas fa-chevron-down card-text text-xl transition-transform duration-300"></i>
-         </div>
-       </div>
+              <%= prize.rank %><%= rankStatus %> Prize: ₹<%= prize.amount.toLocaleString('en-IN') %>
+            </span><br>
+          </div>
+          <% }); %>
+          <!--  -->
+        </div>
+        <div class="text-right ml-4">
+          <i id="arrow-past<%= i %>" class="fas fa-chevron-down card-text text-xl transition-transform duration-300"></i>
+        </div>
+      </div>
 
-       <!-- Admin Actions -->
-       <div class="flex items-center mt-4">
-         <button onclick="editLottery('<%= past[i]._id %>')" class="admin-btn edit-btn">
-           <i class="fas fa-edit mr-1"></i>
-           Edit
-         </button>
-         <button onclick="deleteLottery('<%= past[i]._id %>')" class="admin-btn">
-           <i class="fas fa-trash mr-1"></i>
-           Delete
-         </button>
-       </div>
+      <!-- Admin Actions -->
+      <div class="flex items-center mt-4">
+        <button onclick="editLottery('<%= past[i]._id %>')" class="admin-btn edit-btn">
+          <i class="fas fa-edit mr-1"></i>
+          Edit
+        </button>
+        <button onclick="deleteLottery('<%= past[i]._id %>')" class="admin-btn">
+          <i class="fas fa-trash mr-1"></i>
+          Delete
+        </button>
+      </div>
 
-       <div id="past<%= i %>" class="card-expand collapsed mt-6">
-         <div class="result-container space-y-4">
-           
-<!-- result card loop -->  
-<% past[i].winners.forEach(winner => { %>
-<% 
+      <div id="past<%= i %>" class="card-expand collapsed mt-6">
+        <div class="result-container space-y-4">
+
+          <!-- result card loop -->
+
+          <% past[i].winners.slice().sort((a, b) => new Date(b.resultTime) - new Date(a.resultTime)).forEach(winner => { %>
+          <% 
   // Format the time to 12-hour format with AM/PM
   const resultTime = new Date(winner.resultTime);
   const hours = resultTime.getHours();
@@ -126,105 +162,103 @@ const formattedDate = drawDate.toLocaleDateString('en-GB', {
   const ticketLetters = letters.slice(0, ticketLength);
 %>
 
-<div class="result-card">
-  <div class="result-card-header">
-    <%= formattedTime %>
-  </div>
-  <div class="result-card-content">
-    <style>
-      .letter-container{
-        display: flex;
-        justify-content: center;
-        width: 100%;
-        
-      }
-      .letter-box{    
-        width: 45px;
-        height: auto;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 1.2rem;
-        font-weight: 900;
-        color:#059669;
-      }
-    </style>
-    <div class="letter-container">
-      <% ticketLetters.forEach((letter, index) => { %>
-        <div class="letter-box">
-        <%= letter %>
-        </div>
-      <% }); %>
-    </div>
+          <div class="result-card">
+            <div class="result-card-header">
+              <%= formattedTime %>
+            </div>
+            <div class="result-card-content">
 
-    <div class="winning-numbers-container">
-      <div class="winning-number-item">
-        <div class="winning-number" data-ticket-number="<%= firstTicketNumber %>">
-          <%= firstTicketNumber %>
+              <div class="letter-container">
+                <% ticketLetters.forEach((letter, index) => { %>
+                <div class="letter-box">
+                  <%= letter %>
+                </div>
+                <% }); %>
+              </div>
+
+              <div class="winning-numbers-container">
+                <div class="winning-number-item">
+                  <div class="winning-number" data-ticket-number="<%= firstTicketNumber %>">
+                    <%= firstTicketNumber %>
+                  </div>
+                </div>
+              </div>
+              <div class="otherPrizeContainer">
+                <% winner.winNumbers.forEach((winNumberObj, index) => { %>
+                <div class="win-items">
+                  <% 
+               let rankStatus2= 'th';
+                if(winNumberObj.prizeRank === 1) rankStatus2 = 'st';
+                else if(winNumberObj.prizeRank === 2) rankStatus2 = 'nd';
+                else if(winNumberObj.prizeRank === 3) rankStatus2 = 'rd';
+                else rankStatus2 = 'th';
+               %>
+             
+                  <span class="prize-Rank"><%= winNumberObj.prizeRank %><%= rankStatus2 %> Prize :</span>
+                  <div class="result-winning-number"><%= winNumberObj.ticketNumber %></div>
+                </div>
+                <% }); %>
+              </div>
+            </div>
+          </div>
+          <% }); %>
+          <!-- END Result card loop -->
+
         </div>
       </div>
     </div>
+    <% } %>
+
+    <!-- Load More Button -->
+    <button onclick="getPastLottories()" class="load-more-btn w-full text-white py-4 font-semibold flex items-center
+                                justify-center space-x-2" id="loadmoreBtn">
+      <i class="fas fa-plus"></i>
+      <span>Load More Results</span>
+    </button>
+
+    <script>
+      let currentPageNumber = 1;
+
+      async function getPastLottories() {
+
+
+        try {
+          const response = await fetch('/api/get-past-lottories', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              page: currentPageNumber + 1
+            })
+          });
+
+          if (!response.ok) {
+            throw new Error(`Server responded with status ${response.status}`);
+          }
+
+          const result = await response.json();
+          console.log(result)
+          if (!result.success) {
+            throw new Error(result.message || 'Unknown error occurred');
+          }
+          currentPageNumber += 1;
+
+
+          const pastLotteries = result.items;
+          console.log(pastLotteries)
+          renderPastResults(pastLotteries);
+
+          return
+        } catch (err) {
+          console.error('Failed to load past lotteries:', err.message);
+          return
+          // Optionally show user-friendly error in the UI
+        }
+      }
+    </script>
 
   </div>
-</div>
-<% }); %>
-<!-- END Result card loop -->
-           <!-- END Result card loop -->
-         </div>
-       </div>
-     </div>
-     <% } %>
 
-     <!-- Load More Button -->
-     <button onclick="getPastLottories()" class="load-more-btn w-full text-white py-4 font-semibold flex items-center
-                                justify-center space-x-2" id="loadmoreBtn">
-       <i class="fas fa-plus"></i>
-       <span>Load More Results</span>
-     </button>
-
-     <script>
-       let currentPageNumber = 1;
-
-       async function getPastLottories() {
-
-
-         try {
-           const response = await fetch('/api/get-past-lottories', {
-             method: 'POST',
-             headers: {
-               'Content-Type': 'application/json'
-             },
-             body: JSON.stringify({
-               page: currentPageNumber + 1
-             })
-           });
-
-           if (!response.ok) {
-             throw new Error(`Server responded with status ${response.status}`);
-           }
-
-           const result = await response.json();
-           console.log(result)
-           if (!result.success) {
-             throw new Error(result.message || 'Unknown error occurred');
-           }
-           currentPageNumber += 1;
-
-
-           const pastLotteries = result.items;
-           console.log(pastLotteries)
-           renderPastResults(pastLotteries);
-
-           return
-         } catch (err) {
-           console.error('Failed to load past lotteries:', err.message);
-           return
-           // Optionally show user-friendly error in the UI
-         }
-       }
-     </script>
-
-   </div>
-
-   <% } %>
- </section>
+  <% } %>
+</section>
