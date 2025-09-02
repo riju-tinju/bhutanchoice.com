@@ -195,18 +195,18 @@ const formattedDate = drawDate.toLocaleDateString('en-GB', {
 
                 <% if(index === 4) { %>
                 <div class="win-items">
-                  <span class="prize-Rank">5th Prize : <b>(Single number all series)</b></span>
+                  <span class="prize-Rank">🎖️5th Prize : <b>(Single number all series)</b></span>
                   <!-- <div class="result-winning-number"><%= winNumberObj.ticketNumber %></div> -->
                 </div>
                 <% }else if(index < 4){ %>
                 <% if (winNumberObj.ticketNumber && winNumberObj.ticketNumber.split('').every(char => char === '0')) { %>
                 <div class="win-items">
-                  <span class="prize-Rank"><%= winNumberObj.prizeRank %><%= rankStatus2 %> Prize :</span>
+                  <span class="prize-Rank">🎖️<%= winNumberObj.prizeRank %><%= rankStatus2 %> Prize :</span>
                   <div class="result-winning-number result-winning-number_if_no_results underline-animated"></div>
                 </div>
                 <% }else{ %>
                 <div class="win-items">
-                  <span class="prize-Rank"><%= winNumberObj.prizeRank %><%= rankStatus2 %> Prize :</span>
+                  <span class="prize-Rank">🎖️<%= winNumberObj.prizeRank %><%= rankStatus2 %> Prize :</span>
                   <div class="result-winning-number"><%= winNumberObj.ticketNumber %></div>
                 </div>
                 <% } %>

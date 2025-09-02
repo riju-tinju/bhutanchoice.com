@@ -1228,6 +1228,8 @@
         todays.forEach(lottery => {
             // Initialize nextDrawTime as null
             lottery.nextDrawTime = null;
+            // Initialize lastDrawTime as null
+            lottery.lastDrawTime = null;
             
             if (lottery.winners && lottery.winners.length > 0) {
                 // Find all future result times
@@ -1239,6 +1241,17 @@
                 // Set the next draw time if there are future draws
                 if (futureResultTimes.length > 0) {
                     lottery.nextDrawTime = futureResultTimes[0];
+                }
+                
+                // Find all past result times for lastDrawTime
+                const pastResultTimes = lottery.winners
+                    .filter(winner => winner.resultTime && winner.resultTime <= nowTime)
+                    .map(winner => winner.resultTime)
+                    .sort((a, b) => b - a); // Sort descending (most recent first)
+                
+                // Set the last draw time if there are past draws
+                if (pastResultTimes.length > 0) {
+                    lottery.lastDrawTime = pastResultTimes[0];
                 }
                 
                 // Check if ALL resultTimes in this lottery have passed
