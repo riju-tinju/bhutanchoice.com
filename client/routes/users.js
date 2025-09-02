@@ -10,7 +10,7 @@ router.get('/check-time', (req, res) => {
     const normalTimeFromBackend = new Date();
     const bhutanTime = moment().tz('Asia/Kolkata');
     const indianTime = moment().tz('Asia/Kolkata');
-    const dubaiTime = moment().tz('Asia/Dubai');
+    const dubaiTime = moment().tz('Asia/Kolkata');
     const utcTime = moment().utc();
 
     const timeObj = {
