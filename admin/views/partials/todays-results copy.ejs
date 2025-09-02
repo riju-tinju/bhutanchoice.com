@@ -209,37 +209,7 @@
         <div class="result-container space-y-4">
           <!-- result card loop -->
           
-          <% const now2 = new Date(); // Get the current time
-
-  // Sort the 'lottery.winners' array to show upcoming events first
-  const sortedWinners = lottery.winners.slice().sort((a, b) => {
-    const dateA = new Date(a.resultTime);
-    const dateB = new Date(b.resultTime);
-
-    const isUpcomingA = dateA > now2;
-    const isUpcomingB = dateB > now2;
-
-    // Prioritize upcoming events.
-    if (isUpcomingA && !isUpcomingB) {
-      return -1; // 'a' (upcoming) comes before 'b' (past)
-    }
-    if (!isUpcomingA && isUpcomingB) {
-      return 1; // 'b' (upcoming) comes before 'a' (past)
-    }
-
-    // Sort within the same category.
-    if (isUpcomingA && isUpcomingB) {
-      // Both are upcoming, sort ascending (earliest first).
-      return dateA - dateB;
-    } else {
-      // Both are past, sort descending (most recent first).
-      return dateB - dateA;
-    }
-  });
-
-  // Now, loop through the newly sorted array
-  sortedWinners.forEach(winner => {
-   %>
+          <% lottery.winners.slice().sort((a, b) => new Date(b.resultTime) - new Date(a.resultTime)).forEach(winner => { %>
           <% 
   // Format the time to 12-hour format with AM/PM
   const resultTime = new Date(winner.resultTime);
