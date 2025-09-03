@@ -3,9 +3,6 @@
     <div class="modal-content">
         <div class="modal-header">
             <h2 id="modalTitle" class="modal-title">Create New Lottery</h2>
-            <button type="button" class="modal-close" onclick="closeModal()">
-                <i class="fas fa-times"></i>
-            </button>
         </div>
         <div class="modal-body">
             <form id="lotteryForm">
@@ -95,7 +92,6 @@
 <style>
     * {
         font-family: 'Poppins', sans-serif;
-        box-sizing: border-box;
     }
 
     /* Enhanced Modal styles */
@@ -109,16 +105,13 @@
         height: 100%;
         background-color: rgba(0, 0, 0, 0.5);
         backdrop-filter: blur(5px);
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
     }
 
     .modal.show {
         display: flex;
-        align-items: flex-start;
+        align-items: center;
         justify-content: center;
         padding: 20px;
-        min-height: 100vh;
     }
 
     .modal-content {
@@ -126,12 +119,10 @@
         border-radius: 16px;
         max-width: 800px;
         width: 100%;
-        max-height: calc(100vh - 40px);
+        max-height: 90vh;
         overflow-y: auto;
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
         position: relative;
-        margin: auto;
-        -webkit-overflow-scrolling: touch;
     }
 
     .modal-header {
@@ -142,34 +133,12 @@
         position: sticky;
         top: 0;
         z-index: 10;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
     }
 
     .modal-title {
         font-size: 1.5rem;
         font-weight: 700;
         margin: 0;
-    }
-
-    .modal-close {
-        background: rgba(255, 255, 255, 0.2);
-        border: none;
-        color: white;
-        border-radius: 50%;
-        width: 36px;
-        height: 36px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.1rem;
-        transition: background 0.3s ease;
-    }
-
-    .modal-close:hover {
-        background: rgba(255, 255, 255, 0.3);
     }
 
     .modal-body {
@@ -243,10 +212,6 @@
         cursor: pointer;
         transition: all 0.3s ease;
         font-size: 0.95rem;
-        min-height: 44px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
     }
 
     .btn-primary {
@@ -313,7 +278,6 @@
         font-size: 1rem;
         transition: all 0.3s ease;
         max-width: 100%;
-        min-height: 44px;
     }
 
     .prize-amount-input:focus {
@@ -333,11 +297,6 @@
         font-weight: 600;
         transition: all 0.3s ease;
         flex-shrink: 0;
-        min-height: 44px;
-        min-width: 44px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
     }
 
     .remove-prize:hover {
@@ -357,9 +316,6 @@
         display: flex;
         align-items: center;
         gap: 8px;
-        min-height: 44px;
-        width: 100%;
-        justify-content: center;
     }
 
     .add-prize:hover {
@@ -385,12 +341,11 @@
 
     .winner-group-header {
         display: flex;
-        justify-content: space-between;
+        justify-content: between;
         align-items: center;
         margin-bottom: 16px;
         padding-bottom: 12px;
         border-bottom: 1px solid #E5E7EB;
-        gap: 12px;
     }
 
     .winner-group-title {
@@ -401,13 +356,11 @@
         font-weight: 700;
         font-size: 0.9rem;
         flex-shrink: 0;
-        white-space: nowrap;
     }
 
     .winner-group-time {
         flex: 1;
         margin: 0 12px;
-        min-width: 0;
     }
 
     .winner-group-time input {
@@ -417,7 +370,6 @@
         border-radius: 8px;
         font-size: 0.9rem;
         transition: all 0.3s ease;
-        min-height: 44px;
     }
 
     .winner-group-time input:focus {
@@ -437,11 +389,6 @@
         font-weight: 600;
         transition: all 0.3s ease;
         flex-shrink: 0;
-        min-height: 44px;
-        min-width: 44px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
     }
 
     .remove-winner-group:hover {
@@ -475,7 +422,6 @@
         transition: all 0.3s ease;
         min-width: 120px;
         background: white;
-        min-height: 44px;
     }
 
     .winner-prize-select:focus {
@@ -493,7 +439,6 @@
         transition: all 0.3s ease;
         font-family: "ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New", "monospace";
         letter-spacing: 1px;
-        min-height: 44px;
     }
 
     .winner-ticket-input:focus {
@@ -513,11 +458,6 @@
         font-weight: 600;
         transition: all 0.3s ease;
         flex-shrink: 0;
-        min-height: 44px;
-        min-width: 44px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
     }
 
     .remove-winner-number:hover {
@@ -539,9 +479,6 @@
         align-items: center;
         gap: 6px;
         margin-top: 8px;
-        min-height: 44px;
-        width: 100%;
-        justify-content: center;
     }
 
     .add-winner-number:hover {
@@ -562,9 +499,6 @@
         align-items: center;
         gap: 8px;
         margin-bottom: 12px;
-        min-height: 44px;
-        width: 100%;
-        justify-content: center;
     }
 
     .add-winner-group:hover {
@@ -584,8 +518,6 @@
         z-index: 1100;
         transform: translateX(100%);
         transition: transform 0.3s ease;
-        max-width: calc(100vw - 40px);
-        word-wrap: break-word;
     }
 
     .toast.show {
@@ -611,269 +543,49 @@
         grid-column: span 2;
     }
 
-    /* Enhanced Mobile Responsive Design */
+    /* Mobile Responsive Design */
     @media (max-width: 768px) {
-        .modal {
-            padding: 0;
-            align-items: stretch;
-        }
-
-        .modal.show {
-            padding: 0;
-            min-height: 100vh;
-            align-items: stretch;
-        }
-
         .modal-content {
-            width: 100%;
-            height: 100vh;
-            max-height: 100vh;
-            max-width: 100%;
-            border-radius: 0;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
+            width: 95%;
+            max-height: 95vh;
         }
 
         .modal-header {
-            padding: 16px 20px;
-            border-radius: 0;
-            flex-shrink: 0;
-        }
-
-        .modal-title {
-            font-size: 1.25rem;
-        }
-
-        .modal-body {
-            padding: 16px 20px 20px;
-            flex: 1;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .form-section {
-            margin-bottom: 24px;
             padding: 16px;
         }
 
-        .form-section-title {
-            font-size: 1.1rem;
-            margin-bottom: 12px;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
+        .modal-body {
+            padding: 16px;
         }
 
         .form-grid {
             grid-template-columns: 1fr;
-            gap: 16px;
         }
 
         .form-grid-full {
             grid-column: span 1;
         }
 
-        .form-input {
-            padding: 14px 16px;
-            font-size: 16px; /* Prevents zoom on iOS */
-            min-height: 50px;
-        }
-
-        /* Prize Items Mobile */
         .prize-item {
-            flex-direction: column;
-            align-items: stretch;
-            gap: 12px;
-            padding: 16px;
+            flex-wrap: wrap;
         }
 
         .prize-rank-display {
-            min-width: auto;
-            text-align: center;
-            padding: 10px 16px;
-        }
-
-        .prize-amount-input {
-            min-height: 50px;
-            font-size: 16px;
-        }
-
-        .remove-prize {
-            min-height: 50px;
-            padding: 12px;
-            align-self: center;
-            min-width: 120px;
-        }
-
-        /* Winner Group Mobile */
-        .winner-group {
-            padding: 16px;
+            min-width: 60px;
         }
 
         .winner-group-header {
-            flex-direction: column;
-            align-items: stretch;
-            gap: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
         }
 
-        .winner-group-title {
-            text-align: center;
-            padding: 10px 16px;
-        }
-
-        .winner-group-time {
-            margin: 0;
-        }
-
-        .winner-group-time input {
-            font-size: 16px;
-            min-height: 50px;
-            padding: 12px 16px;
-        }
-
-        .remove-winner-group {
-            min-height: 50px;
-            padding: 12px;
-            align-self: center;
-            min-width: 120px;
-        }
-
-        /* Winner Number Items Mobile */
         .winner-number-item {
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .form-actions {
             flex-direction: column;
-            align-items: stretch;
-            gap: 12px;
-            padding: 16px;
-        }
-
-        .winner-prize-select {
-            min-width: auto;
-            font-size: 16px;
-            min-height: 50px;
-            padding: 12px 16px;
-        }
-
-        .winner-ticket-input {
-            font-size: 16px;
-            min-height: 50px;
-            padding: 12px 16px;
-        }
-
-        .remove-winner-number {
-            min-height: 50px;
-            padding: 12px;
-            align-self: center;
-            min-width: 120px;
-        }
-
-        /* Buttons Mobile */
-        .btn {
-            min-height: 50px;
-            padding: 14px 24px;
-            font-size: 1rem;
-        }
-
-        .add-prize,
-        .add-winner-number,
-        .add-winner-group {
-            min-height: 50px;
-            padding: 14px 24px;
-            font-size: 1rem;
-        }
-
-        .form-actions {
-            flex-direction: column-reverse;
-            gap: 12px;
-            padding-top: 20px;
-            margin-top: 24px;
-            position: sticky;
-            bottom: 0;
-            background: white;
-            border-top: 2px solid #E5E7EB;
-            margin-left: -20px;
-            margin-right: -20px;
-            padding-left: 20px;
-            padding-right: 20px;
-            padding-bottom: 20px;
-        }
-
-        /* Toast Mobile */
-        .toast {
-            top: 10px;
-            right: 10px;
-            left: 10px;
-            max-width: none;
-            transform: translateY(-100%);
-            border-radius: 12px;
-        }
-
-        .toast.show {
-            transform: translateY(0);
-        }
-    }
-
-    /* Extra small devices */
-    @media (max-width: 480px) {
-        .modal-header {
-            padding: 12px 16px;
-        }
-
-        .modal-title {
-            font-size: 1.1rem;
-        }
-
-        .modal-body {
-            padding: 12px 16px 16px;
-        }
-
-        .form-section {
-            padding: 12px;
-            margin-bottom: 20px;
-        }
-
-        .form-section-title {
-            font-size: 1rem;
-        }
-
-        .form-actions {
-            margin-left: -16px;
-            margin-right: -16px;
-            padding-left: 16px;
-            padding-right: 16px;
-        }
-    }
-
-    /* Landscape orientation on mobile */
-    @media (max-width: 768px) and (orientation: landscape) {
-        .modal-content {
-            height: 100vh;
-        }
-
-        .modal-body {
-            padding-bottom: 100px; /* Extra space for sticky form actions */
-        }
-    }
-
-    /* Touch-friendly hover states */
-    @media (hover: none) and (pointer: coarse) {
-        .prize-item:hover,
-        .winner-group:hover,
-        .winner-number-item:hover {
-            transform: none;
-            box-shadow: none;
-        }
-
-        .btn:hover,
-        .add-prize:hover,
-        .add-winner-number:hover,
-        .add-winner-group:hover,
-        .remove-prize:hover,
-        .remove-winner-group:hover,
-        .remove-winner-number:hover {
-            transform: none;
-            box-shadow: none;
         }
     }
 </style>

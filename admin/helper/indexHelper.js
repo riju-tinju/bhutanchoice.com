@@ -316,10 +316,14 @@ const indexHelper = {
       if (!lottery) {
         return res.status(404).json({ success: false, message: 'Lottery not found' });
       }
-
-      return res.status(200).json({
+      console.log("Lottery found:", lottery);
+      console.log({
         success: true,
         data: lottery
+      })
+      return res.status(200).json({
+        success: true,
+        data: lottery,
       });
 
     } catch (err) {
