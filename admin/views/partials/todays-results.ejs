@@ -188,7 +188,7 @@
           <% }); %>
           <!--  -->
 
-          
+
 
           <!-- Admin Actions -->
           <div class="flex items-center mt-4">
@@ -212,7 +212,7 @@
       <div id="today<%= index %>" class="card-expand collapsed mt-6">
         <div class="result-container space-y-4">
           <!-- result card loop -->
-          
+
           <% const now2 = new Date(); // Get the current time
 
   // Sort the 'lottery.winners' array to show upcoming events first
@@ -290,31 +290,31 @@
               </div>
               <div class="otherPrizeContainer">
                 <% winner.winNumbers.forEach((winNumberObj, index) => { %>
-                  <% 
+                <% 
                let rankStatus2= 'th';
                 if(winNumberObj.prizeRank === 1) rankStatus2 = 'st';
                 else if(winNumberObj.prizeRank === 2) rankStatus2 = 'nd';
                 else if(winNumberObj.prizeRank === 3) rankStatus2 = 'rd';
                 else rankStatus2 = 'th';
                %>
-              
-               <% if(index === 4) { %>
+
+                <% if(index === 4) { %>
                 <div class="win-items">
-                  <span class="prize-Rank">🎖️5th Prize :   <b>(Single number all series)</b></span>
+                  <span class="prize-Rank">🎖️5th Prize : <b>(Single number all series)</b></span>
                   <!-- <div class="result-winning-number"><%= winNumberObj.ticketNumber %></div> -->
                 </div>
                 <% }else if(index < 4){ %>
-                  <% if (winNumberObj.ticketNumber && winNumberObj.ticketNumber.split('').every(char => char === '0')) { %>
-                        <div class="win-items">
-                          <span class="prize-Rank">🎖️<%= winNumberObj.prizeRank %><%= rankStatus2 %> Prize :</span>
-                          <div class="result-winning-number result-winning-number_if_no_results underline-animated"></div>
-                        </div>
-                  <% }else{ %>
-                        <div class="win-items">
-                          <span class="prize-Rank">🎖️<%= winNumberObj.prizeRank %><%= rankStatus2 %> Prize :</span>
-                          <div class="result-winning-number"><%= winNumberObj.ticketNumber %></div>
-                        </div>
-                  <% } %>
+                <% if (winNumberObj.ticketNumber && winNumberObj.ticketNumber.split('').every(char => char === '0')) { %>
+                <div class="win-items">
+                  <span class="prize-Rank">🎖️<%= winNumberObj.prizeRank %><%= rankStatus2 %> Prize :</span>
+                  <div class="result-winning-number result-winning-number_if_no_results underline-animated"></div>
+                </div>
+                <% }else{ %>
+                <div class="win-items">
+                  <span class="prize-Rank">🎖️<%= winNumberObj.prizeRank %><%= rankStatus2 %> Prize :</span>
+                  <div class="result-winning-number"><%= winNumberObj.ticketNumber %></div>
+                </div>
+                <% } %>
                 <% } else { %>
                 <% }%>
                 <% }); %>

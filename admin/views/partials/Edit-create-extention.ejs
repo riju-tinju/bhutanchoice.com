@@ -67,14 +67,15 @@
                         Winners (Optional)
                     </h3>
                     
-                    <div id="winnersContainer">
-                        <!-- Winner groups will be added dynamically -->
-                    </div>
-                    
+
                     <button type="button" class="add-winner-group" onclick="addWinnerGroup()">
                         <i class="fas fa-plus"></i>
                         Add Winner Group
                     </button>
+
+                    <div id="winnersContainer">
+                        <!-- Winner groups will be added dynamically -->
+                    </div>
                 </div>
 
                 <div class="form-actions">
@@ -498,6 +499,7 @@
         display: flex;
         align-items: center;
         gap: 8px;
+        margin-bottom: 12px;
     }
 
     .add-winner-group:hover {
@@ -910,7 +912,8 @@
         winnerGroupCounter++;
         const winnersContainer = document.getElementById('winnersContainer');
         const winnerGroupDiv = createWinnerGroupElement(winnerGroupCounter);
-        winnersContainer.appendChild(winnerGroupDiv);
+        // winnersContainer.appendChild(winnerGroupDiv);
+        winnersContainer.prepend(winnerGroupDiv);
 
         // Set default result time (2 hours after draw time)
         const drawDate = document.getElementById('drawDate').value;
