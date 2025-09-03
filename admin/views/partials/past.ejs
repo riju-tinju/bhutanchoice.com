@@ -145,13 +145,18 @@ const formattedDate = drawDate.toLocaleDateString('en-GB', {
 
           <% past[i].winners.slice().sort((a, b) => new Date(b.resultTime) - new Date(a.resultTime)).forEach(winner => { %>
           <% 
-  // Format the time to 12-hour format with AM/PM
+  // Convert to IST explicitly
   const resultTime = new Date(winner.resultTime);
-  const hours = resultTime.getHours();
-  const minutes = resultTime.getMinutes();
-  const ampm = hours >= 12 ? 'PM' : 'AM';
-  const formattedHours = hours % 12 || 12;
-  const formattedTime = `${formattedHours}:${minutes.toString().padStart(2, '0')}${ampm}`;
+
+  // Format with IST timezone
+  const options = { 
+    hour: 'numeric', 
+    minute: '2-digit', 
+    hour12: true, 
+    timeZone: 'Asia/Kolkata' 
+  };
+
+  const formattedTime = resultTime.toLocaleString('en-IN', options);
   
   // Get first ticket number and its length
   const firstTicketNumber = winner.winNumbers[0].ticketNumber;
