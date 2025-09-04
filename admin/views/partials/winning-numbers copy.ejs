@@ -80,69 +80,6 @@
   .result-content:not(.collapsed) {
     display: block;
   }
-
-  /* Other Prize Container Animation */
-  .otherPrizeContainer {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.6s ease;
-    visibility: hidden;
-    overflow: hidden;
-    display: none;
-  }
-
-  .otherPrizeContainer.show {
-    opacity: 1;
-    transform: translateY(0);
-    visibility: visible;
-    height: auto; /* Allow natural height */
-    display: block;
-  }
-
-  /* Enhanced animation for individual win items */
-  .win-items {
-    opacity: 0;
-    transform: translateX(-20px);
-    transition: all 0.4s ease;
-  }
-
-  .win-items.animate {
-    opacity: 1;
-    transform: translateX(0);
-  }
-
-  /* Add these new badge styles */
-  .next-draw-badge {
-    background: linear-gradient(45deg, #10B981, #34D399);
-    color: white;
-    animation: pulse 2s infinite;
-    font-size: 0.875rem;
-    font-weight: 800;
-    padding: 6px 12px;
-  }
-
-  .refresh-btn {
-    background: linear-gradient(135deg, #F59E0B 0%, #F97316 100%);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 8px 16px;
-    font-size: 0.875rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-
-  .refresh-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
-  }
-
-  .refresh-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-  }
 </style>
 
 <!-- 🎵 Add your counting audio file -->
@@ -162,9 +99,6 @@
       setTimeout(() => {
         animateWinningNumbers(id);
       }, 50);
-    } else {
-      // Hide all other prizes when collapsing
-      hideAllOtherPrizes(id);
     }
   }
 
@@ -172,17 +106,6 @@
   function animateWinningNumbers(cardId) {
     const container = document.getElementById(cardId);
     const winningNumberElements = container.querySelectorAll('.winning-number');
-    const otherPrizeContainers = container.querySelectorAll('.otherPrizeContainer');
-
-    // Hide all other prizes initially
-    otherPrizeContainers.forEach(otherPrizeContainer => {
-      otherPrizeContainer.classList.remove('show');
-      // Reset individual win items
-      const winItems = otherPrizeContainer.querySelectorAll('.win-items');
-      winItems.forEach(item => {
-        item.classList.remove('animate');
-      });
-    });
 
     // 🎵 Get audio element
     const audio = document.getElementById('count-audio');
@@ -194,7 +117,7 @@
       audio.play();
     }
 
-    // Animate all digits immediately for all winning numbers
+    // Animate all digits immediately
     winningNumberElements.forEach((element) => {
       const ticketNumber = element.getAttribute('data-ticket-number') || element.textContent;
       initializeTicketNumber(element, ticketNumber);
@@ -208,46 +131,6 @@
         audio.currentTime = 0;
       }
     }, 4800);
-
-    // ✨ Show all other prizes after main animation completes
-    setTimeout(() => {
-      showAllOtherPrizes(cardId);
-    }, 5000); // 4s roll + 0.8s landing + 0.2s buffer
-  }
-
-  // Show all other prizes with animation
-  function showAllOtherPrizes(cardId) {
-    const container = document.getElementById(cardId);
-    const otherPrizeContainers = container.querySelectorAll('.otherPrizeContainer');
-    
-    otherPrizeContainers.forEach((otherPrizeContainer, containerIndex) => {
-      // Show each container with a slight delay
-      setTimeout(() => {
-        otherPrizeContainer.classList.add('show');
-        
-        // Then animate individual items with staggered delay
-        const winItems = otherPrizeContainer.querySelectorAll('.win-items');
-        winItems.forEach((item, itemIndex) => {
-          setTimeout(() => {
-            item.classList.add('animate');
-          }, itemIndex * 150); // 150ms delay between each item
-        });
-      }, containerIndex * 300); // 300ms delay between each container
-    });
-  }
-
-  // Hide all other prizes when collapsing
-  function hideAllOtherPrizes(cardId) {
-    const container = document.getElementById(cardId);
-    const otherPrizeContainers = container.querySelectorAll('.otherPrizeContainer');
-    
-    otherPrizeContainers.forEach(otherPrizeContainer => {
-      otherPrizeContainer.classList.remove('show');
-      const winItems = otherPrizeContainer.querySelectorAll('.win-items');
-      winItems.forEach(item => {
-        item.classList.remove('animate');
-      });
-    });
   }
 
   // Initialize a ticket number display
@@ -317,4 +200,3 @@
     }
   }
 </script>
-
