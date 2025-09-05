@@ -1,5 +1,59 @@
+<%- include('./winning-numbers') %>
+<style>
+  /* Add this to your existing CSS in winning-numbers.ejs */
+  .result-prize-amount {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    /* Same gap as winning-numbers-container */
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #059669;
+  }
 
+  .prize-letter {
+    width: 53px;
+    /* Same width as digit-container */
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
+<style>
+  .letter-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
 
+  }
+
+  .letter-box {
+    width: 45px;
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: #059669;
+  }
+</style>
+<style>
+  .otherPrizeContainer {
+    width: 100%;
+    height: auto;
+    padding: 10px 20px 0px 20px;
+  }
+
+  .win-items {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0px;
+  }
+</style>
 <!-- Past Results -->
 <section>
   <% if(past && past.length>0){ %>
@@ -32,106 +86,138 @@ const minutes = drawDate.getMinutes();
 const ampm = hours >= 12 ? 'PM' : 'AM';
 hours = hours % 12;
 hours = hours ? hours : 12; // Convert 0 to 12
-const formattedDate = drawDate.toLocaleDateString('en-GB', { // 'en-IN' for India English locale
+const formattedDate = drawDate.toLocaleDateString('en-GB', { 
   year: 'numeric',
+  month: 'short',
   day: '2-digit',
   hour: '2-digit',
-  month: 'short',
   minute: '2-digit',
   hour12: true,
-  timeZone: 'Asia/Kolkata' // Specify the timezone for India Standard Time Asia/Kolkata Asia/Kolkata
+  timeZone: 'Asia/Kolkata' // Specify the timezone for India Standard Time
 }).replace(',', '');
 %>
               <%= formattedDate %>
             </span>
           </div>
           <h3 class="card-text card-lottery-name">
-            <%= past[i].name %><br><%= past[i].name2 %>
+            <%= past[i].name %><br><%= past[i].name2 || '' %>
           </h3>
 
-          <!-- Step 3a: Display all prizes -->
+          <!-- priZe listing -->
           <% past[i].prizes.forEach(prize => { %>
           <div class="flex items-center card-text-secondary">
             <i class="fas fa-trophy text-yellow-300 mr-2"></i>
             <span class="card-prize">
-              <%= prize.rank %> Prize: ₹<%= prize.amount.toLocaleString('en-IN') %>
+              <% 
+               let rankStatus= 'th';
+                if(prize.rank === 1) rankStatus = 'st';
+                else if(prize.rank === 2) rankStatus = 'nd';
+                else if(prize.rank === 3) rankStatus = 'rd';
+                else rankStatus = 'th';
+               %>
+              <%= prize.rank %><%= rankStatus %> Prize: ₹<%= prize.amount.toLocaleString('en-IN') %>
             </span><br>
           </div>
           <% }); %>
-
+          <!--  -->
         </div>
         <div class="text-right ml-4">
           <i id="arrow-past<%= i %>" class="fas fa-chevron-down card-text text-xl transition-transform duration-300"></i>
         </div>
       </div>
 
+     
+
       <div id="past<%= i %>" class="card-expand collapsed mt-6">
         <div class="result-container space-y-4">
-          <!-- <% past[i].prizes.forEach(prize=> {const winner = past[i].winners.find(w => w.prizeRank === prize.rank); %>
-          <div class="result-card">
-            <div class="result-card-header">
-              <%= prize.rank %> Prize
-            </div>
-            <div class="result-card-content">
-              <div class="result-prize-amount">₹<%=prize.amount.toLocaleString('en-IN') %>/-</div>
-              <% if(winner) { %>
-              <div class="result-winning-number">
-                <%= winner.ticketNumber %>
-              </div>
-              <% } else { %>
-              <div class="result-winning-number result-winning-number_if_no_results underline-animated"></div>
-              <% } %>
-            </div>
-          </div>
-          <% }); %> -->
 
-          <% past[i].winners.forEach(winner => { %>
+          <!-- result card loop -->
+
+          <% past[i].winners.slice().sort((a, b) => new Date(b.resultTime) - new Date(a.resultTime)).forEach(winner => { %>
           <% 
-    // Format the time to 12-hour format with AM/PM
-    const resultTime = new Date(winner.resultTime);
-    const hours = resultTime.getHours();
-    const minutes = resultTime.getMinutes();
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    const formattedHours = hours % 12 || 12;
-    const formattedTime = `${formattedHours}:${minutes.toString().padStart(2, '0')}${ampm}`;
-  %>
+  // Convert to IST explicitly
+  const resultTime = new Date(winner.resultTime);
+
+  // Format with IST timezone
+  const options = { 
+    hour: 'numeric', 
+    minute: '2-digit', 
+    hour12: true, 
+    timeZone: 'Asia/Kolkata' 
+  };
+
+  const formattedTime = resultTime.toLocaleString('en-IN', options);
+  
+  // Get first ticket number and its length
+  const firstTicketNumber = winner.winNumbers[0].ticketNumber;
+  const ticketLength = firstTicketNumber.toString().length;
+  
+  // Generate letters array based on ticket length
+  const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+  const ticketLetters = letters.slice(0, ticketLength);
+%>
 
           <div class="result-card">
             <div class="result-card-header">
               <%= formattedTime %>
             </div>
             <div class="result-card-content">
-              <div class="result-prize-amount">A B C</div>
-              <!-- <% if(winner.winNumbers && winner.winNumbers.length > 0) { %>
-              <div class="result-winning-numbers">
-                <% winner.winNumbers.forEach(winNumber => { %>
-                <div class="winning-number">
-                  <%= winNumber.ticketNumber %>
+
+              <div class="letter-container">
+                <% ticketLetters.forEach((letter, index) => { %>
+                <div class="letter-box">
+                  <%= letter %>
                 </div>
                 <% }); %>
               </div>
-              <% } else { %>
-              <div class="result-winning-number result-winning-number_if_no_results underline-animated"></div>
-              <% } %> -->
-              
+
+              <div class="winning-numbers-container">
+                <div class="winning-number-item">
+                  <div class="winning-number" data-ticket-number="<%= firstTicketNumber %>">
+                    <%= firstTicketNumber %>
+                  </div>
+                </div>
+              </div>
+              <div class="otherPrizeContainer">
+                <% winner.winNumbers.forEach((winNumberObj, index) => { %>
+                <% 
+               let rankStatus2= 'th';
+                if(winNumberObj.prizeRank === 1) rankStatus2 = 'st';
+                else if(winNumberObj.prizeRank === 2) rankStatus2 = 'nd';
+                else if(winNumberObj.prizeRank === 3) rankStatus2 = 'rd';
+                else rankStatus2 = 'th';
+               %>
+
+                <% if(index === 4) { %>
+                <div class="win-items">
+                  <span class="prize-Rank">🎖️5th Prize : <b>(Single number all series)</b></span>
+                  <!-- <div class="result-winning-number"><%= winNumberObj.ticketNumber %></div> -->
+                </div>
+                <% }else if(index < 4){ %>
+                <% if (winNumberObj.ticketNumber && winNumberObj.ticketNumber.split('').every(char => char === '0')) { %>
+                <div class="win-items">
+                  <span class="prize-Rank">🎖️<%= winNumberObj.prizeRank %><%= rankStatus2 %> Prize :</span>
+                  <div class="result-winning-number result-winning-number_if_no_results underline-animated"></div>
+                </div>
+                <% }else{ %>
+                <div class="win-items">
+                  <span class="prize-Rank">🎖️<%= winNumberObj.prizeRank %><%= rankStatus2 %> Prize :</span>
+                  <div class="result-winning-number"><%= winNumberObj.ticketNumber %></div>
+                </div>
+                <% } %>
+                <% } else { %>
+                <% }%>
+                <% }); %>
+              </div>
             </div>
           </div>
           <% }); %>
+          <!-- END Result card loop -->
+
         </div>
       </div>
     </div>
     <% } %>
-
-    <script>
-      function toggleResult(id) {
-        const element = document.getElementById(id);
-        const arrow = document.getElementById('arrow-' + id);
-
-        element.classList.toggle('collapsed');
-        arrow.classList.toggle('fa-chevron-down');
-        arrow.classList.toggle('fa-chevron-up');
-      }
-    </script>
 
     <!-- Load More Button -->
     <button onclick="getPastLottories()" class="load-more-btn w-full text-white py-4 font-semibold flex items-center
@@ -139,7 +225,19 @@ const formattedDate = drawDate.toLocaleDateString('en-GB', { // 'en-IN' for Indi
       <i class="fas fa-plus"></i>
       <span>Load More Results</span>
     </button>
-    <% } %>
+
+    <!-- Disclaimer Button -->
+    <div class="text-center py-4 px-4">
+      <button id="disclaimerBtn" class="text-sm text-gray-500 hover:text-blue-500 transition-colors duration-300 underline">
+        View Disclaimer
+      </button>
+    </div>
+
+    <!-- ✅ Copyright -->
+    <div class="text-center text-xs text-gray-400 pb-6 px-4">
+      &copy; 2018 bhutanlotteryresults.com<br>All rights reserved.
+    </div>
+
     <script>
       let currentPageNumber = 1;
 
@@ -181,88 +279,8 @@ const formattedDate = drawDate.toLocaleDateString('en-GB', { // 'en-IN' for Indi
         }
       }
     </script>
-    <!-- Disclaimer Button -->
-    <div class="text-center py-4 px-4">
-      <button id="disclaimerBtn" class="text-sm text-gray-500 hover:text-blue-500 transition-colors duration-300 underline">
-        View Disclaimer
-      </button>
-    </div>
 
-    <!-- ✅ Copyright -->
-    <div class="text-center text-xs text-gray-400 pb-6 px-4">
-      &copy; 2018 bhutanlotteryresults.com<br>All rights reserved.
-    </div>
   </div>
+
+  <% } %>
 </section>
-
-
-<script>
-  // Animated Number Counter
-function initializeAnimatedNumbers() {
-  const containers = document.querySelectorAll('.animated-number-container');
-  
-  containers.forEach(container => {
-    const number = container.dataset.number;
-    const delay = parseInt(container.dataset.delay) || 0;
-    
-    if (number) {
-      createDigitBoxes(container, number, delay);
-    }
-  });
-}
-
-function createDigitBoxes(container, number, delay) {
-  const digits = number.toString().split('');
-  
-  digits.forEach((digit, index) => {
-    const digitBox = document.createElement('div');
-    digitBox.className = 'digit-box';
-    digitBox.textContent = '0';
-    container.appendChild(digitBox);
-    
-    // Start animation after delay
-    setTimeout(() => {
-      animateDigit(digitBox, parseInt(digit), index * 100);
-    }, delay);
-  });
-}
-
-function animateDigit(digitBox, targetDigit, delay) {
-  setTimeout(() => {
-    digitBox.classList.add('animating');
-    
-    let currentDigit = 0;
-    const duration = 800;
-    const steps = Math.max(10, targetDigit * 2);
-    const stepDuration = duration / steps;
-    
-    const animate = () => {
-      if (currentDigit <= targetDigit) {
-        digitBox.textContent = currentDigit;
-        
-        if (currentDigit === targetDigit) {
-          digitBox.classList.remove('animating');
-          digitBox.classList.add('completed');
-          return;
-        }
-        
-        currentDigit++;
-        setTimeout(animate, stepDuration);
-      }
-    };
-    
-    animate();
-  }, delay);
-}
-
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', function() {
-  initializeAnimatedNumbers();
-});
-
-// Re-initialize when new content is loaded (for dynamic content)
-function reinitializeAnimatedNumbers() {
-  initializeAnimatedNumbers();
-}
-
-</script>

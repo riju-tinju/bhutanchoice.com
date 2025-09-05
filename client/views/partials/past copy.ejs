@@ -46,17 +46,17 @@ const formattedDate = drawDate.toLocaleDateString('en-GB', { // 'en-IN' for Indi
           <h3 class="card-text card-lottery-name">
             <%= past[i].name %><br><%= past[i].name2 %>
           </h3>
-                
-            <!-- Step 3a: Display all prizes -->
-            <% past[i].prizes.forEach(prize => { %>
-              <div class="flex items-center card-text-secondary"> 
-              <i class="fas fa-trophy text-yellow-300 mr-2"></i>
-               <span class="card-prize">
-                 <%= prize.rank %> Prize: ₹<%= prize.amount.toLocaleString('en-IN') %>
-               </span><br>
-               </div>
-            <% }); %>
-          
+
+          <!-- Step 3a: Display all prizes -->
+          <% past[i].prizes.forEach(prize => { %>
+          <div class="flex items-center card-text-secondary">
+            <i class="fas fa-trophy text-yellow-300 mr-2"></i>
+            <span class="card-prize">
+              <%= prize.rank %> Prize: ₹<%= prize.amount.toLocaleString('en-IN') %>
+            </span><br>
+          </div>
+          <% }); %>
+
         </div>
         <div class="text-right ml-4">
           <i id="arrow-past<%= i %>" class="fas fa-chevron-down card-text text-xl transition-transform duration-300"></i>
@@ -84,7 +84,7 @@ const formattedDate = drawDate.toLocaleDateString('en-GB', { // 'en-IN' for Indi
           <% }); %> -->
 
           <% past[i].winners.forEach(winner => { %>
-  <% 
+          <% 
     // Format the time to 12-hour format with AM/PM
     const resultTime = new Date(winner.resultTime);
     const hours = resultTime.getHours();
@@ -93,27 +93,28 @@ const formattedDate = drawDate.toLocaleDateString('en-GB', { // 'en-IN' for Indi
     const formattedHours = hours % 12 || 12;
     const formattedTime = `${formattedHours}:${minutes.toString().padStart(2, '0')}${ampm}`;
   %>
-  
-  <div class="result-card">
-    <div class="result-card-header">
-      <%= formattedTime %>
-    </div>
-    <div class="result-card-content">
-      <div class="result-prize-amount">A B C</div>
-      <% if(winner.winNumbers && winner.winNumbers.length > 0) { %>
-        <div class="result-winning-numbers">
-          <% winner.winNumbers.forEach(winNumber => { %>
-            <div class="winning-number">
-              <%= winNumber.ticketNumber %>
+
+          <div class="result-card">
+            <div class="result-card-header">
+              <%= formattedTime %>
             </div>
+            <div class="result-card-content">
+              <div class="result-prize-amount">A B C</div>
+              <!-- <% if(winner.winNumbers && winner.winNumbers.length > 0) { %>
+              <div class="result-winning-numbers">
+                <% winner.winNumbers.forEach(winNumber => { %>
+                <div class="winning-number">
+                  <%= winNumber.ticketNumber %>
+                </div>
+                <% }); %>
+              </div>
+              <% } else { %>
+              <div class="result-winning-number result-winning-number_if_no_results underline-animated"></div>
+              <% } %> -->
+
+            </div>
+          </div>
           <% }); %>
-        </div>
-      <% } else { %>
-        <div class="result-winning-number result-winning-number_if_no_results underline-animated"></div>
-      <% } %>
-    </div>
-  </div>
-<% }); %>
         </div>
       </div>
     </div>
@@ -187,7 +188,78 @@ const formattedDate = drawDate.toLocaleDateString('en-GB', { // 'en-IN' for Indi
 
     <!-- ✅ Copyright -->
     <div class="text-center text-xs text-gray-400 pb-6 px-4">
-      &copy; 2018 bhutanlotteryresults.com<br>All rights reserved. 
+      &copy; 2018 bhutanlotteryresults.com<br>All rights reserved.
     </div>
   </div>
 </section>
+
+
+<script>
+  // Animated Number Counter
+  function initializeAnimatedNumbers() {
+    const containers = document.querySelectorAll('.animated-number-container');
+
+    containers.forEach(container => {
+      const number = container.dataset.number;
+      const delay = parseInt(container.dataset.delay) || 0;
+
+      if (number) {
+        createDigitBoxes(container, number, delay);
+      }
+    });
+  }
+
+  function createDigitBoxes(container, number, delay) {
+    const digits = number.toString().split('');
+
+    digits.forEach((digit, index) => {
+      const digitBox = document.createElement('div');
+      digitBox.className = 'digit-box';
+      digitBox.textContent = '0';
+      container.appendChild(digitBox);
+
+      // Start animation after delay
+      setTimeout(() => {
+        animateDigit(digitBox, parseInt(digit), index * 100);
+      }, delay);
+    });
+  }
+
+  function animateDigit(digitBox, targetDigit, delay) {
+    setTimeout(() => {
+      digitBox.classList.add('animating');
+
+      let currentDigit = 0;
+      const duration = 800;
+      const steps = Math.max(10, targetDigit * 2);
+      const stepDuration = duration / steps;
+
+      const animate = () => {
+        if (currentDigit <= targetDigit) {
+          digitBox.textContent = currentDigit;
+
+          if (currentDigit === targetDigit) {
+            digitBox.classList.remove('animating');
+            digitBox.classList.add('completed');
+            return;
+          }
+
+          currentDigit++;
+          setTimeout(animate, stepDuration);
+        }
+      };
+
+      animate();
+    }, delay);
+  }
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    initializeAnimatedNumbers();
+  });
+
+  // Re-initialize when new content is loaded (for dynamic content)
+  function reinitializeAnimatedNumbers() {
+    initializeAnimatedNumbers();
+  }
+</script>

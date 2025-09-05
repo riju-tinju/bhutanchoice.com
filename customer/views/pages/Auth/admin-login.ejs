@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login - Bhutan State Lotteries</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      font-family: 'Poppins', sans-serif;
+    }
+
+    /* Remove default tap highlight on mobile for all elements */
+    * {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      min-height: 100vh;
+    }
+
+    .app-header {
+      background: linear-gradient(135deg, #FF6B6B 0%, #6A82FB 50%, #45EBA5 100%);
+      background-size: 300% 300%;
+      animation: gradientShift 6s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    .login-container {
+      min-height: calc(100vh - 80px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .login-card {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      padding: 40px;
+      width: 100%;
+      max-width: 440px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(135deg, #FF6B6B 0%, #6A82FB 50%, #45EBA5 100%);
+      border-radius: 20px 20px 0 0;
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .login-title {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #1f2937;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #374151 0%, #4B5563 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .login-subtitle {
+      color: #6B7280;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    .security-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 50px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 32px;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #374151;
+      font-size: 0.95rem;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 16px 20px;
+      padding-left: 50px;
+      border: 2px solid #E5E7EB;
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      font-family: inherit;
+      background: #F9FAFB;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #3B82F6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      background: white;
+    }
+
+    .form-input.error {
+      border-color: #EF4444;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+    }
+
+    .form-input.success {
+      border-color: #10B981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6B7280;
+      font-size: 1.1rem;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6B7280;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: color 0.3s ease;
+    }
+
+    .password-toggle:hover {
+      color: #3B82F6;
+    }
+
+    .login-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 16px 24px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 32px;
+    }
+
+    .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+    }
+
+    .login-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .login-btn.loading {
+      pointer-events: none;
+    }
+
+    .error-message {
+      color: #EF4444;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .success-message {
+      color: #10B981;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid transparent;
+      border-top: 2px solid currentColor;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .security-info {
+      margin-top: 32px;
+      padding: 20px;
+      background: #F1F5F9;
+      border-radius: 12px;
+      border-left: 4px solid #3B82F6;
+    }
+
+    .security-info-title {
+      color: #1E293B;
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .security-info-text {
+      color: #475569;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .back-to-site {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      color: #374151;
+      padding: 12px 20px;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      backdrop-filter: blur(10px);
+    }
+
+    .back-to-site:hover {
+      background: white;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .bounce-in {
+      animation: bounceIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    @keyframes bounceIn {
+      0% {
+        transform: scale(0.3) translateY(50px);
+        opacity: 0;
+      }
+
+      50% {
+        transform: scale(1.05) translateY(-10px);
+        opacity: 0.8;
+      }
+
+      70% {
+        transform: scale(0.95) translateY(0px);
+        opacity: 0.9;
+      }
+
+      100% {
+        transform: scale(1) translateY(0px);
+        opacity: 1;
+      }
+    }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 16px 24px;
+      border-radius: 12px;
+      color: white;
+      font-weight: 600;
+      z-index: 1000;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toast.show {
+      transform: translateX(0);
+    }
+
+    .toast.success {
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    }
+
+    .toast.error {
+      background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+    }
+
+    .toast.warning {
+      background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+    }
+
+    /* Mobile Responsive Design */
+    @media (max-width: 768px) {
+      .login-card {
+        padding: 32px 24px;
+        margin: 16px;
+        max-width: none;
+      }
+
+      .login-title {
+        font-size: 1.75rem;
+      }
+
+      .form-input {
+        padding: 14px 18px;
+        padding-left: 45px;
+      }
+
+      .input-icon {
+        left: 15px;
+      }
+
+      .password-toggle {
+        right: 15px;
+      }
+
+      .login-btn {
+        padding: 14px 20px;
+        font-size: 1rem;
+      }
+
+      .back-to-site {
+        top: 16px;
+        left: 16px;
+        padding: 10px 16px;
+        font-size: 0.85rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .login-container {
+        padding: 16px;
+      }
+
+      .login-card {
+        padding: 24px 20px;
+        margin: 0;
+      }
+
+      .login-header {
+        margin-bottom: 32px;
+      }
+
+      .security-badge {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Login Container -->
+  <div class="login-container">
+    <div class="login-card bounce-in">
+      <div class="login-header">
+        <h2 class="login-title">Admin Login</h2>
+        <p class="login-subtitle">Secure access to lottery management system</p>
+        
+        <div class="security-badge">
+          <i class="fas fa-shield-alt"></i>
+          SSL Secured
+        </div>
+      </div>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label class="form-label" for="adminEmail">
+            <i class="fas fa-envelope mr-2"></i>
+            Administrator Email
+          </label>
+          <div class="relative">
+            <i class="fas fa-envelope input-icon"></i>
+            <input 
+              type="email" 
+              id="adminEmail" 
+              class="form-input" 
+              placeholder="Enter your admin email"
+              required
+              autocomplete="email"
+            >
+          </div>
+          <div id="emailError" class="error-message" style="display: none;"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="adminPassword">
+            <i class="fas fa-lock mr-2"></i>
+            Password
+          </label>
+          <div class="relative">
+            <i class="fas fa-lock input-icon"></i>
+            <input 
+              type="password" 
+              id="adminPassword" 
+              class="form-input" 
+              placeholder="Enter your password"
+              required
+              autocomplete="current-password"
+            >
+            <i class="fas fa-eye password-toggle" id="passwordToggle"></i>
+          </div>
+          <div id="passwordError" class="error-message" style="display: none;"></div>
+        </div>
+
+        <button type="submit" class="login-btn" id="loginBtn">
+          <i class="fas fa-sign-in-alt"></i>
+          <span id="loginBtnText">Login to Admin Panel</span>
+        </button>
+
+        <div id="loginError" class="error-message" style="display: none; margin-top: 16px; justify-content: center;"></div>
+        <div id="loginSuccess" class="success-message" style="display: none; margin-top: 16px; justify-content: center;"></div>
+      </form>
+
+      <div class="security-info">
+        <div class="security-info-title">
+          <i class="fas fa-info-circle"></i>
+          Security Notice
+        </div>
+        <div class="security-info-text">
+          This is a secure admin area. All login attempts are monitored and logged for security purposes. Please ensure you are authorized to access this system.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast"></div>
+
+  <script>
+    // DOM Elements
+    const loginForm = document.getElementById('loginForm');
+    const adminEmail = document.getElementById('adminEmail');
+    const adminPassword = document.getElementById('adminPassword');
+    const passwordToggle = document.getElementById('passwordToggle');
+    const loginBtn = document.getElementById('loginBtn');
+    const loginBtnText = document.getElementById('loginBtnText');
+    const emailError = document.getElementById('emailError');
+    const passwordError = document.getElementById('passwordError');
+    const loginError = document.getElementById('loginError');
+    const loginSuccess = document.getElementById('loginSuccess');
+    const toast = document.getElementById('toast');
+
+    // Password visibility toggle
+    passwordToggle.addEventListener('click', function() {
+      const type = adminPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+      adminPassword.setAttribute('type', type);
+      this.classList.toggle('fa-eye');
+      this.classList.toggle('fa-eye-slash');
+    });
+
+    // Input validation
+    function validateInput(input, errorElement, validationFn, errorMessage) {
+      const value = input.value.trim();
+      
+      if (validationFn(value)) {
+        input.classList.remove('error');
+        input.classList.add('success');
+        errorElement.style.display = 'none';
+        return true;
+      } else {
+        input.classList.remove('success');
+        input.classList.add('error');
+        errorElement.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${errorMessage}`;
+        errorElement.style.display = 'flex';
+        return false;
+      }
+    }
+
+    // Real-time validation
+    adminEmail.addEventListener('input', function() {
+      if (this.value.trim()) {
+        validateInput(this, emailError, 
+          (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
+          'Please enter a valid email address'
+        );
+      } else {
+        this.classList.remove('error', 'success');
+        emailError.style.display = 'none';
+      }
+    });
+
+    adminPassword.addEventListener('input', function() {
+      if (this.value.trim()) {
+        validateInput(this, passwordError,
+          (value) => value.length >= 4,
+          'Password must be at least 4 characters long'
+        );
+      } else {
+        this.classList.remove('error', 'success');
+        passwordError.style.display = 'none';
+      }
+    });
+
+    // Form submission
+    loginForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      // Clear previous messages
+      loginError.style.display = 'none';
+      loginSuccess.style.display = 'none';
+      
+      // Validate inputs
+      const isEmailValid = validateInput(adminEmail, emailError,
+        (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
+        'Please enter a valid email address'
+      );
+      
+      const isPasswordValid = validateInput(adminPassword, passwordError,
+        (value) => value.length >= 4,
+        'Password must be at least 4 characters long'
+      );
+
+      if (!isEmailValid || !isPasswordValid) {
+        showToast('Please fix the validation errors', 'error');
+        return;
+      }
+
+      // Show loading state
+      setLoadingState(true);
+
+      try {
+        // Prepare login data
+        const loginData = {
+          email: adminEmail.value.trim(),
+          password: adminPassword.value.trim()
+        };
+
+        // Make API request
+        const response = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(loginData)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.message || `Server error: ${response.status}`);
+        }
+
+        if (result.success) {
+          // Success
+          loginSuccess.innerHTML = `<i class="fas fa-check-circle"></i> Login successful! Redirecting...`;
+          loginSuccess.style.display = 'flex';
+          showToast('Login successful!', 'success');
+          
+          // Store authentication token if provided
+          if (result.token) {
+            localStorage.setItem('admin_token', result.token);
+          }
+          
+          // Redirect to admin dashboard
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 1500);
+          
+        } else {
+          throw new Error(result.message || 'Login failed');
+        }
+
+      } catch (error) {
+        console.error('Login error:', error);
+        
+        // Show error message
+        const errorMessage = getErrorMessage(error.message);
+        loginError.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${errorMessage}`;
+        loginError.style.display = 'flex';
+        showToast(errorMessage, 'error');
+        
+        // Reset form on authentication error
+        if (error.message.includes('Invalid credentials') || error.message.includes('Unauthorized')) {
+          adminPassword.value = '';
+          adminPassword.focus();
+        }
+      } finally {
+        setLoadingState(false);
+      }
+    });
+
+    // Loading state management
+    function setLoadingState(isLoading) {
+      if (isLoading) {
+        loginBtn.disabled = true;
+        loginBtn.classList.add('loading');
+        loginBtnText.innerHTML = '<div class="spinner"></div> Authenticating...';
+      } else {
+        loginBtn.disabled = false;
+        loginBtn.classList.remove('loading');
+        loginBtnText.innerHTML = 'Login to Admin Panel';
+      }
+    }
+
+    // Error message mapping
+    function getErrorMessage(error) {
+      const errorMap = {
+        'Invalid credentials': 'Invalid email or password. Please check your credentials.',
+        'Unauthorized': 'Access denied. Please contact system administrator.',
+        'Too many attempts': 'Too many login attempts. Please try again later.',
+        'Server error': 'Server temporarily unavailable. Please try again later.',
+        'Network error': 'Connection failed. Please check your internet connection.',
+        'Timeout': 'Request timed out. Please try again.'
+      };
+
+      for (const [key, message] of Object.entries(errorMap)) {
+        if (error.toLowerCase().includes(key.toLowerCase())) {
+          return message;
+        }
+      }
+
+      return 'Login failed. Please try again or contact support if the problem persists.';
+    }
+
+    // Toast notification
+    function showToast(message, type) {
+      const iconMap = {
+        success: 'fas fa-check-circle',
+        error: 'fas fa-exclamation-triangle',
+        warning: 'fas fa-exclamation-circle'
+      };
+
+      toast.innerHTML = `<i class="${iconMap[type]}"></i> ${message}`;
+      toast.className = `toast ${type}`;
+      toast.classList.add('show');
+
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 4000);
+    }
+
+    // Security: Clear any existing tokens on page load
+    window.addEventListener('load', function() {
+      // Clear any existing admin tokens
+      localStorage.removeItem('admin_token');
+      sessionStorage.removeItem('admin_token');
+      
+      // Focus on email input
+      adminEmail.focus();
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+      // Ctrl/Cmd + Enter to submit form
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        loginForm.dispatchEvent(new Event('submit'));
+      }
+    });
+
+    // Prevent form submission on Enter in input fields (except password)
+    adminEmail.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        adminPassword.focus();
+      }
+    });
+  </script>
+</body>
+
+</html>
