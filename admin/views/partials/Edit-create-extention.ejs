@@ -1082,8 +1082,9 @@
 
     if (lotteryData.drawDate) {
       const utcDate = new Date(lotteryData.drawDate);
-      const istOffset = (5 * 60 * 60 * 1000) + (30 * 60 * 1000);
-      const istDate = new Date(utcDate.getTime() + istOffset);
+      // const istOffset = (5 * 60 * 60 * 1000) + (30 * 60 * 1000);
+       const dubaiOffset = 4 * 60 * 60 * 1000;
+      const istDate = new Date(utcDate.getTime() + dubaiOffset);
       const formattedIST = istDate.toISOString().slice(0, 16);
       document.getElementById('drawDate').value = formattedIST;
     }
@@ -1379,7 +1380,7 @@
     let drawDateUTC;
 
     if (selectedDateTimeLocalString) {
-      const intendedBTTMoment = moment.tz(selectedDateTimeLocalString, 'YYYY-MM-DDTHH:mm', 'Asia/Kolkata');
+      const intendedBTTMoment = moment.tz(selectedDateTimeLocalString, 'YYYY-MM-DDTHH:mm', 'Asia/Dubai');
       drawDateUTC = intendedBTTMoment.utc().toISOString();
     } else {
       console.error("Draw Date/Time is required.");
@@ -1414,7 +1415,7 @@
       if (!resultTimeInput) return;
 
       let resultTimeUTC;
-      const intendedBTTMoment = moment.tz(resultTimeInput, 'YYYY-MM-DDTHH:mm', 'Asia/Kolkata');
+      const intendedBTTMoment = moment.tz(resultTimeInput, 'YYYY-MM-DDTHH:mm', 'Asia/Dubai');
       resultTimeUTC = intendedBTTMoment.utc().toISOString();
 
       const winNumbers = [];

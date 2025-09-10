@@ -1390,7 +1390,7 @@
           hour: '2-digit',
           minute: '2-digit',
           hour12: true,
-          timeZone: 'Asia/Kolkata'
+          timeZone: 'Asia/Dubai'
         });
 
         // Example: always "RESULT" for past draws
@@ -1465,7 +1465,7 @@
                 hour: 'numeric',
                 minute: '2-digit',
                 hour12: true,
-                timeZone: 'Asia/Kolkata'
+                timeZone: 'Asia/Dubai'
               });
 
               const firstTicketNumber = winner.winNumbers[0].ticketNumber;
@@ -1478,7 +1478,7 @@
           div class = "result-card-header" > $ {
             formattedTime
           } < /div> <
-          div class = "result-card-content" >
+        div class = "result-card-content" >
           <
           div class = "letter-container" >
           $ {
@@ -1496,8 +1496,8 @@
           $ {
             firstTicketNumber
           } <
-          /div> <
-          /div> <
+          /div> < /
+          div > <
           /div>
 
           <
@@ -1529,8 +1529,8 @@
               return '';
             }).join('')
           } <
-          /div> <
-          /div> <
+          /div> < /
+          div > <
           /div>
         `;
             }).join('');

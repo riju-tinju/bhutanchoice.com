@@ -1717,7 +1717,7 @@
 
       if (selectedDateTimeLocalString) {
         // Step 1: Parse the string *as if it's already in Bhutan Time (BTT)*
-        const intendedBTTMoment = moment.tz(selectedDateTimeLocalString, 'YYYY-MM-DDTHH:mm', 'Asia/Kolkata');
+        const intendedBTTMoment = moment.tz(selectedDateTimeLocalString, 'YYYY-MM-DDTHH:mm', 'Asia/Dubai');
 
         // Step 2: Convert this Bhutan Time moment to UTC
         drawDateUTC = intendedBTTMoment.utc().toISOString();
@@ -1824,7 +1824,7 @@
           hour: '2-digit',
           minute: '2-digit',
           hour12: true,
-          timeZone: 'Asia/Kolkata'
+          timeZone: 'Asia/Dubai'
         });
 
         const firstPrize = lottery.prizes.find(p => p.rank === 1);
