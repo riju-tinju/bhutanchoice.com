@@ -13,7 +13,9 @@ router.get('/time', async function (req, res, next) {
 router.get('/', async function (req, res, next) {
   await indexFun.getLotteries(req, res)
 });
-
+router.post('/api/refresh-results',async function(req, res, next) {
+  await indexFun.refreshResults(req,res)
+});
 router.post('/api/get-past-lottories', async function (req, res, next) {
   await indexFun.getPastLotteries(req, res)
 });

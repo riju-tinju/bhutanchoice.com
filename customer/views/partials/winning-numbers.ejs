@@ -146,8 +146,7 @@
 </style>
 
 <!-- 🎵 Add your counting audio file -->
-<audio id="count-audio" src="/audio/counting-sound.mp3" preload="auto"></audio>
-
+<audio id="count-audio" src="/audio/audio-editor-output.mp3" preload="auto"></audio>
 <script>
  
    // Toggle result and trigger animation
@@ -208,12 +207,12 @@
         audio.pause();
         audio.currentTime = 0;
       }
-    }, 6500);
+    }, 5000);
 
     // ✨ Show all other prizes after main animation completes
     setTimeout(() => {
       showAllOtherPrizes(cardId);
-    }, 10000); // 4s roll + 0.8s landing + 2s buffer
+    }, 9000); // 4s roll + 0.8s landing + 2s buffer
   }
 
   // Show all other prizes with animation
