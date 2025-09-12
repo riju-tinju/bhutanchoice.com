@@ -503,86 +503,6 @@
     box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
   }
 
-  /* Result Status Toggle Switch */
-  .result-status-toggle {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    flex-shrink: 0;
-  }
-
-  .result-status-label {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: #6B7280;
-    text-align: center;
-    line-height: 1;
-  }
-
-  .toggle-switch {
-    position: relative;
-    display: inline-block;
-    width: 44px;
-    height: 24px;
-  }
-
-  .toggle-switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-
-  .toggle-slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, #E5E7EB 0%, #D1D5DB 100%);
-    transition: all 0.3s ease;
-    border-radius: 24px;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-
-  .toggle-slider:before {
-    position: absolute;
-    content: "";
-    height: 20px;
-    width: 20px;
-    left: 2px;
-    bottom: 2px;
-    background: white;
-    transition: all 0.3s ease;
-    border-radius: 50%;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  }
-
-  .toggle-switch input:checked + .toggle-slider {
-    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 8px rgba(16, 185, 129, 0.3);
-  }
-
-  .toggle-switch input:focus + .toggle-slider {
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
-  }
-
-  .toggle-switch input:checked + .toggle-slider:before {
-    transform: translateX(20px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  }
-
-  /* Toggle switch states */
-  .toggle-switch input:disabled + .toggle-slider {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-
-  .toggle-switch input:disabled + .toggle-slider:before {
-    cursor: not-allowed;
-  }
-
   .remove-winner-number {
     background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
     color: white;
@@ -841,33 +761,6 @@
       font-size: 16px;
       min-height: 50px;
       padding: 12px 16px;
-    }
-
-    /* Result Status Toggle Mobile */
-    .result-status-toggle {
-      flex-direction: row;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 0;
-    }
-
-    .result-status-label {
-      font-size: 0.875rem;
-    }
-
-    .toggle-switch {
-      width: 50px;
-      height: 28px;
-    }
-
-    .toggle-slider:before {
-      height: 24px;
-      width: 24px;
-    }
-
-    .toggle-switch input:checked + .toggle-slider:before {
-      transform: translateX(22px);
     }
 
     .remove-winner-number {
@@ -1250,13 +1143,11 @@
 
             const prizeSelect = winNumberDiv.querySelector('.winner-prize-select');
             const ticketInput = winNumberDiv.querySelector('.winner-ticket-input');
-            const resultStatusToggle = winNumberDiv.querySelector('.result-status-switch');
 
             // FIXED: First populate options, then set value
             updatePrizeRankOptions(winnerGroupCounter);
             prizeSelect.value = winNumber.prizeRank || '';
             ticketInput.value = winNumber.ticketNumber || '';
-            resultStatusToggle.checked = winNumber.resultStatus || false;
           });
         }
 
@@ -1401,13 +1292,6 @@
                 <option value="">Select Prize</option>
             </select>
             <input type="text" placeholder="Ticket Number" class="winner-ticket-input" required>
-            <div class="result-status-toggle">
-                <div class="result-status-label">Result Status</div>
-                <label class="toggle-switch">
-                    <input type="checkbox" class="result-status-switch">
-                    <span class="toggle-slider"></span>
-                </label>
-            </div>
             <button type="button" class="remove-winner-number" onclick="removeWinnerNumber(${groupIndex}, ${numberIndex})">
                 <i class="fas fa-trash"></i>
             </button>
@@ -1540,13 +1424,11 @@
       winnerNumbers.forEach(numberItem => {
         const prizeRank = parseInt(numberItem.querySelector('.winner-prize-select').value);
         const ticketNumber = numberItem.querySelector('.winner-ticket-input').value.trim();
-        const resultStatus = numberItem.querySelector('.result-status-switch').checked;
 
         if (prizeRank && ticketNumber) {
           winNumbers.push({
             prizeRank: prizeRank,
-            ticketNumber: ticketNumber,
-            resultStatus: resultStatus
+            ticketNumber: ticketNumber
           });
         }
       });
