@@ -791,9 +791,9 @@
 
         if (lotteryData.drawDate) {
             const utcDate = new Date(lotteryData.drawDate);
-            const istOffset = (4 * 60 * 60 * 1000) ;
-            const istDate = new Date(utcDate.getTime() );
-            const formattedIST = istDate.toISOString().slice(0, 16);
+            const dubaiOffset = (4 * 60 * 60 * 1000) ;
+            const dubaiDate = new Date(utcDate.getTime()+dubaiOffset);
+            const formattedIST = dubaiDate.toISOString().slice(0, 16);
             document.getElementById('drawDate').value = formattedIST;
         }
 
