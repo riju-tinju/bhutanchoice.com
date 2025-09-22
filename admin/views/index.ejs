@@ -1211,6 +1211,14 @@
       </button>
     </div>
 
+    <!-- Create New Lottery Button -->
+    <div class="text-center">
+      <button onclick="openTicketChargesModal()" class="create-btn">
+        <i class="fas fa-ticket mr-2"></i>
+        See Ticket Charges
+      </button>
+    </div>
+
     <script>
       console.log("now time with iso: ", new Date().toISOString());
       console.log("now time without iso: ", new Date());
@@ -1299,6 +1307,9 @@
 
   <!-- Enhanced Create/Edit Lottery Modal -->
   <%- include('partials/Edit-create-extention') %>
+
+   <!-- Enhanced Create/Edit Lottery Modal -->
+  <%- include('partials/ticketChargeExtention') %>
 
   <!-- Toast Notification -->
   <div id="toast" class="toast"></div>

@@ -1,4 +1,6 @@
 const Lottery = require('../model/lotterySchema'); // Your model
+const Charge = require('../model/ticketChargeSchema'); // Your model
+mongoose = require('mongoose');
 const moment = require('moment-timezone');
 
 const indexHelper = {
@@ -354,6 +356,226 @@ const indexHelper = {
     } catch (err) {
       console.error("Error in deleteLottery:", err);
       return res.status(500).json({ success: false, message: 'Failed to delete lottery' });
+    }
+  },
+  getAllCharges: async (req, res) => {
+    try {
+
+      const allCharges = await Charge.find({}).sort({ ticketType: 1 });
+
+      let resObj = {
+        "success": true,
+        "message": "Ticket charges retrieved successfully",
+        "ticketCharges": allCharges || [],
+        "count": allCharges.length || 0
+      }
+      await res.status(200).json(resObj);
+
+    } catch (err) {
+      res.status(502).json({
+        "success": false,
+        "message": "Failed to retrieve ticket charges",
+        "error": "Database connection error"
+      });
+    }
+  },
+  createCharge: async (req, res) => {
+    try {
+      const { ticketType, chargeAmount } = req.body;
+
+      // Check for missing required fields
+      if (!ticketType || chargeAmount === undefined || chargeAmount === null) {
+        return res.status(400).json({
+          "success": false,
+          "message": "Missing required fields: ticketType, chargeAmount"
+        });
+      }
+
+      // Create new charge
+      const newCharge = new Charge({
+        ticketType,
+        chargeAmount
+      });
+
+      // Save to database
+      const savedCharge = await newCharge.save();
+
+      // Success response
+      res.status(201).json({
+        "success": true,
+        "message": "Ticket charge created successfully",
+        "ticketCharge": savedCharge
+      });
+
+    } catch (err) {
+      // Handle duplicate ticket type error
+      if (err.code === 11000 && err.keyPattern && err.keyPattern.ticketType) {
+        return res.status(409).json({
+          "success": false,
+          "message": `Ticket type ${req.body.ticketType} already exists`,
+          "error": "DUPLICATE_TICKET_TYPE"
+        });
+      }
+
+      // Handle validation errors
+      if (err.name === 'ValidationError') {
+        const errors = {};
+        Object.keys(err.errors).forEach(key => {
+          errors[key] = err.errors[key].message;
+        });
+
+        return res.status(400).json({
+          "success": false,
+          "message": "Validation failed",
+          "errors": errors
+        });
+      }
+
+      // Handle other database errors
+      res.status(502).json({
+        "success": false,
+        "message": "Failed to create ticket charge",
+        "error": "Database connection error"
+      });
+    }
+  },
+  updateCharge: async (req, res) => {
+    try {
+      const { chargeId } = req.params;
+      const { ticketType, chargeAmount } = req.body;
+
+      // Check if chargeId is a valid MongoDB ObjectId
+      if (!mongoose.Types.ObjectId.isValid(chargeId)) {
+        return res.status(400).json({
+          "success": false,
+          "message": "Invalid ticket charge ID format"
+        });
+      }
+
+      // Check for missing required fields
+      if (chargeAmount === undefined || chargeAmount === null) {
+        return res.status(400).json({
+          "success": false,
+          "message": "chargeAmount is required"
+        });
+      }
+
+      // Prepare update object
+      const updateData = {};
+      if (ticketType !== undefined) updateData.ticketType = ticketType;
+      if (chargeAmount !== undefined) updateData.chargeAmount = chargeAmount;
+
+      // Find and update the charge
+      const updatedCharge = await Charge.findByIdAndUpdate(
+        chargeId,
+        updateData,
+        { new: true, runValidators: true } // Return updated document and run validators
+      );
+
+      // Check if charge was found and updated
+      if (!updatedCharge) {
+        return res.status(404).json({
+          "success": false,
+          "message": "Ticket charge not found",
+          "error": "CHARGE_NOT_FOUND"
+        });
+      }
+
+      // Success response
+      res.status(200).json({
+        "success": true,
+        "message": "Ticket charge updated successfully",
+        "ticketCharge": updatedCharge
+      });
+
+    } catch (err) {
+      console.error("Error in updateCharge:", err);
+      // Handle duplicate ticket type error
+      if (err.code === 11000 && err.keyPattern && err.keyPattern.ticketType) {
+        return res.status(409).json({
+          "success": false,
+          "message": `Ticket type ${req.body.ticketType} already exists`,
+          "error": "DUPLICATE_TICKET_TYPE"
+        });
+      }
+
+      // Handle validation errors
+      if (err.name === 'ValidationError') {
+        const errors = {};
+        Object.keys(err.errors).forEach(key => {
+          errors[key] = err.errors[key].message;
+        });
+
+        return res.status(400).json({
+          "success": false,
+          "message": "Validation failed",
+          "errors": errors
+        });
+      }
+
+      // Handle other database errors
+      res.status(502).json({
+        "success": false,
+        "message": "Failed to update ticket charge",
+        "error": "Database connection error"
+      });
+    }
+  },
+  deleteCharge: async (req, res) => {
+    try {
+      const { chargeId } = req.params;
+
+      // Check if chargeId is a valid MongoDB ObjectId
+      if (!mongoose.Types.ObjectId.isValid(chargeId)) {
+        return res.status(400).json({
+          "success": false,
+          "message": "Invalid ticket charge ID format"
+        });
+      }
+
+      // Find the charge first to return it in response
+      const chargeToDelete = await Charge.findById(chargeId);
+
+      // Check if charge exists
+      if (!chargeToDelete) {
+        return res.status(404).json({
+          "success": false,
+          "message": "Ticket charge not found",
+          "error": "CHARGE_NOT_FOUND"
+        });
+      }
+
+      // Attempt to delete the charge
+      const deletedCharge = await Charge.findByIdAndDelete(chargeId);
+
+      // Success response
+      res.status(200).json({
+        "success": true,
+        "message": "Ticket charge deleted successfully",
+        "deletedCharge:": {
+          _id: chargeToDelete._id,
+          ticketType: chargeToDelete.ticketType,
+          chargeAmount: chargeToDelete.chargeAmount
+        }
+      });
+
+    } catch (err) {
+      // Handle constraint violation (if charge is being referenced elsewhere)
+      // This would typically require additional logic based on your application's relationships
+      if (err.code === 'CONSTRAINT_VIOLATION' || err.message?.includes('constraint') || err.message?.includes('reference')) {
+        return res.status(409).json({
+          "success": false,
+          "message": "Cannot delete ticket charge. It is currently being used by existing tickets.",
+          "error": "CHARGE_IN_USE"
+        });
+      }
+
+      // Handle other database errors
+      res.status(502).json({
+        "success": false,
+        "message": "Failed to delete ticket charge",
+        "error": "Database connection error"
+      });
     }
   },
 

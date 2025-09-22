@@ -33,9 +33,19 @@ const lotterySchema = new Schema({
       required: true,
       min: 0
     },
+    // ticketCharge : {
+    //   type: Number,
+    //   required: true,
+    //   min: 0
+    // }
   }],
   
   winners: [{
+    _id: {
+      type: Schema.Types.ObjectId,
+      default: () => new mongoose.Types.ObjectId(), // Auto-generate unique ID
+      auto: true
+    },
     resultTime:{
       type: Date,
       default: Date.now
