@@ -47,15 +47,15 @@ router.get('/api/lottery-autocomplete', async function (req, res, next) {
 })
 
 router.post('/api/lottery', async function (req, res, next) {
-  
+
   await indexFun.createLottery(req, res)
- 
+
 })
 
 router.put('/api/lottery/:id', async function (req, res, next) {
-  
+
   await indexFun.updateLottery(req, res)
- 
+
 })
 router.get('/api/lottery/:id', async function (req, res, next) {
   await indexFun.getLottery(req, res)
@@ -64,26 +64,26 @@ router.delete('/api/lottery/:id', async function (req, res, next) {
   await indexFun.deleteLottery(req, res)
 })
 
-router.get('/admin-login', function(req, res, next) {
-    res.render('pages/Auth/admin-login', )
+router.get('/admin-login', function (req, res, next) {
+  res.render('pages/Auth/admin-login',)
 });
 
-router.get('/api/ticket-charges',async function(req, res, next) {
-   await indexFun.getAllCharges(req, res);
+router.get('/api/ticket-charges', async function (req, res, next) {
+  await indexFun.getAllCharges(req, res);
 });
 
-router.post('/api/ticket-charges',async function(req, res, next) {
-   await indexFun.createCharge(req, res)
+router.post('/api/ticket-charges', async function (req, res, next) {
+  await indexFun.createCharge(req, res)
 });
-router.put('/api/ticket-charges/:chargeId',async function(req, res, next) {
-   await indexFun.updateCharge(req, res)
-});
-
-router.delete('/api/ticket-charges/:chargeId',async function(req, res, next) {
-   await indexFun.deleteCharge(req, res)
+router.put('/api/ticket-charges/:chargeId', async function (req, res, next) {
+  await indexFun.updateCharge(req, res)
 });
 
-router.get('/booking', async function (req, res, next){
+router.delete('/api/ticket-charges/:chargeId', async function (req, res, next) {
+  await indexFun.deleteCharge(req, res)
+});
+
+router.get('/booking', async function (req, res, next) {
   res.render('pages/lottery-booking')
 })
 
@@ -404,27 +404,27 @@ router.get('/api/lotteries', async function (req, res, next) {
   )
 })
 
-router.get('/api/booking/ticket-charges',async function(req, res, next) {
-   res.status(200).json({
-  "success": true,
-  "ticketCharges": [
-    {
-      "_id": "charge_id1",
-      "ticketType": 3,
-      "chargeAmount": 10.00
-    },
-    {
-      "_id": "charge_id2",
-      "ticketType": 5,
-      "chargeAmount": 50.00
-    },
-    {
-      "_id": "charge_id3",
-      "ticketType": 1,
-      "chargeAmount": 10.00
-    }
-  ]
-})
+router.get('/api/booking/ticket-charges', async function (req, res, next) {
+  res.status(200).json({
+    "success": true,
+    "ticketCharges": [
+      {
+        "_id": "charge_id1",
+        "ticketType": 3,
+        "chargeAmount": 10.00
+      },
+      {
+        "_id": "charge_id2",
+        "ticketType": 5,
+        "chargeAmount": 50.00
+      },
+      {
+        "_id": "charge_id3",
+        "ticketType": 1,
+        "chargeAmount": 10.00
+      }
+    ]
+  })
 });
 
 module.exports = router;

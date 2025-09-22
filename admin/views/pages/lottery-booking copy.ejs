@@ -1,10 +1,3 @@
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="robots" content="noindex">
-  <title>Admin - Bhutan State Lotteries</title>
-</head>
 <!-- Flexible Ticket Booking Page -->
 <div class="booking-container">
   <!-- Header Section -->
@@ -120,7 +113,7 @@
                    placeholder="Enter number">
             <button type="button" class="add-single-btn" id="addSingleTicket" disabled>
               <i class="fas fa-plus"></i>
-              <span class="btn-text">Add This Ticket</span>
+              Add This Ticket
             </button>
           </div>
           
@@ -141,11 +134,11 @@
     <div class="quick-actions">
       <button type="button" class="btn btn-secondary" id="resetSelection">
         <i class="fas fa-undo"></i>
-        <span class="btn-text">Reset</span>
+        Reset Selection
       </button>
       <button type="button" class="btn btn-info" id="changeSelections">
         <i class="fas fa-edit"></i>
-        <span class="btn-text">Change</span>
+        Change Selections
       </button>
     </div>
   </div>
@@ -189,11 +182,11 @@
   <div class="form-actions" id="formActions" style="display: none;">
     <button type="button" class="btn btn-secondary" id="clearAllTickets">
       <i class="fas fa-trash"></i>
-      <span class="btn-text">Clear All</span>
+      Clear All
     </button>
     <button type="button" class="btn btn-primary" id="proceedBooking">
       <i class="fas fa-check"></i>
-      <span class="btn-text">Complete Booking (<span id="finalTicketCount">0</span>)</span>
+      Complete Booking (<span id="finalTicketCount">0</span> tickets)
     </button>
   </div>
 </div>
@@ -232,7 +225,7 @@
 </div>
 
 <style>
-/* Mobile-First Responsive Base Styles */
+/* Mobile-First Base Styles */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -243,69 +236,67 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   line-height: 1.6;
   color: #1f2937;
-  overflow-x: hidden;
 }
 
 .booking-container {
-  padding: 8px;
+  padding: 16px;
   max-width: 100%;
   margin: 0 auto;
   background: #f8fafc;
   min-height: 100vh;
 }
 
-/* Header - Mobile Optimized */
+/* Header - Mobile First */
 .booking-header {
   text-align: center;
-  margin-bottom: 16px;
-  padding: 16px 12px;
+  margin-bottom: 24px;
+  padding: 20px 16px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 12px;
   color: white;
 }
 
 .page-title {
-  font-size: 1.25rem;
-  margin-bottom: 6px;
+  font-size: 1.75rem;
+  margin-bottom: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 12px;
   flex-wrap: wrap;
-  line-height: 1.2;
 }
 
 .page-subtitle {
-  font-size: 0.8rem;
+  font-size: 0.95rem;
   opacity: 0.9;
-  line-height: 1.3;
+  line-height: 1.4;
 }
 
-/* Form Sections - Mobile First */
+/* Form Sections */
 .form-section {
   background: white;
   border-radius: 12px;
-  padding: 12px;
-  margin-bottom: 12px;
+  padding: 20px 16px;
+  margin-bottom: 16px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .section-title {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 1rem;
+  gap: 10px;
+  font-size: 1.25rem;
   color: #1e293b;
-  margin-bottom: 16px;
-  padding-bottom: 6px;
+  margin-bottom: 20px;
+  padding-bottom: 8px;
   border-bottom: 2px solid #e2e8f0;
 }
 
-/* Form Elements - Touch Optimized */
+/* Form Elements */
 .form-row {
   display: grid;
-  gap: 12px;
-  margin-bottom: 12px;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
 .form-group {
@@ -317,19 +308,19 @@ body {
   font-weight: 600;
   color: #374151;
   margin-bottom: 6px;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
 }
 
 .form-input,
 .search-input,
 .ticket-number-input {
-  padding: 12px 14px;
+  padding: 14px 16px;
   border: 2px solid #e5e7eb;
   border-radius: 8px;
-  font-size: 16px; /* Prevents zoom on iOS */
+  font-size: 16px;
   background: white;
   transition: all 0.2s ease;
-  min-height: 44px; /* Touch-friendly minimum */
+  min-height: 48px;
 }
 
 .form-input:focus,
@@ -342,22 +333,21 @@ body {
 
 .form-error {
   color: #ef4444;
-  font-size: 0.8rem;
+  font-size: 0.875rem;
   margin-top: 4px;
-  min-height: 18px;
-  word-break: break-word;
+  min-height: 20px;
 }
 
-/* Quick Add Interface - Mobile Stacked */
+/* Quick Add Interface */
 .quick-add-interface {
   display: grid;
-  gap: 16px;
+  gap: 24px;
 }
 
 .selection-group {
   border: 2px solid #e2e8f0;
   border-radius: 12px;
-  padding: 12px;
+  padding: 16px;
   transition: all 0.3s ease;
 }
 
@@ -374,17 +364,16 @@ body {
 .selection-title {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.95rem;
+  gap: 8px;
+  font-size: 1.1rem;
   color: #475569;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
   font-weight: 600;
-  flex-wrap: wrap;
 }
 
-/* Search Container - Mobile Optimized */
+/* Search Container */
 .search-container {
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .search-input-wrapper {
@@ -393,22 +382,22 @@ body {
 
 .search-input {
   width: 100%;
-  padding-left: 40px;
-  padding-right: 40px;
+  padding-left: 48px;
+  padding-right: 48px;
 }
 
 .search-icon {
   position: absolute;
-  left: 12px;
+  left: 16px;
   top: 50%;
   transform: translateY(-50%);
   color: #6b7280;
-  font-size: 1rem;
+  font-size: 1.1rem;
 }
 
 .search-clear {
   position: absolute;
-  right: 8px;
+  right: 12px;
   top: 50%;
   transform: translateY(-50%);
   background: none;
@@ -417,16 +406,13 @@ body {
   cursor: pointer;
   padding: 8px;
   border-radius: 50%;
-  min-width: 32px;
-  min-height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  min-width: 36px;
+  min-height: 36px;
 }
 
-/* Lottery Options - Mobile Responsive */
+/* Lottery Options */
 .lottery-selector {
-  max-height: 250px;
+  max-height: 300px;
   overflow-y: auto;
   border: 2px solid #e5e7eb;
   border-radius: 10px;
@@ -438,33 +424,33 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 30px 16px;
+  padding: 40px 20px;
   color: #6b7280;
 }
 
 .loading-spinner {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border: 3px solid #e5e7eb;
   border-top: 3px solid #3b82f6;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .lottery-options {
-  padding: 8px;
+  padding: 12px;
 }
 
 .lottery-option {
   background: white;
   border: 2px solid #e5e7eb;
   border-radius: 8px;
-  padding: 10px;
-  margin-bottom: 6px;
+  padding: 12px;
+  margin-bottom: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-height: 48px;
+  min-height: 56px;
 }
 
 .lottery-option:hover,
@@ -483,41 +469,37 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 6px;
-  gap: 8px;
+  margin-bottom: 8px;
+  gap: 12px;
 }
 
 .lottery-name {
   font-weight: 600;
   color: #1e293b;
-  font-size: 0.9rem;
+  font-size: 1rem;
   line-height: 1.3;
-  flex: 1;
-  word-break: break-word;
 }
 
 .lottery-name2 {
   color: #64748b;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   margin-top: 2px;
-  word-break: break-word;
 }
 
 .lottery-draw-badge {
   background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
   color: white;
-  padding: 3px 6px;
+  padding: 4px 8px;
   border-radius: 6px;
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 600;
   flex-shrink: 0;
-  white-space: nowrap;
 }
 
 .lottery-details {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 8px;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .lottery-detail {
@@ -525,29 +507,27 @@ body {
   align-items: center;
   gap: 4px;
   color: #64748b;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
 }
 
 .lottery-detail i {
   color: #3b82f6;
-  width: 12px;
-  flex-shrink: 0;
+  width: 14px;
 }
 
-/* Child Lottery Selector - Mobile Stacked */
+/* Child Lottery Selector */
 .child-lottery-selector {
   display: grid;
-  gap: 8px;
+  gap: 12px;
 }
 
 .child-option {
   background: white;
   border: 2px solid #e5e7eb;
   border-radius: 8px;
-  padding: 10px;
+  padding: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-height: 44px;
 }
 
 .child-option:hover {
@@ -564,31 +544,29 @@ body {
   font-weight: 600;
   color: #1e293b;
   margin-bottom: 4px;
-  font-size: 0.9rem;
 }
 
 .child-details {
   color: #64748b;
-  font-size: 0.75rem;
-  line-height: 1.2;
+  font-size: 0.85rem;
 }
 
-/* Ticket Type Selector - Responsive Grid */
+/* Ticket Type Selector */
 .ticket-type-selector {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
 }
 
 .type-option {
   background: white;
   border: 2px solid #e5e7eb;
   border-radius: 10px;
-  padding: 12px 8px;
+  padding: 16px 12px;
   text-align: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-height: 100px;
+  min-height: 120px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -606,56 +584,56 @@ body {
 }
 
 .type-number {
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: 700;
   color: #1e293b;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .type-label {
   color: #64748b;
-  font-size: 0.75rem;
-  margin-bottom: 6px;
+  font-size: 0.85rem;
+  margin-bottom: 8px;
   line-height: 1.2;
 }
 
 .type-price {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
-  padding: 4px 6px;
+  padding: 6px 10px;
   border-radius: 6px;
   font-weight: 600;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
 }
 
-/* Ticket Input Area - Mobile Optimized */
+/* Ticket Input Area */
 .ticket-input-area {
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .input-helper {
   background: #f1f5f9;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
-  padding: 10px;
-  margin-bottom: 10px;
-  font-size: 0.8rem;
+  padding: 12px;
+  margin-bottom: 12px;
+  font-size: 0.9rem;
   color: #475569;
   line-height: 1.4;
 }
 
 .number-input-wrapper {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  gap: 12px;
+  align-items: stretch;
 }
 
 .ticket-number-input {
+  flex: 1;
   text-align: center;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 600;
   font-family: monospace;
-  padding: 14px;
 }
 
 .add-single-btn {
@@ -669,10 +647,9 @@ body {
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
+  gap: 8px;
+  min-width: 140px;
   justify-content: center;
-  gap: 6px;
-  min-height: 44px;
-  font-size: 0.9rem;
 }
 
 .add-single-btn:hover:not(:disabled) {
@@ -691,174 +668,160 @@ body {
   background: #f8fafc;
   border: 2px solid #e2e8f0;
   border-radius: 8px;
-  padding: 12px;
-  margin-top: 12px;
+  padding: 16px;
+  margin-top: 16px;
 }
 
 .selection-summary-title {
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 600;
   color: #374151;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .selection-summary {
   display: grid;
-  gap: 6px;
+  gap: 8px;
 }
 
 .summary-detail {
   display: flex;
-  align-items: flex-start;
-  gap: 6px;
+  align-items: center;
+  gap: 8px;
   color: #64748b;
-  font-size: 0.8rem;
-  line-height: 1.3;
+  font-size: 0.9rem;
 }
 
 .summary-detail i {
   color: #3b82f6;
-  width: 14px;
-  flex-shrink: 0;
-  margin-top: 2px;
+  width: 16px;
 }
 
 .summary-detail .value {
   color: #1e293b;
   font-weight: 600;
-  word-break: break-word;
 }
 
-/* Quick Actions - Mobile Stacked */
+/* Quick Actions */
 .quick-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-top: 16px;
-  padding-top: 16px;
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 20px;
   border-top: 1px solid #e2e8f0;
 }
 
-/* Added Tickets Display - Mobile Optimized */
+/* Added Tickets Display */
 .tickets-by-lottery {
-  margin-bottom: 16px;
+  margin-bottom: 24px;
 }
 
 .lottery-group {
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 10px;
-  padding: 12px;
-  margin-bottom: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
 }
 
 .lottery-group-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 12px;
-  padding-bottom: 6px;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
   border-bottom: 1px solid #e2e8f0;
-  gap: 8px;
 }
 
 .lottery-group-title {
   font-weight: 600;
   color: #1e293b;
-  font-size: 0.9rem;
-  flex: 1;
-  word-break: break-word;
+  font-size: 1.1rem;
 }
 
 .lottery-group-count {
   background: #3b82f6;
   color: white;
-  padding: 2px 6px;
+  padding: 4px 8px;
   border-radius: 6px;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   font-weight: 600;
-  flex-shrink: 0;
-  white-space: nowrap;
 }
 
 .draw-time-group {
   background: white;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
-  padding: 10px;
-  margin-bottom: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
 }
 
 .draw-time-header {
   font-weight: 600;
   color: #475569;
-  margin-bottom: 10px;
-  font-size: 0.85rem;
+  margin-bottom: 12px;
+  font-size: 0.95rem;
 }
 
 .tickets-grid {
   display: grid;
-  gap: 6px;
+  gap: 8px;
 }
 
 .ticket-item {
   background: #f1f5f9;
   border: 1px solid #e2e8f0;
   border-radius: 6px;
-  padding: 10px;
+  padding: 12px;
   position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  min-height: 40px;
 }
 
 .ticket-info {
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex: 1;
+  gap: 12px;
 }
 
 .ticket-number {
   font-family: monospace;
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 1.1rem;
   color: #1e293b;
 }
 
 .ticket-type-badge {
   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   color: white;
-  padding: 2px 6px;
+  padding: 4px 8px;
   border-radius: 4px;
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  white-space: nowrap;
 }
 
 .ticket-price {
   color: #059669;
   font-weight: 700;
-  font-size: 0.85rem;
-  flex-shrink: 0;
+  font-size: 0.95rem;
 }
 
 .remove-ticket-btn {
   position: absolute;
-  top: -4px;
-  right: -4px;
+  top: -6px;
+  right: -6px;
   background: #ef4444;
   color: white;
   border: none;
   border-radius: 50%;
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.6rem;
+  font-size: 0.7rem;
   transition: all 0.2s ease;
 }
 
@@ -867,38 +830,39 @@ body {
   transform: scale(1.1);
 }
 
-/* Summary Grid - Mobile Stacked */
+/* Summary Grid */
 .tickets-summary {
   background: #f1f5f9;
   border: 2px solid #e2e8f0;
   border-radius: 10px;
-  padding: 16px;
+  padding: 20px;
 }
 
 .summary-grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
 }
 
 .summary-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 6px 0;
+  padding: 8px 0;
 }
 
 .summary-item.total-item {
+  grid-column: 1 / -1;
   border-top: 2px solid #e2e8f0;
-  padding-top: 12px;
+  padding-top: 16px;
   margin-top: 8px;
-  font-size: 1.05rem;
+  font-size: 1.1rem;
 }
 
 .summary-label {
   color: #475569;
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
 }
 
 .summary-value {
@@ -908,12 +872,12 @@ body {
 
 .total-item .summary-value {
   color: #059669;
-  font-size: 1.2rem;
+  font-size: 1.25rem;
 }
 
-/* Buttons - Mobile Optimized */
+/* Buttons */
 .btn {
-  padding: 12px 16px;
+  padding: 12px 20px;
   border: none;
   border-radius: 8px;
   font-weight: 600;
@@ -922,11 +886,10 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  font-size: 0.9rem;
-  min-height: 44px;
-  text-align: center;
-  word-break: break-word;
+  gap: 8px;
+  font-size: 1rem;
+  min-height: 48px;
+  flex: 1;
 }
 
 .btn-primary {
@@ -962,32 +925,25 @@ body {
 .btn.loading .btn-spinner {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .btn-spinner {
   display: none;
 }
 
-.btn-text {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-/* Form Actions - Mobile Stacked */
+/* Form Actions */
 .form-actions {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px;
-  margin-top: 16px;
-  padding: 16px 12px;
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  padding: 20px 16px;
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-/* Modal - Mobile Responsive */
+/* Modal */
 .modal {
   display: none;
   position: fixed;
@@ -997,25 +953,24 @@ body {
   width: 100%;
   height: 100%;
   background-color: rgba(0,0,0,0.5);
-  padding: 8px;
-  overflow-y: auto;
+  padding: 16px;
 }
 
 .modal-content {
   background: white;
   border-radius: 12px;
   width: 100%;
-  max-width: 500px;
+  max-width: 600px;
   margin: 20px auto;
   box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-  max-height: 90vh;
+  max-height: 80vh;
   overflow-y: auto;
 }
 
 .modal-header {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 12px 16px;
+  padding: 16px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -1024,26 +979,22 @@ body {
 
 .modal-title {
   margin: 0;
-  font-size: 1.1rem;
-  word-break: break-word;
-  flex: 1;
-  margin-right: 8px;
+  font-size: 1.2rem;
 }
 
 .modal-close {
   background: none;
   border: none;
   color: white;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   cursor: pointer;
-  padding: 6px;
+  padding: 8px;
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
 }
 
 .modal-close:hover {
@@ -1051,24 +1002,22 @@ body {
 }
 
 .modal-body {
-  padding: 16px;
-  font-size: 0.9rem;
+  padding: 20px;
 }
 
 .modal-footer {
-  padding: 12px 16px;
+  padding: 16px 20px;
   border-top: 1px solid #e2e8f0;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  display: flex;
+  gap: 12px;
 }
 
-/* Toast - Mobile Positioned */
+/* Toast */
 .toast {
   position: fixed;
-  bottom: 20px;
+  top: 20px;
   left: 50%;
-  transform: translateX(-50%) translateY(100%);
+  transform: translateX(-50%) translateY(-100%);
   padding: 12px 20px;
   border-radius: 8px;
   color: white;
@@ -1077,7 +1026,6 @@ body {
   transition: transform 0.3s ease;
   max-width: calc(100vw - 32px);
   text-align: center;
-  font-size: 0.9rem;
 }
 
 .toast.show {
@@ -1094,62 +1042,52 @@ body {
   100% { transform: rotate(360deg); }
 }
 
-@keyframes fadeOut {
-  to {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-}
-
-/* Responsive Breakpoints */
-@media (min-width: 480px) {
+/* Responsive Design */
+@media (min-width: 768px) {
   .booking-container {
-    padding: 12px;
-  }
-  
-  .form-section {
-    padding: 16px;
+    padding: 24px;
+    max-width: 1200px;
   }
   
   .page-title {
-    font-size: 1.5rem;
+    font-size: 2.25rem;
+  }
+  
+  .form-section {
+    padding: 30px 24px;
   }
   
   .form-row {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
   
-  .number-input-wrapper {
-    flex-direction: row;
-    align-items: stretch;
+  .tickets-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
   
-  .ticket-number-input {
-    flex: 1;
+  .summary-grid {
+    grid-template-columns: repeat(4, 1fr);
   }
   
-  .add-single-btn {
-    flex-shrink: 0;
-    min-width: 140px;
+  .summary-item.total-item {
+    grid-column: 3 / -1;
   }
   
   .quick-actions {
-    display: flex;
     justify-content: flex-end;
   }
   
   .quick-actions .btn {
     flex: none;
-    min-width: 120px;
+    min-width: 140px;
   }
   
-  .form-actions {
-    grid-template-columns: 1fr 2fr;
+  .number-input-wrapper {
+    max-width: 400px;
   }
   
   .toast {
     top: 20px;
-    bottom: auto;
     right: 20px;
     left: auto;
     transform: translateX(100%);
@@ -1161,112 +1099,13 @@ body {
   }
 }
 
-@media (min-width: 768px) {
-  .booking-container {
-    padding: 20px;
-    max-width: 800px;
-  }
-  
-  .page-title {
-    font-size: 1.8rem;
-  }
-  
-  .form-section {
-    padding: 20px;
-  }
-  
+@media (min-width: 1024px) {
   .tickets-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .ticket-type-selector {
-    grid-template-columns: repeat(5, 1fr);
-  }
-  
-  .summary-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .summary-item.total-item {
-    grid-column: 1 / -1;
+    grid-template-columns: repeat(3, 1fr);
   }
   
   .child-lottery-selector {
     grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .lottery-details {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  
-  .modal-content {
-    max-width: 600px;
-  }
-}
-
-@media (min-width: 1024px) {
-  .booking-container {
-    max-width: 900px;
-  }
-  
-  .tickets-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  
-  .summary-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-  
-  .summary-item.total-item {
-    grid-column: 3 / -1;
-  }
-}
-
-/* Accessibility & Touch Improvements */
-@media (hover: none) and (pointer: coarse) {
-  .btn:hover {
-    transform: none;
-  }
-  
-  .lottery-option:hover,
-  .child-option:hover,
-  .type-option:hover {
-    border-color: #e5e7eb;
-    box-shadow: none;
-  }
-}
-
-/* High DPI Displays */
-@media (-webkit-min-device-pixel-ratio: 2) {
-  .loading-spinner {
-    border-width: 2px;
-    border-top-width: 2px;
-  }
-}
-
-/* Landscape Orientation on Small Screens */
-@media (max-height: 500px) and (orientation: landscape) {
-  .booking-header {
-    padding: 12px;
-    margin-bottom: 12px;
-  }
-  
-  .page-title {
-    font-size: 1.2rem;
-  }
-  
-  .page-subtitle {
-    font-size: 0.75rem;
-  }
-  
-  .form-section {
-    padding: 12px;
-    margin-bottom: 8px;
-  }
-  
-  .modal-content {
-    margin: 10px auto;
-    max-height: 95vh;
   }
 }
 </style>
@@ -1877,7 +1716,7 @@ body {
         
         // Show/hide form actions
         if (totalTickets > 0) {
-            document.getElementById('formActions').style.display = 'grid';
+            document.getElementById('formActions').style.display = 'flex';
         } else {
             document.getElementById('formActions').style.display = 'none';
         }
@@ -2050,16 +1889,16 @@ body {
             const groupTotal = group.tickets.reduce((sum, ticket) => sum + ticket.chargeAmount, 0);
             
             lotteryGroupsHtml += `
-                <div style="margin-bottom: 16px; padding: 12px; background: #f8fafc; border-radius: 8px; border-left: 4px solid #3b82f6;">
-                    <div style="font-weight: 600; margin-bottom: 6px; color: #1e293b; font-size: 0.9rem;">
+                <div style="margin-bottom: 16px; padding: 16px; background: #f8fafc; border-radius: 8px; border-left: 4px solid #3b82f6;">
+                    <div style="font-weight: 600; margin-bottom: 8px; color: #1e293b;">
                         ${group.lottery} (Draw #${group.drawNumber}) - ${group.timeName}
                     </div>
-                    <div style="margin-bottom: 6px; color: #64748b; font-size: 0.8rem;">
+                    <div style="margin-bottom: 8px; color: #64748b; font-size: 0.9rem;">
                         ${group.tickets.length} tickets - Total: ₹${groupTotal.toFixed(2)}
                     </div>
-                    <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                    <div style="display: flex; flex-wrap: wrap; gap: 6px;">
                         ${group.tickets.map(ticket => `
-                            <span style="background: white; border: 1px solid #e2e8f0; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.75rem;">
+                            <span style="background: white; border: 1px solid #e2e8f0; padding: 4px 8px; border-radius: 4px; font-family: monospace; font-size: 0.85rem;">
                                 ${ticket.number} (T${ticket.type})
                             </span>
                         `).join('')}
@@ -2069,27 +1908,27 @@ body {
         });
         
         const html = `
-            <div style="margin-bottom: 16px;">
-                <h4 style="margin-bottom: 8px; color: #1e293b; font-size: 1rem;">Customer Details</h4>
-                <div style="background: #f1f5f9; padding: 12px; border-radius: 8px; font-size: 0.85rem;">
-                    <div style="margin-bottom: 6px;"><strong>Name:</strong> ${customerName}</div>
+            <div style="margin-bottom: 20px;">
+                <h4 style="margin-bottom: 12px; color: #1e293b;">Customer Details</h4>
+                <div style="background: #f1f5f9; padding: 16px; border-radius: 8px;">
+                    <div style="margin-bottom: 8px;"><strong>Name:</strong> ${customerName}</div>
                     <div><strong>Phone:</strong> ${customerPhone}</div>
                 </div>
             </div>
             
-            <div style="margin-bottom: 16px;">
-                <h4 style="margin-bottom: 8px; color: #1e293b; font-size: 1rem;">Multi-Lottery Booking Summary</h4>
+            <div style="margin-bottom: 20px;">
+                <h4 style="margin-bottom: 12px; color: #1e293b;">Multi-Lottery Booking Summary</h4>
                 ${lotteryGroupsHtml}
             </div>
             
-            <div style="background: #f0fdf4; border: 2px solid #10b981; border-radius: 8px; padding: 12px;">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; font-size: 0.85rem;">
+            <div style="background: #f0fdf4; border: 2px solid #10b981; border-radius: 8px; padding: 16px;">
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px;">
                     <div><strong>Total Tickets:</strong> ${addedTickets.length}</div>
                     <div><strong>Unique Lotteries:</strong> ${new Set(addedTickets.map(t => t.lottery.id)).size}</div>
                 </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #10b981; padding-top: 12px;">
-                    <span style="font-weight: 600; color: #059669; font-size: 1rem;">Total Amount:</span>
-                    <span style="font-size: 1.2rem; font-weight: 700; color: #059669;">₹${totalAmount.toFixed(2)}</span>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #10b981; padding-top: 16px;">
+                    <span style="font-weight: 600; color: #059669; font-size: 1.1rem;">Total Amount:</span>
+                    <span style="font-size: 1.4rem; font-weight: 700; color: #059669;">₹${totalAmount.toFixed(2)}</span>
                 </div>
             </div>
         `;
@@ -2273,6 +2112,18 @@ body {
             toast.classList.remove('show');
         }, 5000);
     }
+    
+    // Add CSS animation for ticket removal
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+        }
+    `;
+    document.head.appendChild(style);
     
     console.log('Flexible Multi-Lottery Booking System Loaded Successfully');
 })();
