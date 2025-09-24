@@ -173,235 +173,7 @@ router.get('/booking', async function (req, res, next) {
 // })
 
 router.get('/api/lotteries', async function (req, res, next) {
-  res.status(200).json(
-    {
-      "success": true,
-      "lotteries": [
-        {
-          _id: "68ca601f35fa3310739da189",
-          name: 'wed Choice Weekly Lottery',
-          name2: '12th draw',
-          drawNumber: 12,
-          drawDate: "2025-09-17T05:00:00.000Z",
-          prizes: [
-            {
-              rank: 1,
-              amount: 100000,
-              _id: "68ca601f35fa3310739da18a"
-            },
-            {
-              rank: 2,
-              amount: 50000,
-              _id: "68ca601f35fa3310739da18b"
-            },
-            {
-              rank: 3,
-              amount: 10000,
-              _id: "68ca601f35fa3310739da18c"
-            },
-            {
-              rank: 4,
-              amount: 1000,
-              _id: "68ca601f35fa3310739da18d"
-            },
-            {
-              rank: 5,
-              amount: 100,
-              _id: "68ca601f35fa3310739da18e"
-            }
-          ],
-          winners: [
-            {
-              _id: "68ca601f35fa3310739da18f",
-              resultTime: "2025-09-17T07:00:00.000Z",
-              winNumbers: [
-                {
-                  prizeRank: 1,
-                  ticketNumber: '56787',
-                  resultStatus: true,
-                  _id: "68ca601f35fa3310739da190"
-                },
-                {
-                  prizeRank: 2,
-                  ticketNumber: '6787',
-                  resultStatus: true,
-                  _id: "68ca601f35fa3310739da191"
-                },
-                {
-                  prizeRank: 3,
-                  ticketNumber: '000',
-                  resultStatus: false,
-                  _id: "68ca601f35fa3310739da192"
-                },
-                {
-                  prizeRank: 4,
-                  ticketNumber: '00',
-                  resultStatus: false,
-                  _id: "68ca601f35fa3310739da193"
-                },
-                {
-                  prizeRank: 5,
-                  ticketNumber: '00000',
-                  resultStatus: false,
-                  _id: "68ca601f35fa3310739da194"
-                }
-              ]
-            },
-            {
-              _id: "68ca601f35fa3310739da18f",
-              resultTime: "2025-09-17T07:00:00.000Z",
-              winNumbers: [
-                {
-                  prizeRank: 1,
-                  ticketNumber: '56787',
-                  resultStatus: true,
-                  _id: "68ca601f35fa3310739da190"
-                },
-                {
-                  prizeRank: 2,
-                  ticketNumber: '6787',
-                  resultStatus: true,
-                  _id: "68ca601f35fa3310739da191"
-                },
-                {
-                  prizeRank: 3,
-                  ticketNumber: '000',
-                  resultStatus: false,
-                  _id: "68ca601f35fa3310739da192"
-                },
-                {
-                  prizeRank: 4,
-                  ticketNumber: '00',
-                  resultStatus: false,
-                  _id: "68ca601f35fa3310739da193"
-                },
-                {
-                  prizeRank: 5,
-                  ticketNumber: '00000',
-                  resultStatus: false,
-                  _id: "68ca601f35fa3310739da194"
-                }
-              ]
-            }
-          ],
-          createdAt: "2025-09-17T07:15:43.298Z",
-          updatedAt: "2025-09-17T07:15:43.298Z",
-          __v: 0
-        },
-        {
-          _id: "68ca601f35fa3310739da34189",
-          name: 'wed Choice Weekly Lottery2',
-          name2: '12th draw',
-          drawNumber: 12,
-          drawDate: "2025-09-17T05:00:00.000Z",
-          prizes: [
-            {
-              rank: 1,
-              amount: 100000,
-              _id: "68ca601f35fa3310739da18a"
-            },
-            {
-              rank: 2,
-              amount: 50000,
-              _id: "68ca601f35fa3310739da18b"
-            },
-            {
-              rank: 3,
-              amount: 10000,
-              _id: "68ca601f35fa3310739da18c"
-            },
-            {
-              rank: 4,
-              amount: 1000,
-              _id: "68ca601f35fa3310739da18d"
-            },
-            {
-              rank: 5,
-              amount: 100,
-              _id: "68ca601f35fa3310739da18e"
-            }
-          ],
-          winners: [
-            {
-              _id: "68ca601f35fa3310739da18f",
-              resultTime: "2025-09-17T07:00:00.000Z",
-              winNumbers: [
-                {
-                  prizeRank: 1,
-                  ticketNumber: '56787',
-                  resultStatus: true,
-                  _id: "68ca601f35fa3310739da190"
-                },
-                {
-                  prizeRank: 2,
-                  ticketNumber: '6787',
-                  resultStatus: true,
-                  _id: "68ca601f35fa3310739da191"
-                },
-                {
-                  prizeRank: 3,
-                  ticketNumber: '000',
-                  resultStatus: false,
-                  _id: "68ca601f35fa3310739da192"
-                },
-                {
-                  prizeRank: 4,
-                  ticketNumber: '00',
-                  resultStatus: false,
-                  _id: "68ca601f35fa3310739da193"
-                },
-                {
-                  prizeRank: 5,
-                  ticketNumber: '00000',
-                  resultStatus: false,
-                  _id: "68ca601f35fa3310739da194"
-                }
-              ]
-            },
-            {
-              _id: "68ca601f35fa336510739da18f",
-              resultTime: "2025-09-17T07:00:00.000Z",
-              winNumbers: [
-                {
-                  prizeRank: 1,
-                  ticketNumber: '56787',
-                  resultStatus: true,
-                  _id: "68ca601f35fa36310739da190"
-                },
-                {
-                  prizeRank: 2,
-                  ticketNumber: '6787',
-                  resultStatus: true,
-                  _id: "68ca601f35fa33610739da191"
-                },
-                {
-                  prizeRank: 3,
-                  ticketNumber: '000',
-                  resultStatus: false,
-                  _id: "68ca601f35fa33610739da192"
-                },
-                {
-                  prizeRank: 4,
-                  ticketNumber: '00',
-                  resultStatus: false,
-                  _id: "68ca601f35fa63310739da193"
-                },
-                {
-                  prizeRank: 5,
-                  ticketNumber: '00000',
-                  resultStatus: false,
-                  _id: "68ca601f35fa33106739da194"
-                }
-              ]
-            }
-          ],
-          createdAt: "2025-09-17T07:15:43.298Z",
-          updatedAt: "2025-09-17T07:15:43.298Z",
-          __v: 0
-        },
-      ]
-    }
-  )
+  await indexFun.getLotteriesForApi(req, res)
 })
 
 router.get('/api/booking/ticket-charges', async function (req, res, next) {
@@ -426,5 +198,50 @@ router.get('/api/booking/ticket-charges', async function (req, res, next) {
     ]
   })
 });
+
+router.post('/api/bookings', async function (req, res, next) {
+  console.log(req.body)
+  
+ await indexFun.saveBooking(req, res)
+})
+
+const PDFDocument = require('pdfkit');
+const Booking = require('../model/bookingsSchema');
+router.get('/api/download-receipt/:ticketNumber', async (req, res) => {
+  try {
+    const { ticketNumber } = req.params;
+    const booking = await Booking.findOne({ ticketNumber });
+    if (!booking) {
+      return res.status(404).json({ success: false, message: "Booking not found" });
+    }
+
+    const doc = new PDFDocument();
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename=receipt-${ticketNumber}.pdf`);
+
+    doc.pipe(res);
+
+    // Add receipt content
+    doc.fontSize(18).text("Booking Receipt", { align: "center" });
+    doc.moveDown();
+    doc.fontSize(12).text(`Ticket Number: ${booking.ticketNumber}`);
+    doc.text(`Customer: ${booking.customer.name}`);
+    doc.text(`Phone: ${booking.customer.phone}`);
+    doc.moveDown();
+
+    booking.tickets.forEach((t, i) => {
+      doc.text(`Ticket ${i + 1}: ${t.number} (${t.lottery.name}) - $${t.chargeAmount}`);
+    });
+
+    doc.moveDown();
+    doc.text(`Total: ${booking.financial.totalAmount}`);
+
+    doc.end();
+  } catch (err) {
+    console.error("Error generating receipt:", err);
+    res.status(500).json({ success: false, message: "Failed to generate receipt" });
+  }
+});
+
 
 module.exports = router;

@@ -1214,14 +1214,23 @@
     <!-- Create New Lottery Button -->
     <div class="text-center">
       <button onclick="openTicketChargesModal()" class="create-btn">
-        <i class="fas fa-ticket mr-2"></i>
+        <i class="fas fa-coin mr-2"></i>
         See Ticket Charges
       </button>
     </div>
 
+    <div class="text-center">
+      <button onclick="openBookPage()" class="create-btn">
+        <i class="fas fa-ticket mr-2"></i>
+        Book Tickets
+      </button>
+    </div>
+
     <script>
-      console.log("now time with iso: ", new Date().toISOString());
-      console.log("now time without iso: ", new Date());
+      function openBookPage(){
+        
+        location.href = '/booking';
+      }
     </script>
 
 

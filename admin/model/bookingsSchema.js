@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
+
 const ticketSchema = new Schema({
   // Ticket Identification
   ticketNumber: {
@@ -32,7 +33,7 @@ const ticketSchema = new Schema({
     },
     id: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       required: true
     },
     phone: {
@@ -40,11 +41,13 @@ const ticketSchema = new Schema({
       required: true,
       trim: true
     },
-    role: [{
-      type: String,
-      enum: ['agent', 'admin', 'supervisor'],
-      required: true
-    }]
+    role: [
+      {
+        type: String,
+        enum: ["agent", "admin", "supervisor"],
+        required: true
+      }
+    ]
   },
   
   // Booking Information Group
@@ -55,56 +58,57 @@ const ticketSchema = new Schema({
     },
     status: {
       type: String,
-      enum: ['active', 'cancelled'],
-      default: 'active'
+      enum: ["active", "cancelled"],
+      default: "active"
     }
   },
   
   // Ticket Details Group (array of tickets)
-  tickets: [{
-    lottery: {
-      id: {
-        type: Schema.Types.ObjectId,
-        ref: 'Lottery',
-        required: true
+  tickets: [
+    {
+      lottery: {
+        id: {
+          type: Schema.Types.ObjectId,
+          ref: "Lottery",
+          required: true
+        },
+        name: {
+          type: String,
+          required: true,
+          trim: true
+        },
+        drawNumber: {
+          type: Number,
+          required: true
+        },
+        drawDate: {
+          type: Date,
+          required: true
+        },
+        timeId: {
+          type: Schema.Types.ObjectId,
+          ref: "DrawTime",
+          required: true
+        }
       },
-      name: {
+      number: {
         type: String,
         required: true,
         trim: true
       },
-      drawNumber: {
+      type: {
         type: Number,
-        required: true
+        required: true,
+        min: 1,
+        max: 5
       },
-      drawDate: {
-        type: Date,
-        required: true
-      },
-      timeId: {
-        type: Schema.Types.ObjectId,
-        ref: 'DrawTime',
-        required: true
+      chargeAmount: {
+        type: Number,
+        required: true,
+        min: 0
       }
-    },
-    number: {
-      type: String,
-      required: true,
-      trim: true
-    },
-    type: {
-      type: Number,
-      required: true,
-      min: 1,
-      max: 5,
-    },
-    chargeAmount: {
-      type: Number,
-      required: true,
-      min: 0
-    },
-    
-  }],
+    }
+  ],
   
   // Financial Information Group
   financial: {
@@ -130,8 +134,8 @@ const ticketSchema = new Schema({
     },
     currency: {
       type: String,
-      default: 'USD',
-      enum: ['USD', 'EUR', 'GBP', 'INR', 'LKR'],
+      default: "USD",
+      enum: ["USD", "EUR", "GBP", "INR", "LKR"],
       uppercase: true,
       trim: true
     }
@@ -141,35 +145,47 @@ const ticketSchema = new Schema({
   payment: {
     method: {
       type: String,
-      enum: ['cash', 'card', 'bank_transfer', 'mobile_money'],
+      enum: ["cash", "card", "bank_transfer", "mobile_money"],
       required: true
     },
     status: {
       type: String,
-      enum: ['pending', 'partial', 'paid', 'failed', 'refunded'],
-      default: 'pending'
+      enum: ["pending", "partial", "paid", "failed", "refunded"],
+      default: "pending"
     },
     reference: {
       type: String,
       trim: true
     }
   }
-  
-}, { 
+},
+{ 
   timestamps: true,
   toJSON: { virtuals: true },
   toObject: { virtuals: true }
 });
 
 // Virtual for formatted ticket display
-ticketSchema.virtual('displayId').get(function() {
+ticketSchema.virtual("displayId").get(function () {
   return `TKT-${this.ticketNumber}`;
 });
 
+// Pre-save hook: auto-calculate quantity, subtotal, and totalAmount
+ticketSchema.pre("save", function (next) {
+  if (this.tickets && this.tickets.length > 0) {
+    this.financial.quantity = this.tickets.length;
+    this.financial.subtotal = this.tickets.reduce((sum, t) => sum + (t.chargeAmount || 0), 0);
+    this.financial.totalAmount = this.financial.subtotal + (this.financial.tax || 0);
+  }
+  next();
+});
+
 // Indexes for better query performance
-ticketSchema.index({ 'customer.phone': 1 });
-ticketSchema.index({ 'agent.id': 1 });
-ticketSchema.index({ 'booking.date': -1 });
-ticketSchema.index({ 'tickets.lottery.drawDate': 1 });
-ticketSchema.index({ 'payment.status': 1 });
-ticketSchema.index({ 'booking.status': 1 });
+ticketSchema.index({ "customer.phone": 1 });
+ticketSchema.index({ "agent.id": 1 });
+ticketSchema.index({ "booking.date": -1 });
+ticketSchema.index({ "tickets.lottery.drawDate": 1 });
+ticketSchema.index({ "payment.status": 1 });
+ticketSchema.index({ "booking.status": 1 });
+
+module.exports = mongoose.model("Ticket", ticketSchema);
