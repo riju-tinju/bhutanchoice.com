@@ -177,26 +177,7 @@ router.get('/api/lotteries', async function (req, res, next) {
 })
 
 router.get('/api/booking/ticket-charges', async function (req, res, next) {
-  res.status(200).json({
-    "success": true,
-    "ticketCharges": [
-      {
-        "_id": "charge_id1",
-        "ticketType": 3,
-        "chargeAmount": 10.00
-      },
-      {
-        "_id": "charge_id2",
-        "ticketType": 5,
-        "chargeAmount": 50.00
-      },
-      {
-        "_id": "charge_id3",
-        "ticketType": 1,
-        "chargeAmount": 10.00
-      }
-    ]
-  })
+  await indexFun.getAllTicketCharges(req, res)
 });
 
 router.post('/api/bookings', async function (req, res, next) {

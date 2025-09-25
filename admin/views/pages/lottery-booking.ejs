@@ -138,10 +138,10 @@
         <i class="fas fa-undo"></i>
         <span class="btn-text">Reset</span>
       </button>
-      <button type="button" class="btn btn-info" id="changeSelections">
+      <!-- <button type="button" class="btn btn-info" id="changeSelections">
         <i class="fas fa-edit"></i>
         <span class="btn-text">Change</span>
-      </button>
+      </button> -->
     </div>
   </div>
 
@@ -174,7 +174,7 @@
         </div> -->
         <div class="summary-item total-item">
           <span class="summary-label">Total Amount:</span>
-          <span class="summary-value" id="totalAmount">₹0.00</span>
+          <span class="summary-value" id="totalAmount">Nu0.00</span>
         </div>
       </div>
     </div>
@@ -1325,7 +1325,7 @@
 
       // Buttons
       document.getElementById('resetSelection').addEventListener('click', resetCurrentSelection);
-      document.getElementById('changeSelections').addEventListener('click', changeSelections);
+      // document.getElementById('changeSelections').addEventListener('click', changeSelections);
       document.getElementById('addSingleTicket').addEventListener('click', addSingleTicket);
       document.getElementById('clearAllTickets').addEventListener('click', clearAllTickets);
       document.getElementById('proceedBooking').addEventListener('click', proceedToFinalBooking);
@@ -1497,11 +1497,26 @@
             `;
         container.innerHTML = html;
       } else {
+        //   winner.resultTime=new Date(winner.resultTime).toLocaleString('en-IN', {
+        //   hour: 'numeric',
+        //   minute: '2-digit',
+        //   hour12: true,
+        //   timeZone: 'Asia/Dubai'
+        // }) 
         const html = selectedParentLottery.winners.map((winner, index) => `
                 <div class="child-option" onclick="selectChildLottery('${winner._id}', 'Draw Time ${index + 1}')">
                     <div class="child-name">Draw Time ${index + 1}</div>
                     <div class="child-details">
-                        ${winner.resultTime ? new Date(winner.resultTime).toLocaleString() : 'Time TBA'}
+                        ${
+  winner.resultTime 
+    ? new Date(winner.resultTime).toLocaleString('en-IN', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+        timeZone: 'Asia/Dubai'
+      }) 
+    : 'Time TBA'
+}
                     </div>
                     <div class="child-details">
                         ${winner.winNumbers?.length || 0} winning positions
@@ -1576,7 +1591,7 @@
             <div class="type-option" onclick="selectTicketType(${charge.ticketType}, ${charge.chargeAmount})">
                 <div class="type-number">${charge.ticketType}</div>
                 <div class="type-label">${ticketTypeInfo[charge.ticketType]?.label || 'Type ' + charge.ticketType}</div>
-                <div class="type-price">₹${charge.chargeAmount.toFixed(2)}</div>
+                <div class="type-price">Nu${charge.chargeAmount.toFixed(2)}</div>
             </div>
         `).join('');
 
@@ -1850,7 +1865,7 @@
                                 <div class="ticket-type-badge">Type ${ticket.type}</div>
                             </div>
                             
-                            <div class="ticket-price">₹${ticket.chargeAmount.toFixed(2)}</div>
+                            <div class="ticket-price">Nu ${ticket.chargeAmount.toFixed(2)}</div>
                         </div>
                     `;
           });
@@ -1899,7 +1914,7 @@
       document.getElementById('totalTickets').textContent = totalTickets;
       //document.getElementById('uniqueLotteries').textContent = uniqueLotteries;
       //document.getElementById('uniqueDrawTimes').textContent = uniqueDrawTimes;
-      document.getElementById('totalAmount').textContent = `₹${totalAmount.toFixed(2)}`;
+      document.getElementById('totalAmount').textContent = `Nu${totalAmount.toFixed(2)}`;
       document.getElementById('finalTicketCount').textContent = totalTickets;
 
       // Show/hide form actions
@@ -1940,7 +1955,7 @@
         html += `
                 <div class="summary-detail">
                     <i class="fas fa-hashtag"></i>
-                    <span>Ticket Type: <span class="value">Type ${selectedTicketType.type} (₹${selectedTicketType.charge})</span></span>
+                    <span>Ticket Type: <span class="value">Type ${selectedTicketType.type} (Nu${selectedTicketType.charge})</span></span>
                 </div>
             `;
       }
@@ -2082,7 +2097,7 @@
                         ${group.lottery} (Draw #${group.drawNumber}) - ${group.timeName}
                     </div>
                     <div style="margin-bottom: 6px; color: #64748b; font-size: 0.8rem;">
-                        ${group.tickets.length} tickets - Total: ₹${groupTotal.toFixed(2)}
+                        ${group.tickets.length} tickets - Total: Nu ${groupTotal.toFixed(2)}
                     </div>
                     <div style="display: flex; flex-wrap: wrap; gap: 4px;">
                         ${group.tickets.map(ticket => `
@@ -2116,7 +2131,7 @@
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #10b981; padding-top: 12px;">
                     <span style="font-weight: 600; color: #059669; font-size: 1rem;">Total Amount:</span>
-                    <span style="font-size: 1.2rem; font-weight: 700; color: #059669;">₹${totalAmount.toFixed(2)}</span>
+                    <span style="font-size: 1.2rem; font-weight: 700; color: #059669;">Nu${totalAmount.toFixed(2)}</span>
                 </div>
             </div>
         `;
@@ -2137,7 +2152,7 @@
         btn.classList.add('loading');
         btn.disabled = true;
 
-        let bookRes=await submitMultiLotteryBooking();
+        let bookRes = await submitMultiLotteryBooking();
 
         closeConfirmationModal();
         showToast('Multi-lottery booking completed successfully!', 'success');

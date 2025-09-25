@@ -789,6 +789,19 @@ const indexHelper = {
       });
     }
   },
+  getAllTicketCharges: async (req, res) => {
+    try{
+      let charges = await Charge.find({}).sort({ticketType:1})
+      if(!charges){
+       return res.status(404).json({success:false, message:"No ticket charges found"})
+      }
+     return res.status(200).json({success:true, message:"Ticket charges retrieved successfully", ticketCharges: charges, count: charges.length})
+
+     
+    }catch(err){
+      res.status(500).json({success:false, message:"Failed to retrieve ticket charges", error: err.message})
+    }
+  },
   saveBooking: async (req, res) => {
     try {
       const { customer, tickets } = req.body;
