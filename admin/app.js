@@ -6,6 +6,7 @@ var logger = require('morgan');
 
 
 var indexRouter = require('./routes/index');
+var agentRouter = require('./routes/agent');
 var settingsRouter = require('./routes/settings');
 var adminAuthRouter = require('./routes/adminAuth');// custom
 
@@ -37,6 +38,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', adminAuthRouter); // custom route for admin authentication
 let verifyAdmin = require("./helper/verifyAdmin");// custom
 app.use('/', indexRouter);//verifyAdmin,
+app.use('/agent', agentRouter); 
 app.use('/', settingsRouter);
 
 // catch 404 and forward to error handler

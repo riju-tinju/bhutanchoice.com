@@ -1227,8 +1227,8 @@
     </div>
 
     <script>
-      function openBookPage(){
-        
+      function openBookPage() {
+
         location.href = '/booking';
       }
     </script>
@@ -1304,20 +1304,20 @@
   </main>
 
   <!-- Settings Button -->
-  <script>
+  <!-- <script>
     // Settings Function
     function goToSettings() {
       window.location.href = '/setting';
     }
-  </script>
-  <button onclick="goToSettings()" class="settings-btn">
+  </script> -->
+  <!-- <button onclick="goToSettings()" class="settings-btn">
     <i class="fas fa-cog"></i>
-  </button>
+  </button> -->
 
   <!-- Enhanced Create/Edit Lottery Modal -->
   <%- include('partials/Edit-create-extention') %>
 
-   <!-- Enhanced Create/Edit Lottery Modal -->
+  <!-- Enhanced Create/Edit Lottery Modal -->
   <%- include('partials/ticketChargeExtention') %>
 
   <!-- Toast Notification -->
@@ -1517,7 +1517,7 @@
             firstTicketNumber
           } <
           /div> < /
-          div > <
+        div > <
           /div>
 
           <
@@ -1550,7 +1550,7 @@
             }).join('')
           } <
           /div> < /
-          div > <
+        div > <
           /div>
         `;
             }).join('');
@@ -1565,6 +1565,5 @@
       });
     }
   </script>
-</body>
 
-</html>
+  <%- include('partials/Footer') %>
