@@ -7,6 +7,7 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var agentRouter = require('./routes/agent');
+var bookingsRouter = require('./routes/bookings');
 var settingsRouter = require('./routes/settings');
 var adminAuthRouter = require('./routes/adminAuth');// custom
 
@@ -39,6 +40,7 @@ app.use('/', adminAuthRouter); // custom route for admin authentication
 let verifyAdmin = require("./helper/verifyAdmin");// custom
 app.use('/', indexRouter);//verifyAdmin,
 app.use('/agent', agentRouter); 
+app.use('/bookings', bookingsRouter); 
 app.use('/', settingsRouter);
 
 // catch 404 and forward to error handler

@@ -91,6 +91,10 @@ const ticketSchema = new Schema({
           required: true
         }
       },
+      isWon:{
+        type: Boolean,
+        default: false
+      },
       number: {
         type: String,
         required: true,
