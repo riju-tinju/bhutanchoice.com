@@ -1,0 +1,16 @@
+{
+  "watch": [
+    "*.js",
+    "*.ejs",
+    "views/*.ejs",
+    "public/*",
+    "routes/*.js"
+  ],
+  "ext": "js,ejs,html,css",
+  "ignore": [
+    "node_modules/"
+  ],
+  "env": {
+    "NODE_ENV": "development"
+  }
+}

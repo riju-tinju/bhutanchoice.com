@@ -1,0 +1,265 @@
+<!-- partials/upcoming-lotteries.ejs -->
+<% if (upcoming && upcoming.length> 0) { %>
+<section>
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="text-xl font-bold section-title flex items-center">
+      <i class="fas fa-clock text-orange-500 mr-2 text-xl"></i>
+      Upcoming Lottery
+    </h2>
+  </div>
+
+  <div class="space-y-6">
+
+    <% upcoming.forEach((lottery, index)=> {
+    // Step 4a: Determine status and countdown
+    const isFirst = index === 0;
+    const status = isFirst ? "NEXT DRAW" : "UPCOMING";
+    const badgeClass = isFirst ? "next-draw-badge" : "upcoming-badge";
+
+    const firstPrize = lottery.prizes.find(p => p.rank === 1);
+    const drawDate = new Date(lottery.drawDate);
+
+    // Calculate nextDrawTime and lastDrawTime based on winners array
+    let nextDrawTime = null;
+    let lastDrawTime = null;
+    
+    if (lottery.winners && lottery.winners.length > 0) {
+        // Sort winners by resultTime in descending order (most recent first)
+        const sortedWinners = [...lottery.winners].sort((a, b) => 
+            new Date(b.resultTime) - new Date(a.resultTime)
+        );
+        
+        // The most recent resultTime is the lastDrawTime
+        lastDrawTime = sortedWinners[0].resultTime;
+        
+        // Find the next draw time by looking for resultTimes that are in the future
+        const now = new Date();
+        const futureResults = sortedWinners.filter(winner => 
+            new Date(winner.resultTime) > now
+        );
+        
+        if (futureResults.length > 0) {
+            // Sort future results in ascending order to get the next one
+            futureResults.sort((a, b) => 
+                new Date(a.resultTime) - new Date(b.resultTime)
+            );
+            nextDrawTime = futureResults[0].resultTime;
+        }
+    }
+
+    const day = drawDate.getDate();
+    const month = drawDate.toLocaleString('en-US', { month: 'long' });
+    const year = drawDate.getFullYear();
+    let hours = drawDate.getHours();
+    const minutes = drawDate.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // Convert 0 to 12
+    const formattedDate = drawDate.toLocaleDateString('en-GB', {
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+        timeZone: 'Asia/Dubai'
+    }).replace(',', '');
+    
+   
+%>
+
+    <div class="lottery-card <%=lottery.dayName %>-card cursor-pointer" onclick="toggleResult('upcoming<%= index %>')">
+      <div class="flex items-center justify-between">
+        <div class="flex-1 card-element-spacing">
+          <div class="flex flex-wrap items-center" style="row-gap: 9px; column-gap: 20px;">
+            <span class="<%= badgeClass %> rounded-full">
+              <%= status %>
+            </span>
+            <span class="card-text-secondary card-date">
+              <%= nextDrawTime %>
+            </span>
+          </div>
+
+          <h3 class="card-text card-lottery-name">
+            <%= lottery.name %><br>
+            <%= lottery.name2 || '' %>
+          </h3>
+
+          <!-- priZe listing -->
+          <% lottery.prizes.forEach(prize=> { %>
+          <div class="flex items-center card-text-secondary">
+            <i class="fas fa-trophy text-yellow-300 mr-2"></i>
+            <span class="card-prize">
+              <% let rankStatus='th' ; if(prize.rank===1) rankStatus='st' ; else
+                                            if(prize.rank===2) rankStatus='nd' ; else if(prize.rank===3) rankStatus='rd'
+                                            ; else rankStatus='th' ; %>
+              <%= prize.rank %>
+              <%= rankStatus %> Prize: ₹<%= prize.amount.toLocaleString('en-IN') %>
+            </span><br>
+          </div>
+          <% }); %>
+          <!--  -->
+          <!-- Step 4b: Only first lottery gets countdown -->
+          <% if (isFirst) { %>
+          <div class="countdown-container">
+            <div class="flex items-center justify-between">
+              <span class="countdown-label">Draws in:</span>
+              <div class="flex space-x-2 items-center">
+                <div class="countdown-badge" id="upcoming-countdown<%= index %>-hours">00</div>
+                <!-- <span class="card-text font-bold">d</span> -->
+                <div class="countdown-badge" id="upcoming-countdown<%= index %>-minutes">00</div>
+                <!-- <span class="card-text font-bold">h</span> -->
+                <div class="countdown-badge" id="upcoming-countdown<%= index %>-seconds">00</div>
+                <!-- <span class="card-text font-bold">m</span> -->
+              </div>
+            </div>
+          </div>
+          <% } %>
+
+          <!-- Admin Actions -->
+          <div class="flex items-center mt-4">
+            <button onclick="editLottery('<%= lottery._id %>')" class="admin-btn edit-btn">
+              <i class="fas fa-edit mr-1"></i>
+              Edit
+            </button>
+            <button onclick="deleteLottery('<%= lottery._id %>')" class="admin-btn">
+              <i class="fas fa-trash mr-1"></i>
+              Delete
+            </button>
+          </div>
+        </div>
+        <div class="text-right ml-4">
+          <i id="arrow-upcoming<%= index %>" class="fas fa-chevron-down card-text text-xl transition-transform duration-300"></i>
+        </div>
+      </div>
+
+      
+
+      <!-- Step 4c: Show prize structure with placeholders -->
+      <div id="upcoming<%= index %>" class="card-expand collapsed mt-6">
+        <div class="result-container space-y-4">
+
+            <!-- EJS Start -->
+              <% const now2 = new Date(); // Get the current time
+
+  // Sort the 'lottery.winners' array to show upcoming events first
+  const sortedWinners = lottery.winners.slice().sort((a, b) => {
+    const dateA = new Date(a.resultTime);
+    const dateB = new Date(b.resultTime);
+
+    const isUpcomingA = dateA > now2;
+    const isUpcomingB = dateB > now2;
+
+    // Prioritize upcoming events.
+    if (isUpcomingA && !isUpcomingB) {
+      return -1; // 'a' (upcoming) comes before 'b' (past)
+    }
+    if (!isUpcomingA && isUpcomingB) {
+      return 1; // 'b' (upcoming) comes before 'a' (past)
+    }
+
+    // Sort within the same category.
+    if (isUpcomingA && isUpcomingB) {
+      // Both are upcoming, sort ascending (earliest first).
+      return dateA - dateB;
+    } else {
+      // Both are past, sort descending (most recent first).
+      return dateB - dateA;
+    }
+  });
+
+  // Now, loop through the newly sorted array
+  sortedWinners.forEach(winner => {
+   %>
+
+   <% 
+  // Convert to IST explicitly
+  const resultTime = new Date(winner.resultTime);
+
+  // Format with IST timezone
+  const options = { 
+    hour: 'numeric', 
+    minute: '2-digit', 
+    hour12: true, 
+    timeZone: 'Asia/Dubai' 
+  };
+
+  const formattedTime = resultTime.toLocaleString('en-IN', options);
+  
+  // Get first ticket number and its length
+  const firstTicketNumber = winner.winNumbers[0].ticketNumber;
+  const ticketLength = firstTicketNumber.toString().length;
+  
+  // Generate letters array based on ticket length
+  const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+  const ticketLetters = letters.slice(0, ticketLength);
+%>
+            <!-- EJS End -->
+          
+          
+            <div class="result-card">
+            <div class="result-card-header">
+              <%= formattedTime %>
+            </div>
+            <div class="result-card-content">
+
+              <div class="letter-container">
+                <% ticketLetters.forEach((letter, index) => { %>
+                <div class="letter-box">
+                  <%= letter %>
+                </div>
+                <% }); %>
+              </div>
+
+              <div class="winning-numbers-container">
+                <div class="winning-number-item">
+                  <div class="winning-number" data-ticket-number="<%= firstTicketNumber %>">
+                    <%= firstTicketNumber %>
+                  </div>
+                </div>
+              </div>
+              <div class="otherPrizeContainer">
+                <% winner.winNumbers.forEach((winNumberObj, index) => { %>
+                <% 
+               let rankStatus2= 'th';
+                if(winNumberObj.prizeRank === 1) rankStatus2 = 'st';
+                else if(winNumberObj.prizeRank === 2) rankStatus2 = 'nd';
+                else if(winNumberObj.prizeRank === 3) rankStatus2 = 'rd';
+                else rankStatus2 = 'th';
+               %>
+
+                <% if(index === 4) { %>
+                <div class="win-items">
+                  <span class="prize-Rank">🎖️5th Prize : <b>(Single number all series)</b></span>
+                  <!-- <div class="result-winning-number"><%= winNumberObj.ticketNumber %></div> -->
+                </div>
+                <% }else if(index < 4){ %>
+                <% if (winNumberObj.ticketNumber && winNumberObj.ticketNumber.split('').every(char => char === '0')) { %>
+                <div class="win-items">
+                  <span class="prize-Rank">🎖️<%= winNumberObj.prizeRank %><%= rankStatus2 %> Prize :</span>
+                  <div class="result-winning-number result-winning-number_if_no_results underline-animated"></div>
+                </div>
+                <% }else{ %>
+                <div class="win-items">
+                  <span class="prize-Rank">🎖️<%= winNumberObj.prizeRank %><%= rankStatus2 %> Prize :</span>
+                  <div class="result-winning-number"><%= winNumberObj.ticketNumber %></div>
+                </div>
+                <% } %>
+                <% } else { %>
+                <% }%>
+                <% }); %>
+              </div>
+            </div>
+          </div>
+          <% }); %>
+          <!-- END Result card loop -->
+
+
+            <!--  -->
+        </div>
+      </div>
+    </div>
+    <% }); %>
+  </div>
+</section>
+<% } %>

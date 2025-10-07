@@ -22,20 +22,19 @@
     <div class="search-section">
       <div class="search-input-wrapper">
         <i class="fas fa-search search-icon"></i>
-        <input type="text" id="agentSearch" class="search-input" 
-               placeholder="Search agents by name, email, or phone...">
+        <input type="text" id="agentSearch" class="search-input" placeholder="Search agents by name, email, or phone...">
         <button type="button" class="search-clear" id="clearSearch" style="display: none;">
           <i class="fas fa-times"></i>
         </button>
       </div>
     </div>
-    
+
     <div class="action-buttons">
       <button type="button" class="btn btn-primary" id="addAgentBtn">
         <i class="fas fa-plus"></i>
         <span class="btn-text">Add Agent</span>
       </button>
-      
+
       <div class="view-toggle">
         <button type="button" class="view-btn active" id="cardViewBtn" data-view="card">
           <i class="fas fa-th-large"></i>
@@ -57,7 +56,7 @@
         <option value="false">Inactive</option>
       </select>
     </div>
-    
+
     <div class="filter-group">
       <label class="filter-label">Sort by:</label>
       <select id="sortFilter" class="filter-select">
@@ -67,7 +66,7 @@
         <option value="name_desc">Name Z-A</option>
       </select>
     </div>
-    
+
     <button type="button" class="btn btn-secondary btn-sm" id="clearFilters">
       <i class="fas fa-filter"></i>
       Clear Filters
@@ -86,7 +85,7 @@
     <div class="agents-cards" id="agentsCards">
       <!-- Agent cards will be inserted here -->
     </div>
-    
+
     <!-- Table View -->
     <div class="agents-table-container" id="agentsTableContainer" style="display: none;">
       <table class="agents-table">
@@ -149,43 +148,52 @@
     <div class="modal-body">
       <form id="agentForm">
         <input type="hidden" id="agentId" name="agentId">
-        
+
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Full Name *</label>
-            <input type="text" id="name" name="name" class="form-input" 
-                   placeholder="Enter full name" required>
+            <input type="text" id="name" name="name" class="form-input" placeholder="Enter full name" required>
             <div class="form-error" id="nameError"></div>
           </div>
         </div>
-        
+
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Email Address *</label>
-            <input type="email" id="email" name="email" class="form-input" 
-                   placeholder="Enter email address" required>
+            <input type="email" id="email" name="email" class="form-input" placeholder="Enter email address" required>
             <div class="form-error" id="emailError"></div>
           </div>
         </div>
-        
+
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Phone Number *</label>
-            <input type="tel" id="phone" name="phone" class="form-input" 
-                   placeholder="Enter phone number" required>
+            <input type="tel" id="phone" name="phone" class="form-input" placeholder="Enter phone number" required>
             <div class="form-error" id="phoneError"></div>
           </div>
         </div>
         
+        <style>
+          .passHidden {
+            display: none !important;
+          }
+        </style>
+        <div class="form-row passHidden" id="passwordInputRow">
+          <div class="form-group">
+            <label class="form-label">Create Password</label>
+            <input type="url" id="password" name="password" class="form-input" placeholder="Enter the password">
+            <div class="form-error" id="passwordError"></div>
+          </div>
+        </div>
+
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Avatar URL</label>
-            <input type="url" id="avatar" name="avatar" class="form-input" 
-                   placeholder="Enter avatar image URL (optional)">
+            <input type="url" id="avatar" name="avatar" class="form-input" placeholder="Enter avatar image URL (optional)">
             <div class="form-error" id="avatarError"></div>
           </div>
         </div>
-        
+
         <div class="form-row">
           <div class="form-group">
             <label class="toggle-label">
@@ -250,896 +258,910 @@
 <div id="agentToast" class="toast"></div>
 
 <style>
-/* Mobile-First Responsive Base Styles */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+  /* Mobile-First Responsive Base Styles */
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+    color: #1f2937;
+    overflow-x: hidden;
+    background: #f8fafc;
+  }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  line-height: 1.6;
-  color: #1f2937;
-  overflow-x: hidden;
-  background: #f8fafc;
-}
-
-.agent-container {
-  padding: 8px;
-  max-width: 100%;
-  margin: 0 auto;
-  min-height: 100vh;
-}
-
-/* Header - Mobile Optimized */
-.agent-header {
-  text-align: center;
-  margin-bottom: 16px;
-  padding: 16px 12px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 12px;
-  color: white;
-}
-
-.page-title {
-  font-size: 1.25rem;
-  margin-bottom: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  line-height: 1.2;
-}
-
-.page-subtitle {
-  font-size: 0.8rem;
-  opacity: 0.9;
-  line-height: 1.3;
-}
-
-/* Actions Bar - Mobile First */
-.actions-bar {
-  background: white;
-  border-radius: 12px;
-  padding: 12px;
-  margin-bottom: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  display: grid;
-  gap: 12px;
-}
-
-.search-section {
-  grid-column: 1 / -1;
-}
-
-.search-input-wrapper {
-  position: relative;
-}
-
-.search-input {
-  width: 100%;
-  padding: 12px 14px 12px 40px;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 16px;
-  background: white;
-  transition: all 0.2s ease;
-  min-height: 44px;
-}
-
-.search-input:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.search-icon {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #6b7280;
-  font-size: 1rem;
-}
-
-.search-clear {
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: #6b7280;
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 50%;
-  min-width: 32px;
-  min-height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.action-buttons {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.view-toggle {
-  display: flex;
-  background: #f3f4f6;
-  border-radius: 8px;
-  padding: 2px;
-  gap: 2px;
-}
-
-.view-btn {
-  background: none;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  color: #6b7280;
-  transition: all 0.2s ease;
-  min-width: 40px;
-  min-height: 36px;
-}
-
-.view-btn.active {
-  background: white;
-  color: #3b82f6;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-/* Filters Section */
-.filters-section {
-  background: white;
-  border-radius: 12px;
-  padding: 12px;
-  margin-bottom: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  display: grid;
-  gap: 12px;
-  grid-template-columns: 1fr;
-}
-
-.filter-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.filter-label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #374151;
-}
-
-.filter-select {
-  padding: 8px 12px;
-  border: 2px solid #e5e7eb;
-  border-radius: 6px;
-  font-size: 14px;
-  background: white;
-  min-height: 36px;
-}
-
-.filter-select:focus {
-  outline: none;
-  border-color: #3b82f6;
-}
-
-/* Buttons - Mobile Optimized */
-.btn {
-  padding: 12px 16px;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  font-size: 0.9rem;
-  min-height: 44px;
-  text-align: center;
-  word-break: break-word;
-}
-
-.btn-sm {
-  padding: 8px 12px;
-  font-size: 0.8rem;
-  min-height: 36px;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  color: white;
-}
-
-.btn-secondary {
-  background: #6b7280;
-  color: white;
-}
-
-.btn-danger {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  color: white;
-}
-
-.btn-success {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
-}
-
-.btn:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-.btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.btn.loading .btn-text {
-  display: none;
-}
-
-.btn.loading .btn-spinner {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.btn-spinner {
-  display: none;
-}
-
-.btn-text {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-/* Loading State */
-.loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 20px;
-  color: #6b7280;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.loading-spinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid #e5e7eb;
-  border-top: 3px solid #3b82f6;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 16px;
-}
-
-/* Agent Cards - Mobile First */
-.agents-cards {
-  display: grid;
-  gap: 12px;
-  grid-template-columns: 1fr;
-}
-
-.agent-card {
-  background: white;
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  transition: all 0.2s ease;
-  border: 2px solid transparent;
-}
-
-.agent-card:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-  border-color: #e5e7eb;
-}
-
-.agent-card-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.agent-avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 600;
-  font-size: 1.2rem;
-  flex-shrink: 0;
-}
-
-.agent-avatar img {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.agent-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.agent-name {
-  font-weight: 600;
-  color: #1e293b;
-  font-size: 1rem;
-  margin-bottom: 2px;
-  word-break: break-word;
-}
-
-.agent-email {
-  color: #64748b;
-  font-size: 0.85rem;
-  word-break: break-all;
-}
-
-.agent-status {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 12px;
-}
-
-.status-badge {
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.status-badge.active {
-  background: #dcfce7;
-  color: #166534;
-}
-
-.status-badge.inactive {
-  background: #fef2f2;
-  color: #991b1b;
-}
-
-.status-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-}
-
-.status-badge.active .status-dot {
-  background: #22c55e;
-}
-
-.status-badge.inactive .status-dot {
-  background: #ef4444;
-}
-
-.agent-details {
-  display: grid;
-  gap: 8px;
-  margin-bottom: 16px;
-  font-size: 0.85rem;
-}
-
-.agent-detail {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #64748b;
-}
-
-.agent-detail i {
-  color: #3b82f6;
-  width: 14px;
-  flex-shrink: 0;
-}
-
-.agent-actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.btn-icon {
-  padding: 8px;
-  min-width: 36px;
-  min-height: 36px;
-}
-
-/* Table View */
-.agents-table-container {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  overflow: hidden;
-}
-
-.agents-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.agents-table th {
-  background: #f8fafc;
-  padding: 12px;
-  text-align: left;
-  font-weight: 600;
-  color: #374151;
-  border-bottom: 2px solid #e5e7eb;
-  font-size: 0.85rem;
-}
-
-.agents-table td {
-  padding: 12px;
-  border-bottom: 1px solid #e5e7eb;
-  font-size: 0.85rem;
-}
-
-.table-agent-info {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.table-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 600;
-  font-size: 0.9rem;
-  flex-shrink: 0;
-}
-
-.table-avatar img {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.table-agent-details {
-  min-width: 0;
-}
-
-.table-agent-name {
-  font-weight: 600;
-  color: #1e293b;
-  margin-bottom: 2px;
-}
-
-.table-agent-email {
-  color: #64748b;
-  font-size: 0.8rem;
-}
-
-.table-contact {
-  color: #64748b;
-}
-
-.table-actions {
-  display: flex;
-  gap: 4px;
-  flex-wrap: wrap;
-}
-
-/* Empty State */
-.empty-state {
-  text-align: center;
-  padding: 40px 20px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.empty-state i {
-  font-size: 3rem;
-  color: #9ca3af;
-  margin-bottom: 16px;
-}
-
-.empty-state h3 {
-  color: #374151;
-  margin-bottom: 8px;
-}
-
-.empty-state p {
-  color: #6b7280;
-  margin-bottom: 20px;
-}
-
-/* Pagination */
-.pagination-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: white;
-  border-radius: 12px;
-  padding: 16px;
-  margin-top: 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.pagination-info {
-  font-size: 0.85rem;
-  color: #6b7280;
-}
-
-.pagination-controls {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.page-info {
-  font-size: 0.85rem;
-  color: #374151;
-  font-weight: 600;
-}
-
-/* Modal Styles */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.5);
-  padding: 8px;
-  overflow-y: auto;
-}
-
-.modal-content {
-  background: white;
-  border-radius: 12px;
-  width: 100%;
-  max-width: 500px;
-  margin: 20px auto;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.modal-sm {
-  max-width: 400px;
-}
-
-.modal-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 12px 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-radius: 12px 12px 0 0;
-}
-
-.modal-title {
-  margin: 0;
-  font-size: 1.1rem;
-  word-break: break-word;
-  flex: 1;
-  margin-right: 8px;
-}
-
-.modal-close {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 1.2rem;
-  cursor: pointer;
-  padding: 6px;
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.modal-close:hover {
-  background: rgba(255,255,255,0.2);
-}
-
-.modal-body {
-  padding: 16px;
-}
-
-.modal-footer {
-  padding: 12px 16px;
-  border-top: 1px solid #e2e8f0;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-/* Form Styles */
-.form-row {
-  display: grid;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-}
-
-.form-label {
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: 6px;
-  font-size: 0.9rem;
-}
-
-.form-input {
-  padding: 12px 14px;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 16px;
-  background: white;
-  transition: all 0.2s ease;
-  min-height: 44px;
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.form-error {
-  color: #ef4444;
-  font-size: 0.8rem;
-  margin-top: 4px;
-  min-height: 18px;
-  word-break: break-word;
-}
-
-/* Toggle Switch */
-.toggle-label {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
-  margin-top: 8px;
-}
-
-.toggle-input {
-  opacity: 0;
-  position: absolute;
-}
-
-.toggle-slider {
-  position: relative;
-  width: 48px;
-  height: 24px;
-  background: #d1d5db;
-  border-radius: 12px;
-  transition: all 0.2s ease;
-}
-
-.toggle-slider::before {
-  content: '';
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 20px;
-  height: 20px;
-  background: white;
-  border-radius: 50%;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-
-.toggle-input:checked + .toggle-slider {
-  background: #3b82f6;
-}
-
-.toggle-input:checked + .toggle-slider::before {
-  transform: translateX(24px);
-}
-
-.toggle-text {
-  font-weight: 600;
-  color: #374151;
-}
-
-/* Delete Confirmation */
-.delete-confirmation {
-  text-align: center;
-  padding: 20px 0;
-}
-
-.delete-confirmation i {
-  font-size: 3rem;
-  color: #fbbf24;
-  margin-bottom: 16px;
-}
-
-.delete-confirmation h3 {
-  color: #374151;
-  margin-bottom: 12px;
-}
-
-.delete-confirmation p {
-  color: #6b7280;
-  margin-bottom: 8px;
-}
-
-.delete-confirmation .warning {
-  color: #dc2626;
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-
-/* Toast */
-.toast {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%) translateY(100%);
-  padding: 12px 20px;
-  border-radius: 8px;
-  color: white;
-  font-weight: 600;
-  z-index: 10000;
-  transition: transform 0.3s ease;
-  max-width: calc(100vw - 32px);
-  text-align: center;
-  font-size: 0.9rem;
-}
-
-.toast.show {
-  transform: translateX(-50%) translateY(0);
-}
-
-.toast.success { background: #10b981; }
-.toast.error { background: #ef4444; }
-.toast.info { background: #3b82f6; }
-
-/* Animations */
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* Responsive Breakpoints */
-@media (min-width: 480px) {
   .agent-container {
-    padding: 12px;
+    padding: 8px;
+    max-width: 100%;
+    margin: 0 auto;
+    min-height: 100vh;
   }
-  
+
+  /* Header - Mobile Optimized */
+  .agent-header {
+    text-align: center;
+    margin-bottom: 16px;
+    padding: 16px 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    color: white;
+  }
+
   .page-title {
-    font-size: 1.5rem;
-  }
-  
-  .actions-bar {
-    grid-template-columns: 1fr auto;
+    font-size: 1.25rem;
+    margin-bottom: 6px;
+    display: flex;
     align-items: center;
-    padding: 16px;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    line-height: 1.2;
   }
-  
+
+  .page-subtitle {
+    font-size: 0.8rem;
+    opacity: 0.9;
+    line-height: 1.3;
+  }
+
+  /* Actions Bar - Mobile First */
+  .actions-bar {
+    background: white;
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: grid;
+    gap: 12px;
+  }
+
   .search-section {
-    grid-column: 1;
+    grid-column: 1 / -1;
   }
-  
+
+  .search-input-wrapper {
+    position: relative;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 12px 14px 12px 40px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 16px;
+    background: white;
+    transition: all 0.2s ease;
+    min-height: 44px;
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6b7280;
+    font-size: 1rem;
+  }
+
+  .search-clear {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    min-width: 32px;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .view-toggle {
+    display: flex;
+    background: #f3f4f6;
+    border-radius: 8px;
+    padding: 2px;
+    gap: 2px;
+  }
+
+  .view-btn {
+    background: none;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: #6b7280;
+    transition: all 0.2s ease;
+    min-width: 40px;
+    min-height: 36px;
+  }
+
+  .view-btn.active {
+    background: white;
+    color: #3b82f6;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Filters Section */
   .filters-section {
-    grid-template-columns: repeat(2, 1fr) auto;
-    align-items: end;
-    padding: 16px;
+    background: white;
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: grid;
+    gap: 12px;
+    grid-template-columns: 1fr;
   }
-  
+
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .filter-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #374151;
+  }
+
+  .filter-select {
+    padding: 8px 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 14px;
+    background: white;
+    min-height: 36px;
+  }
+
+  .filter-select:focus {
+    outline: none;
+    border-color: #3b82f6;
+  }
+
+  /* Buttons - Mobile Optimized */
+  .btn {
+    padding: 12px 16px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 0.9rem;
+    min-height: 44px;
+    text-align: center;
+    word-break: break-word;
+  }
+
+  .btn-sm {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    min-height: 36px;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+  }
+
+  .btn-secondary {
+    background: #6b7280;
+    color: white;
+  }
+
+  .btn-danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+  }
+
+  .btn-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+  }
+
+  .btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn.loading .btn-text {
+    display: none;
+  }
+
+  .btn.loading .btn-spinner {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn-spinner {
+    display: none;
+  }
+
+  .btn-text {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* Loading State */
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    color: #6b7280;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid #e5e7eb;
+    border-top: 3px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+  }
+
+  /* Agent Cards - Mobile First */
   .agents-cards {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    display: grid;
+    gap: 12px;
+    grid-template-columns: 1fr;
   }
-  
+
+  .agent-card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+  }
+
+  .agent-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    border-color: #e5e7eb;
+  }
+
+  .agent-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .agent-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  .agent-avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .agent-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .agent-name {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 1rem;
+    margin-bottom: 2px;
+    word-break: break-word;
+  }
+
+  .agent-email {
+    color: #64748b;
+    font-size: 0.85rem;
+    word-break: break-all;
+  }
+
+  .agent-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .status-badge.active {
+    background: #dcfce7;
+    color: #166534;
+  }
+
+  .status-badge.inactive {
+    background: #fef2f2;
+    color: #991b1b;
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  .status-badge.active .status-dot {
+    background: #22c55e;
+  }
+
+  .status-badge.inactive .status-dot {
+    background: #ef4444;
+  }
+
+  .agent-details {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 16px;
+    font-size: 0.85rem;
+  }
+
+  .agent-detail {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #64748b;
+  }
+
+  .agent-detail i {
+    color: #3b82f6;
+    width: 14px;
+    flex-shrink: 0;
+  }
+
+  .agent-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .btn-icon {
+    padding: 8px;
+    min-width: 36px;
+    min-height: 36px;
+  }
+
+  /* Table View */
+  .agents-table-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .agents-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .agents-table th {
+    background: #f8fafc;
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 2px solid #e5e7eb;
+    font-size: 0.85rem;
+  }
+
+  .agents-table td {
+    padding: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 0.85rem;
+  }
+
+  .table-agent-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .table-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+
+  .table-avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .table-agent-details {
+    min-width: 0;
+  }
+
+  .table-agent-name {
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 2px;
+  }
+
+  .table-agent-email {
+    color: #64748b;
+    font-size: 0.8rem;
+  }
+
+  .table-contact {
+    color: #64748b;
+  }
+
+  .table-actions {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .empty-state i {
+    font-size: 3rem;
+    color: #9ca3af;
+    margin-bottom: 16px;
+  }
+
+  .empty-state h3 {
+    color: #374151;
+    margin-bottom: 8px;
+  }
+
+  .empty-state p {
+    color: #6b7280;
+    margin-bottom: 20px;
+  }
+
+  /* Pagination */
   .pagination-container {
-    flex-wrap: nowrap;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    flex-wrap: wrap;
+    gap: 12px;
   }
-  
-  .toast {
-    top: 20px;
-    bottom: auto;
-    right: 20px;
-    left: auto;
-    transform: translateX(100%);
+
+  .pagination-info {
+    font-size: 0.85rem;
+    color: #6b7280;
+  }
+
+  .pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .page-info {
+    font-size: 0.85rem;
+    color: #374151;
+    font-weight: 600;
+  }
+
+  /* Modal Styles */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 8px;
+    overflow-y: auto;
+  }
+
+  .modal-content {
+    background: white;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 500px;
+    margin: 20px auto;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .modal-sm {
     max-width: 400px;
   }
-  
-  .toast.show {
-    transform: translateX(0);
-  }
-}
 
-@media (min-width: 768px) {
-  .agent-container {
-    padding: 20px;
-    max-width: 1200px;
+  .modal-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 12px 12px 0 0;
   }
-  
-  .page-title {
-    font-size: 1.8rem;
+
+  .modal-title {
+    margin: 0;
+    font-size: 1.1rem;
+    word-break: break-word;
+    flex: 1;
+    margin-right: 8px;
   }
-  
-  .actions-bar,
-  .filters-section {
-    padding: 20px;
+
+  .modal-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
   }
-  
-  .filters-section {
-    grid-template-columns: repeat(3, 1fr) auto;
+
+  .modal-close:hover {
+    background: rgba(255, 255, 255, 0.2);
   }
-  
+
+  .modal-body {
+    padding: 16px;
+  }
+
   .modal-footer {
-    grid-template-columns: auto auto;
-    justify-content: flex-end;
+    padding: 12px 16px;
+    border-top: 1px solid #e2e8f0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
   }
-  
-  .agents-table th,
-  .agents-table td {
-    padding: 16px 12px;
-  }
-}
 
-@media (min-width: 1024px) {
-  .agents-cards {
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  /* Form Styles */
+  .form-row {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 16px;
   }
-  
-  .filters-section {
-    grid-template-columns: repeat(4, 1fr) auto;
-  }
-}
 
-/* Touch Device Optimizations */
-@media (hover: none) and (pointer: coarse) {
-  .btn:hover,
-  .agent-card:hover {
-    transform: none;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  .form-group {
+    display: flex;
+    flex-direction: column;
   }
-}
+
+  .form-label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+  }
+
+  .form-input {
+    padding: 12px 14px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 16px;
+    background: white;
+    transition: all 0.2s ease;
+    min-height: 44px;
+  }
+
+  .form-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .form-error {
+    color: #ef4444;
+    font-size: 0.8rem;
+    margin-top: 4px;
+    min-height: 18px;
+    word-break: break-word;
+  }
+
+  /* Toggle Switch */
+  .toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+
+  .toggle-input {
+    opacity: 0;
+    position: absolute;
+  }
+
+  .toggle-slider {
+    position: relative;
+    width: 48px;
+    height: 24px;
+    background: #d1d5db;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+  }
+
+  .toggle-slider::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .toggle-input:checked+.toggle-slider {
+    background: #3b82f6;
+  }
+
+  .toggle-input:checked+.toggle-slider::before {
+    transform: translateX(24px);
+  }
+
+  .toggle-text {
+    font-weight: 600;
+    color: #374151;
+  }
+
+  /* Delete Confirmation */
+  .delete-confirmation {
+    text-align: center;
+    padding: 20px 0;
+  }
+
+  .delete-confirmation i {
+    font-size: 3rem;
+    color: #fbbf24;
+    margin-bottom: 16px;
+  }
+
+  .delete-confirmation h3 {
+    color: #374151;
+    margin-bottom: 12px;
+  }
+
+  .delete-confirmation p {
+    color: #6b7280;
+    margin-bottom: 8px;
+  }
+
+  .delete-confirmation .warning {
+    color: #dc2626;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100%);
+    padding: 12px 20px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    z-index: 10000;
+    transition: transform 0.3s ease;
+    max-width: calc(100vw - 32px);
+    text-align: center;
+    font-size: 0.9rem;
+  }
+
+  .toast.show {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .toast.success {
+    background: #10b981;
+  }
+
+  .toast.error {
+    background: #ef4444;
+  }
+
+  .toast.info {
+    background: #3b82f6;
+  }
+
+  /* Animations */
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Responsive Breakpoints */
+  @media (min-width: 480px) {
+    .agent-container {
+      padding: 12px;
+    }
+
+    .page-title {
+      font-size: 1.5rem;
+    }
+
+    .actions-bar {
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      padding: 16px;
+    }
+
+    .search-section {
+      grid-column: 1;
+    }
+
+    .filters-section {
+      grid-template-columns: repeat(2, 1fr) auto;
+      align-items: end;
+      padding: 16px;
+    }
+
+    .agents-cards {
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+
+    .pagination-container {
+      flex-wrap: nowrap;
+    }
+
+    .toast {
+      top: 20px;
+      bottom: auto;
+      right: 20px;
+      left: auto;
+      transform: translateX(100%);
+      max-width: 400px;
+    }
+
+    .toast.show {
+      transform: translateX(0);
+    }
+  }
+
+  @media (min-width: 768px) {
+    .agent-container {
+      padding: 20px;
+      max-width: 1200px;
+    }
+
+    .page-title {
+      font-size: 1.8rem;
+    }
+
+    .actions-bar,
+    .filters-section {
+      padding: 20px;
+    }
+
+    .filters-section {
+      grid-template-columns: repeat(3, 1fr) auto;
+    }
+
+    .modal-footer {
+      grid-template-columns: auto auto;
+      justify-content: flex-end;
+    }
+
+    .agents-table th,
+    .agents-table td {
+      padding: 16px 12px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .agents-cards {
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    }
+
+    .filters-section {
+      grid-template-columns: repeat(4, 1fr) auto;
+    }
+  }
+
+  /* Touch Device Optimizations */
+  @media (hover: none) and (pointer: coarse) {
+
+    .btn:hover,
+    .agent-card:hover {
+      transform: none;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+  }
 </style>
 
 <script>
-(function() {
+  (function() {
     'use strict';
-    
+
     // Global state
     let agents = [];
     let filteredAgents = [];
@@ -1150,227 +1172,227 @@ body {
     let searchTimeout = null;
     let isEditing = false;
     let editingAgentId = null;
-    
+
     // Initialize
     document.addEventListener('DOMContentLoaded', function() {
-        initializeAgentManagement();
-        setupEventListeners();
-        loadAgents();
+      initializeAgentManagement();
+      setupEventListeners();
+      loadAgents();
     });
-    
+
     function initializeAgentManagement() {
-        console.log('Agent Management System Initialized');
+      console.log('Agent Management System Initialized');
     }
-    
+
     function setupEventListeners() {
-        // Search
-        document.getElementById('agentSearch').addEventListener('input', handleSearch);
-        document.getElementById('clearSearch').addEventListener('click', clearSearch);
-        
-        // Filters
-        document.getElementById('statusFilter').addEventListener('change', applyFilters);
-        document.getElementById('sortFilter').addEventListener('change', applyFilters);
-        document.getElementById('clearFilters').addEventListener('click', clearAllFilters);
-        
-        // View toggle
-        document.getElementById('cardViewBtn').addEventListener('click', () => switchView('card'));
-        document.getElementById('tableViewBtn').addEventListener('click', () => switchView('table'));
-        
-        // Buttons
-        document.getElementById('addAgentBtn').addEventListener('click', openAddAgentModal);
-        document.getElementById('saveAgentBtn').addEventListener('click', saveAgent);
-        document.getElementById('confirmDeleteBtn').addEventListener('click', confirmDeleteAgent);
-        
-        // Pagination
-        document.getElementById('prevPageBtn').addEventListener('click', () => changePage(currentPage - 1));
-        document.getElementById('nextPageBtn').addEventListener('click', () => changePage(currentPage + 1));
-        
-        // Form validation
-        document.getElementById('agentForm').addEventListener('input', validateForm);
+      // Search
+      document.getElementById('agentSearch').addEventListener('input', handleSearch);
+      document.getElementById('clearSearch').addEventListener('click', clearSearch);
+
+      // Filters
+      document.getElementById('statusFilter').addEventListener('change', applyFilters);
+      document.getElementById('sortFilter').addEventListener('change', applyFilters);
+      document.getElementById('clearFilters').addEventListener('click', clearAllFilters);
+
+      // View toggle
+      document.getElementById('cardViewBtn').addEventListener('click', () => switchView('card'));
+      document.getElementById('tableViewBtn').addEventListener('click', () => switchView('table'));
+
+      // Buttons
+      document.getElementById('addAgentBtn').addEventListener('click', openAddAgentModal);
+      document.getElementById('saveAgentBtn').addEventListener('click', saveAgent);
+      document.getElementById('confirmDeleteBtn').addEventListener('click', confirmDeleteAgent);
+
+      // Pagination
+      document.getElementById('prevPageBtn').addEventListener('click', () => changePage(currentPage - 1));
+      document.getElementById('nextPageBtn').addEventListener('click', () => changePage(currentPage + 1));
+
+      // Form validation
+      document.getElementById('agentForm').addEventListener('input', validateForm);
     }
-    
+
     // Load agents from API
     async function loadAgents() {
-        try {
-            showLoading(true);
-            
-            const response = await fetch('/agent/api/agents', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const data = await response.json();
-            agents = data.agents || [];
-            
-            applyFilters();
-            showLoading(false);
-            
-        } catch (error) {
-            console.error('Error loading agents:', error);
-            showToast('Error loading agents: ' + error.message, 'error');
-            showLoading(false);
-            showEmptyState();
+      try {
+        showLoading(true);
+
+        const response = await fetch('/agent/api/agents', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
+
+        const data = await response.json();
+        agents = data.agents || [];
+
+        applyFilters();
+        showLoading(false);
+
+      } catch (error) {
+        console.error('Error loading agents:', error);
+        showToast('Error loading agents: ' + error.message, 'error');
+        showLoading(false);
+        showEmptyState();
+      }
     }
-    
+
     // Search functionality
     function handleSearch(e) {
-        const searchTerm = e.target.value.trim();
-        const clearBtn = document.getElementById('clearSearch');
-        
-        clearBtn.style.display = searchTerm ? 'block' : 'none';
-        
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            applyFilters();
-        }, 300);
-    }
-    
-    function clearSearch() {
-        document.getElementById('agentSearch').value = '';
-        document.getElementById('clearSearch').style.display = 'none';
+      const searchTerm = e.target.value.trim();
+      const clearBtn = document.getElementById('clearSearch');
+
+      clearBtn.style.display = searchTerm ? 'block' : 'none';
+
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
         applyFilters();
+      }, 300);
     }
-    
+
+    function clearSearch() {
+      document.getElementById('agentSearch').value = '';
+      document.getElementById('clearSearch').style.display = 'none';
+      applyFilters();
+    }
+
     // Apply filters and search
     function applyFilters() {
-        const searchTerm = document.getElementById('agentSearch').value.toLowerCase().trim();
-        const statusFilter = document.getElementById('statusFilter').value;
-        const sortFilter = document.getElementById('sortFilter').value;
-        
-        // Filter agents
-        filteredAgents = agents.filter(agent => {
-            // Search filter
-            const matchesSearch = !searchTerm || 
-                agent.name.toLowerCase().includes(searchTerm) ||
-                agent.email.toLowerCase().includes(searchTerm) ||
-                agent.phone.toLowerCase().includes(searchTerm);
-            
-            // Status filter
-            const matchesStatus = !statusFilter || 
-                agent.isActive.toString() === statusFilter;
-            
-            return matchesSearch && matchesStatus;
-        });
-        
-        // Sort agents
-        const [sortField, sortDirection] = sortFilter.split('_');
-        filteredAgents.sort((a, b) => {
-            let aValue = a[sortField];
-            let bValue = b[sortField];
-            
-            if (sortField === 'name') {
-                aValue = aValue.toLowerCase();
-                bValue = bValue.toLowerCase();
-            } else if (sortField === 'createdAt') {
-                aValue = new Date(aValue);
-                bValue = new Date(bValue);
-            }
-            
-            if (sortDirection === 'asc') {
-                return aValue > bValue ? 1 : -1;
-            } else {
-                return aValue < bValue ? 1 : -1;
-            }
-        });
-        
-        // Reset pagination
-        currentPage = 1;
-        updatePagination();
-        renderAgents();
+      const searchTerm = document.getElementById('agentSearch').value.toLowerCase().trim();
+      const statusFilter = document.getElementById('statusFilter').value;
+      const sortFilter = document.getElementById('sortFilter').value;
+
+      // Filter agents
+      filteredAgents = agents.filter(agent => {
+        // Search filter
+        const matchesSearch = !searchTerm ||
+          agent.name.toLowerCase().includes(searchTerm) ||
+          agent.email.toLowerCase().includes(searchTerm) ||
+          agent.phone.toLowerCase().includes(searchTerm);
+
+        // Status filter
+        const matchesStatus = !statusFilter ||
+          agent.isActive.toString() === statusFilter;
+
+        return matchesSearch && matchesStatus;
+      });
+
+      // Sort agents
+      const [sortField, sortDirection] = sortFilter.split('_');
+      filteredAgents.sort((a, b) => {
+        let aValue = a[sortField];
+        let bValue = b[sortField];
+
+        if (sortField === 'name') {
+          aValue = aValue.toLowerCase();
+          bValue = bValue.toLowerCase();
+        } else if (sortField === 'createdAt') {
+          aValue = new Date(aValue);
+          bValue = new Date(bValue);
+        }
+
+        if (sortDirection === 'asc') {
+          return aValue > bValue ? 1 : -1;
+        } else {
+          return aValue < bValue ? 1 : -1;
+        }
+      });
+
+      // Reset pagination
+      currentPage = 1;
+      updatePagination();
+      renderAgents();
     }
-    
+
     // Clear all filters
     function clearAllFilters() {
-        document.getElementById('agentSearch').value = '';
-        document.getElementById('clearSearch').style.display = 'none';
-        document.getElementById('statusFilter').value = '';
-        document.getElementById('sortFilter').value = 'createdAt_desc';
-        applyFilters();
+      document.getElementById('agentSearch').value = '';
+      document.getElementById('clearSearch').style.display = 'none';
+      document.getElementById('statusFilter').value = '';
+      document.getElementById('sortFilter').value = 'createdAt_desc';
+      applyFilters();
     }
-    
+
     // Switch view between card and table
     function switchView(view) {
-        currentView = view;
-        
-        // Update view buttons
-        document.querySelectorAll('.view-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        document.getElementById(`${view}ViewBtn`).classList.add('active');
-        
-        renderAgents();
+      currentView = view;
+
+      // Update view buttons
+      document.querySelectorAll('.view-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      document.getElementById(`${view}ViewBtn`).classList.add('active');
+
+      renderAgents();
     }
-    
+
     // Update pagination
     function updatePagination() {
-        totalPages = Math.ceil(filteredAgents.length / itemsPerPage);
-        
-        if (totalPages === 0) totalPages = 1;
-        if (currentPage > totalPages) currentPage = totalPages;
-        
-        const startItem = (currentPage - 1) * itemsPerPage + 1;
-        const endItem = Math.min(currentPage * itemsPerPage, filteredAgents.length);
-        
-        document.getElementById('startItem').textContent = filteredAgents.length > 0 ? startItem : 0;
-        document.getElementById('endItem').textContent = endItem;
-        document.getElementById('totalItems').textContent = filteredAgents.length;
-        document.getElementById('currentPage').textContent = currentPage;
-        document.getElementById('totalPages').textContent = totalPages;
-        
-        document.getElementById('prevPageBtn').disabled = currentPage === 1;
-        document.getElementById('nextPageBtn').disabled = currentPage === totalPages;
-        
-        document.getElementById('paginationContainer').style.display = 
-            filteredAgents.length > 0 ? 'flex' : 'none';
+      totalPages = Math.ceil(filteredAgents.length / itemsPerPage);
+
+      if (totalPages === 0) totalPages = 1;
+      if (currentPage > totalPages) currentPage = totalPages;
+
+      const startItem = (currentPage - 1) * itemsPerPage + 1;
+      const endItem = Math.min(currentPage * itemsPerPage, filteredAgents.length);
+
+      document.getElementById('startItem').textContent = filteredAgents.length > 0 ? startItem : 0;
+      document.getElementById('endItem').textContent = endItem;
+      document.getElementById('totalItems').textContent = filteredAgents.length;
+      document.getElementById('currentPage').textContent = currentPage;
+      document.getElementById('totalPages').textContent = totalPages;
+
+      document.getElementById('prevPageBtn').disabled = currentPage === 1;
+      document.getElementById('nextPageBtn').disabled = currentPage === totalPages;
+
+      document.getElementById('paginationContainer').style.display =
+        filteredAgents.length > 0 ? 'flex' : 'none';
     }
-    
+
     // Change page
     function changePage(page) {
-        if (page >= 1 && page <= totalPages) {
-            currentPage = page;
-            updatePagination();
-            renderAgents();
-        }
+      if (page >= 1 && page <= totalPages) {
+        currentPage = page;
+        updatePagination();
+        renderAgents();
+      }
     }
-    
+
     // Render agents based on current view
     function renderAgents() {
-        if (filteredAgents.length === 0) {
-            showEmptyState();
-            return;
-        }
-        
-        hideEmptyState();
-        
-        // Get paginated data
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        const endIndex = startIndex + itemsPerPage;
-        const paginatedAgents = filteredAgents.slice(startIndex, endIndex);
-        
-        if (currentView === 'card') {
-            renderCardView(paginatedAgents);
-        } else {
-            renderTableView(paginatedAgents);
-        }
-        
-        updatePagination();
+      if (filteredAgents.length === 0) {
+        showEmptyState();
+        return;
+      }
+
+      hideEmptyState();
+
+      // Get paginated data
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const paginatedAgents = filteredAgents.slice(startIndex, endIndex);
+
+      if (currentView === 'card') {
+        renderCardView(paginatedAgents);
+      } else {
+        renderTableView(paginatedAgents);
+      }
+
+      updatePagination();
     }
-    
+
     // Render card view
     function renderCardView(agentsData) {
-        document.getElementById('agentsCards').style.display = 'grid';
-        document.getElementById('agentsTableContainer').style.display = 'none';
-        
-        const container = document.getElementById('agentsCards');
-        
-        const html = agentsData.map(agent => `
+      document.getElementById('agentsCards').style.display = 'grid';
+      document.getElementById('agentsTableContainer').style.display = 'none';
+
+      const container = document.getElementById('agentsCards');
+
+      const html = agentsData.map(agent => `
             <div class="agent-card">
                 <div class="agent-card-header">
                     <div class="agent-avatar">
@@ -1428,18 +1450,18 @@ body {
                 </div>
             </div>
         `).join('');
-        
-        container.innerHTML = html;
+
+      container.innerHTML = html;
     }
-    
+
     // Render table view
     function renderTableView(agentsData) {
-        document.getElementById('agentsCards').style.display = 'none';
-        document.getElementById('agentsTableContainer').style.display = 'block';
-        
-        const tbody = document.getElementById('agentsTableBody');
-        
-        const html = agentsData.map(agent => `
+      document.getElementById('agentsCards').style.display = 'none';
+      document.getElementById('agentsTableContainer').style.display = 'block';
+
+      const tbody = document.getElementById('agentsTableBody');
+
+      const html = agentsData.map(agent => `
             <tr>
                 <td>
                     <div class="table-agent-info">
@@ -1484,324 +1506,349 @@ body {
                 </td>
             </tr>
         `).join('');
-        
-        tbody.innerHTML = html;
+
+      tbody.innerHTML = html;
     }
-    
+
     // Show/hide loading state
     function showLoading(show) {
-        document.getElementById('loadingContainer').style.display = show ? 'block' : 'none';
-        document.getElementById('agentsContainer').style.display = show ? 'none' : 'block';
+      document.getElementById('loadingContainer').style.display = show ? 'block' : 'none';
+      document.getElementById('agentsContainer').style.display = show ? 'none' : 'block';
     }
-    
+
     // Show/hide empty state
     function showEmptyState() {
-        document.getElementById('agentsContainer').style.display = 'none';
-        document.getElementById('emptyState').style.display = 'block';
-        document.getElementById('paginationContainer').style.display = 'none';
+      document.getElementById('agentsContainer').style.display = 'none';
+      document.getElementById('emptyState').style.display = 'block';
+      document.getElementById('paginationContainer').style.display = 'none';
     }
-    
+
     function hideEmptyState() {
-        document.getElementById('agentsContainer').style.display = 'block';
-        document.getElementById('emptyState').style.display = 'none';
+      document.getElementById('agentsContainer').style.display = 'block';
+      document.getElementById('emptyState').style.display = 'none';
     }
-    
+
     // Modal functions
     function openAddAgentModal() {
-        isEditing = false;
-        editingAgentId = null;
-        document.getElementById('modalTitle').textContent = 'Add New Agent';
-        document.getElementById('agentForm').reset();
-        document.getElementById('isActive').checked = true;
-        clearFormErrors();
-        document.getElementById('agentModal').style.display = 'block';
+      isEditing = false;
+      editingAgentId = null;
+      document.getElementById('modalTitle').textContent = 'Add New Agent';
+      document.getElementById('agentForm').reset();
+      document.getElementById('isActive').checked = true;
+      clearFormErrors();
+      document.getElementById('agentModal').style.display = 'block';
+      document.getElementById('passwordInputRow').classList.remove('passHidden');
     }
-    
+
     window.openEditAgentModal = function(agentId) {
-        const agent = agents.find(a => a._id === agentId);
-        if (!agent) return;
-        
-        isEditing = true;
-        editingAgentId = agentId;
-        document.getElementById('modalTitle').textContent = 'Edit Agent';
-        
-        // Populate form
-        document.getElementById('agentId').value = agent._id;
-        document.getElementById('name').value = agent.name;
-        document.getElementById('email').value = agent.email;
-        document.getElementById('phone').value = agent.phone;
-        document.getElementById('avatar').value = agent.avatar || '';
-        document.getElementById('isActive').checked = agent.isActive;
-        
-        clearFormErrors();
-        document.getElementById('agentModal').style.display = 'block';
+      const agent = agents.find(a => a._id === agentId);
+      if (!agent) return;
+
+      isEditing = true;
+      editingAgentId = agentId;
+      document.getElementById('modalTitle').textContent = 'Edit Agent';
+
+      // Populate form
+      document.getElementById('agentId').value = agent._id;
+      document.getElementById('name').value = agent.name;
+      document.getElementById('email').value = agent.email;
+      document.getElementById('phone').value = agent.phone;
+      document.getElementById('avatar').value = agent.avatar || '';
+      document.getElementById('isActive').checked = agent.isActive;
+
+      clearFormErrors();
+      document.getElementById('agentModal').style.display = 'block';
     };
-    
+
     window.closeAgentModal = function() {
-        document.getElementById('agentModal').style.display = 'none';
-        document.getElementById('agentForm').reset();
-        clearFormErrors();
-        isEditing = false;
-        editingAgentId = null;
+      document.getElementById('passwordInputRow').classList.add('passHidden');
+      document.getElementById('agentModal').style.display = 'none';
+      document.getElementById('agentForm').reset();
+      clearFormErrors();
+      isEditing = false;
+      editingAgentId = null;
     };
-    
+
     // Delete modal functions
     window.openDeleteModal = function(agentId, agentName) {
-        editingAgentId = agentId;
-        document.getElementById('deleteAgentName').textContent = agentName;
-        document.getElementById('deleteModal').style.display = 'block';
+      editingAgentId = agentId;
+      document.getElementById('deleteAgentName').textContent = agentName;
+      document.getElementById('deleteModal').style.display = 'block';
     };
-    
+
     window.closeDeleteModal = function() {
-        document.getElementById('deleteModal').style.display = 'none';
-        editingAgentId = null;
+      document.getElementById('deleteModal').style.display = 'none';
+      editingAgentId = null;
     };
-    
+
     // Form validation
     function validateForm() {
-        clearFormErrors();
-        
-        const name = document.getElementById('name').value.trim();
-        const email = document.getElementById('email').value.trim();
-        const phone = document.getElementById('phone').value.trim();
-        const avatar = document.getElementById('avatar').value.trim();
-        
-        let isValid = true;
-        
-        // Name validation
-        if (!name) {
-            showFieldError('name', 'Name is required');
-            isValid = false;
-        } else if (name.length < 2) {
-            showFieldError('name', 'Name must be at least 2 characters');
-            isValid = false;
-        }
-        
-        // Email validation
-        if (!email) {
-            showFieldError('email', 'Email is required');
-            isValid = false;
-        } else if (!isValidEmail(email)) {
-            showFieldError('email', 'Please enter a valid email address');
-            isValid = false;
-        } else if (!isEditing && agents.some(a => a.email === email)) {
-            showFieldError('email', 'Email already exists');
-            isValid = false;
-        } else if (isEditing && agents.some(a => a.email === email && a._id !== editingAgentId)) {
-            showFieldError('email', 'Email already exists');
-            isValid = false;
-        }
-        
-        // Phone validation
-        if (!phone) {
-            showFieldError('phone', 'Phone number is required');
-            isValid = false;
-        } else if (!isValidPhone(phone)) {
-            showFieldError('phone', 'Please enter a valid phone number');
-            isValid = false;
-        }
-        
-        // Avatar validation
-        if (avatar && !isValidUrl(avatar)) {
-            showFieldError('avatar', 'Please enter a valid URL');
-            isValid = false;
-        }
-        
-        return isValid;
+      clearFormErrors();
+
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const phone = document.getElementById('phone').value.trim();
+      const avatar = document.getElementById('avatar').value.trim();
+
+      let isValid = true;
+
+      // Name validation
+      if (!name) {
+        showFieldError('name', 'Name is required');
+        isValid = false;
+      } else if (name.length < 2) {
+        showFieldError('name', 'Name must be at least 2 characters');
+        isValid = false;
+      }
+
+      // Email validation
+      if (!email) {
+        showFieldError('email', 'Email is required');
+        isValid = false;
+      } else if (!isValidEmail(email)) {
+        showFieldError('email', 'Please enter a valid email address');
+        isValid = false;
+      } else if (!isEditing && agents.some(a => a.email === email)) {
+        showFieldError('email', 'Email already exists');
+        isValid = false;
+      } else if (isEditing && agents.some(a => a.email === email && a._id !== editingAgentId)) {
+        showFieldError('email', 'Email already exists');
+        isValid = false;
+      }
+
+      // Phone validation
+      if (!phone) {
+        showFieldError('phone', 'Phone number is required');
+        isValid = false;
+      } else if (!isValidPhone(phone)) {
+        showFieldError('phone', 'Please enter a valid phone number');
+        isValid = false;
+      }
+
+      // password validation
+      if(!isEditing){
+
+        if (!password ) {       
+        showFieldError('password', 'Password is required');
+        isValid = false;
+      } else if (!isValidPassword(password)) {
+        showFieldError('password', 'Password must be at least 4 characters');
+        isValid = false;
+      }
+
+      }
+      
+
+      // Avatar validation
+      if (avatar && !isValidUrl(avatar)) {
+        showFieldError('avatar', 'Please enter a valid URL');
+        isValid = false;
+      }
+
+      return isValid;
     }
-    
+
     // Save agent
     async function saveAgent() {
-        if (!validateForm()) {
-            showToast('Please fix the errors in the form', 'error');
-            return;
+      if (!validateForm()) {
+        showToast('Please fix the errors in the form', 'error');
+        return;
+      }
+
+      const saveBtn = document.getElementById('saveAgentBtn');
+      const formData = {
+        name: document.getElementById('name').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        password: document.getElementById('password').value.trim(),
+        avatar: document.getElementById('avatar').value.trim(),
+        isActive: document.getElementById('isActive').checked,
+        admin_saved: true
+      };
+
+      try {
+        showButtonLoading(saveBtn, true);
+
+        const url = isEditing ? `/agent/api/agents/${editingAgentId}` : '/agent/api/agents';
+        const method = isEditing ? 'PUT' : 'POST';
+
+        const response = await fetch(url, {
+          method: method,
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || `Failed to ${isEditing ? 'update' : 'create'} agent`);
         }
-        
-        const saveBtn = document.getElementById('saveAgentBtn');
-        const formData = {
-            name: document.getElementById('name').value.trim(),
-            email: document.getElementById('email').value.trim(),
-            phone: document.getElementById('phone').value.trim(),
-            avatar: document.getElementById('avatar').value.trim(),
-            isActive: document.getElementById('isActive').checked,
-            admin_saved: true
-        };
-        
-        try {
-            showButtonLoading(saveBtn, true);
-            
-            const url = isEditing ? `/agent/api/agents/${editingAgentId}` : '/agent/api/agents';
-            const method = isEditing ? 'PUT' : 'POST';
-            
-            const response = await fetch(url, {
-                method: method,
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
-            });
-            
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || `Failed to ${isEditing ? 'update' : 'create'} agent`);
-            }
-            
-            const result = await response.json();
-            
-            showToast(`Agent ${isEditing ? 'updated' : 'created'} successfully!`, 'success');
-            closeAgentModal();
-            await loadAgents();
-            
-        } catch (error) {
-            console.error('Error saving agent:', error);
-            showToast('Error: ' + error.message, 'error');
-        } finally {
-            showButtonLoading(saveBtn, false);
-        }
+
+        const result = await response.json();
+
+        showToast(`Agent ${isEditing ? 'updated' : 'created'} successfully!`, 'success');
+        closeAgentModal();
+        await loadAgents();
+
+      } catch (error) {
+        console.error('Error saving agent:', error);
+        showToast('Error: ' + error.message, 'error');
+      } finally {
+        showButtonLoading(saveBtn, false);
+      }
     }
-    
+
     // Toggle agent status
     window.toggleAgentStatus = async function(agentId, newStatus) {
-        try {
-            const response = await fetch(`/agent/api/agents/${agentId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ isActive: newStatus })
-            });
-            
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Failed to update agent status');
-            }
-            
-            showToast(`Agent ${newStatus ? 'activated' : 'deactivated'} successfully!`, 'success');
-            await loadAgents();
-            
-        } catch (error) {
-            console.error('Error updating agent status:', error);
-            showToast('Error: ' + error.message, 'error');
+      try {
+        const response = await fetch(`/agent/api/agents/${agentId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            isActive: newStatus
+          })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to update agent status');
         }
+
+        showToast(`Agent ${newStatus ? 'activated' : 'deactivated'} successfully!`, 'success');
+        await loadAgents();
+
+      } catch (error) {
+        console.error('Error updating agent status:', error);
+        showToast('Error: ' + error.message, 'error');
+      }
     };
-    
+
     // Delete agent
     async function confirmDeleteAgent() {
-        if (!editingAgentId) return;
-        
-        const deleteBtn = document.getElementById('confirmDeleteBtn');
-        
-        try {
-            showButtonLoading(deleteBtn, true);
-            
-            const response = await fetch(`/agent/api/agents/${editingAgentId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Failed to delete agent');
-            }
-            
-            showToast('Agent deleted successfully!', 'success');
-            closeDeleteModal();
-            await loadAgents();
-            
-        } catch (error) {
-            console.error('Error deleting agent:', error);
-            showToast('Error: ' + error.message, 'error');
-        } finally {
-            showButtonLoading(deleteBtn, false);
+      if (!editingAgentId) return;
+
+      const deleteBtn = document.getElementById('confirmDeleteBtn');
+
+      try {
+        showButtonLoading(deleteBtn, true);
+
+        const response = await fetch(`/agent/api/agents/${editingAgentId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to delete agent');
         }
+
+        showToast('Agent deleted successfully!', 'success');
+        closeDeleteModal();
+        await loadAgents();
+
+      } catch (error) {
+        console.error('Error deleting agent:', error);
+        showToast('Error: ' + error.message, 'error');
+      } finally {
+        showButtonLoading(deleteBtn, false);
+      }
     }
-    
+
     // Utility functions
     function getInitials(name) {
-        return name.split(' ')
-            .map(word => word.charAt(0).toUpperCase())
-            .join('')
-            .substring(0, 2);
+      return name.split(' ')
+        .map(word => word.charAt(0).toUpperCase())
+        .join('')
+        .substring(0, 2);
     }
-    
+
     function formatDate(dateString) {
-        const date = new Date(dateString);
-        const now = new Date();
-        const diffTime = Math.abs(now - date);
-        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-        
-        if (diffDays === 0) {
-            return 'Today';
-        } else if (diffDays === 1) {
-            return 'Yesterday';
-        } else if (diffDays < 7) {
-            return `${diffDays} days ago`;
-        } else {
-            return date.toLocaleDateString();
-        }
+      const date = new Date(dateString);
+      const now = new Date();
+      const diffTime = Math.abs(now - date);
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 0) {
+        return 'Today';
+      } else if (diffDays === 1) {
+        return 'Yesterday';
+      } else if (diffDays < 7) {
+        return `${diffDays} days ago`;
+      } else {
+        return date.toLocaleDateString();
+      }
     }
-    
+
     function isValidEmail(email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
     }
-    
+
+    function isValidPassword(password) {
+      const passwordRegex = /^.{4,}$/;
+      return passwordRegex.test(password);
+    }
+
     function isValidPhone(phone) {
-        const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
-        return phoneRegex.test(phone.replace(/[\s\-\(\)]/g, ''));
+      const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+      return phoneRegex.test(phone.replace(/[\s\-\(\)]/g, ''));
     }
-    
+
     function isValidUrl(url) {
-        try {
-            new URL(url);
-            return true;
-        } catch {
-            return false;
-        }
+      try {
+        new URL(url);
+        return true;
+      } catch {
+        return false;
+      }
     }
-    
+
     function showFieldError(fieldName, message) {
-        const errorElement = document.getElementById(`${fieldName}Error`);
-        if (errorElement) {
-            errorElement.textContent = message;
-        }
+      const errorElement = document.getElementById(`${fieldName}Error`);
+      if (errorElement) {
+        errorElement.textContent = message;
+      }
     }
-    
+
     function clearFormErrors() {
-        const errorElements = document.querySelectorAll('.form-error');
-        errorElements.forEach(element => {
-            element.textContent = '';
-        });
+      const errorElements = document.querySelectorAll('.form-error');
+      errorElements.forEach(element => {
+        element.textContent = '';
+      });
     }
-    
+
     function showButtonLoading(button, loading) {
-        if (loading) {
-            button.classList.add('loading');
-            button.disabled = true;
-        } else {
-            button.classList.remove('loading');
-            button.disabled = false;
-        }
+      if (loading) {
+        button.classList.add('loading');
+        button.disabled = true;
+      } else {
+        button.classList.remove('loading');
+        button.disabled = false;
+      }
     }
-    
+
     function showToast(message, type = 'info') {
-        const toast = document.getElementById('agentToast');
-        toast.textContent = message;
-        toast.className = `toast ${type}`;
-        toast.classList.add('show');
-        
-        setTimeout(() => {
-            toast.classList.remove('show');
-        }, 5000);
+      const toast = document.getElementById('agentToast');
+      toast.textContent = message;
+      toast.className = `toast ${type}`;
+      toast.classList.add('show');
+
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 5000);
     }
-    
+
     // Global function for clearing filters
     window.clearAllFilters = clearAllFilters;
-    
+
     console.log('Agent Management System Loaded Successfully');
-})();
+  })();
 </script>
 
- <%- include('../../partials/Footer') %>
+<%- include('../../partials/Footer') %>

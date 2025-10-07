@@ -1,0 +1,1569 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>Admin - Bhutan State Lotteries</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      font-family: 'Poppins', sans-serif;
+    }
+
+    /* Remove default tap highlight on mobile for all elements */
+    * {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      min-height: 100vh;
+    }
+
+    .app-header {
+      background: linear-gradient(135deg, #FF6B6B 0%, #6A82FB 50%, #45EBA5 100%);
+      background-size: 300% 300%;
+      animation: gradientShift 6s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    .card-expand {
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-origin: top;
+    }
+
+    .card-expand.expanded {
+      transform: scaleY(1);
+      opacity: 1;
+      /* max-height: 1000px; */
+    }
+
+    .card-expand.collapsed {
+      transform: scaleY(0);
+      opacity: 0;
+      max-height: 0;
+      overflow: hidden;
+    }
+
+    .lottery-card {
+      border-radius: 20px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      position: relative;
+      overflow: hidden;
+      min-height: 44px;
+      padding: 28px !important;
+    }
+
+    .lottery-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 6px;
+      height: 100%;
+      border-radius: 20px 0 0 20px;
+    }
+
+    .lottery-card:active {
+      transform: scale(0.98);
+    }
+
+    .lottery-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    }
+
+    .kerala-card {
+      background: linear-gradient(135deg, #FF6B6B 0%, #FF8E8E 100%);
+    }
+
+    .kerala-card::before {
+      background: #FF4444;
+    }
+
+    .maharashtra-card {
+      background: linear-gradient(135deg, #6A82FB 0%, #8FA8FF 100%);
+    }
+
+    .maharashtra-card::before {
+      background: #4263EB;
+    }
+
+    .punjab-card {
+      background: linear-gradient(135deg, #45EBA5 0%, #6BFFB8 100%);
+    }
+
+    .punjab-card::before {
+      background: #20C997;
+    }
+
+    .upcoming-card-1 {
+      background: linear-gradient(135deg, #FFC93C 0%, #FFD666 100%);
+    }
+
+    .upcoming-card-1::before {
+      background: #FFB020;
+    }
+
+    .upcoming-card-2 {
+      background: linear-gradient(135deg, #A855F7 0%, #C084FC 100%);
+    }
+
+    .upcoming-card-2::before {
+      background: #9333EA;
+    }
+
+    .upcoming-card-3 {
+      background: linear-gradient(135deg, #EC4899 0%, #F472B6 100%);
+    }
+
+    .upcoming-card-3::before {
+      background: #DB2777;
+    }
+
+    .upcoming-card-4 {
+      background: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%);
+    }
+
+    .upcoming-card-4::before {
+      background: #2563EB;
+    }
+
+    .upcoming-card-5 {
+      background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+    }
+
+    .upcoming-card-5::before {
+      background: #059669;
+    }
+
+    .upcoming-card-6 {
+      background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);
+    }
+
+    .upcoming-card-6::before {
+      background: #D97706;
+    }
+
+    .upcoming-card-7 {
+      background: linear-gradient(135deg, #6366F1 0%, #818CF8 100%);
+    }
+
+    .upcoming-card-7::before {
+      background: #4F46E5;
+    }
+
+    .past-card1 {
+      background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);
+    }
+
+    .past-card1::before {
+      background: #D97706;
+    }
+
+    .past-card2 {
+      background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+    }
+
+    .past-card2::before {
+      background: #059669;
+    }
+
+    .past-card3 {
+      background: linear-gradient(135deg, #6366F1 0%, #818CF8 100%);
+    }
+
+    .past-card3::before {
+      background: #4F46E5;
+    }
+
+    .past-card4 {
+      background: linear-gradient(135deg, #EC4899 0%, #F472B6 100%);
+    }
+
+    .past-card4::before {
+      background: #DB2777;
+    }
+
+    .past-card5 {
+      background: linear-gradient(135deg, #A855F7 0%, #C084FC 100%);
+    }
+
+    .past-card5::before {
+      background: #9333EA;
+    }
+
+    .past-card6 {
+      background: linear-gradient(135deg, #FFC93C 0%, #FFD666 100%);
+    }
+
+    .past-card6::before {
+      background: #FFB020;
+    }
+
+    /* Past Card styles for each day */
+    .Sunday-card {
+      background: linear-gradient(135deg, #D51F48 0%, #EB5A7C 100%);
+    }
+
+    .Sunday-card::before {
+      background: #B01A3A;
+    }
+
+    /* Monday - Royal Purple (more regal tones) */
+    .Monday-card {
+      background: linear-gradient(135deg, #8B46FF 0%, #B18AFF 100%);
+    }
+
+    .Monday-card::before {
+      background: #6D28D9;
+    }
+
+    /* Tuesday - Fiery Orange (more intense gradient) */
+    .Tuesday-card {
+      background: linear-gradient(135deg, #FF5E1A 0%, #FF8C4B 100%);
+    }
+
+    .Tuesday-card::before {
+      background: #E04A10;
+    }
+
+    /* Wednesday - Emerald Green (richer tones) */
+    .Wednesday-card {
+      background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+    }
+
+    .Wednesday-card::before {
+      background: #0D9D70;
+    }
+
+    /* Thursday - Ocean Blue (deeper gradient) */
+    .Thursday-card {
+      background: linear-gradient(135deg, #2563EB 0%, #3B82F6 100%);
+    }
+
+    .Thursday-card::before {
+      background: #1D4ED8;
+    }
+
+    /* Friday - Vibrant Pink (more saturated) */
+    .Friday-card {
+      background: linear-gradient(135deg, #DB2777 0%, #F472B6 100%);
+    }
+
+    .Friday-card::before {
+      background: #BE185D;
+    }
+
+    /* Saturday - Golden Yellow (warmer tones) */
+    .Saturday-card {
+      background: linear-gradient(135deg, #D97706 0%, #F59E0B 100%);
+    }
+
+    .Saturday-card::before {
+      background: #B45309;
+    }
+
+    .countdown-badge {
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      border-radius: 12px;
+      color: white;
+      font-weight: 800;
+      min-width: 50px;
+      min-height: 50px;
+      font-family: 'Courier New', monospace;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .prize-badge {
+      background: linear-gradient(45deg, #ffd700, #ffed4a);
+      color: #744210;
+      font-weight: 700;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+    }
+
+    .live-badge {
+      /* background: linear-gradient(45deg, #10B981, #34D399);
+      color: white; */
+      animation: blink-badge .5s infinite;
+      font-size: 0.875rem;
+      font-weight: 800;
+      padding: 6px 12px;
+    }
+
+    .result-badge {
+      background: linear-gradient(45deg, #3B82F6, #60A5FA);
+      color: white;
+      font-size: 0.875rem;
+      font-weight: 800;
+      padding: 6px 12px;
+    }
+
+    .upcoming-badge {
+      background: linear-gradient(45deg, #F59E0B, #FBBF24);
+      color: white;
+      animation: glow 2s infinite alternate;
+      font-size: 0.875rem;
+      font-weight: 800;
+      padding: 6px 12px;
+    }
+
+    .next-draw-badge {
+      background: linear-gradient(45deg, #10B981, #34D399);
+      color: white;
+      animation: pulse 2s infinite;
+      font-size: 0.875rem;
+      font-weight: 800;
+      padding: 6px 12px;
+    }
+
+    .refresh-btn {
+      background: linear-gradient(135deg, #F59E0B 0%, #F97316 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .refresh-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    }
+
+    .refresh-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    @keyframes blink-badge {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+        background: white;
+        color: red;
+        box-shadow: 0 0 0 rgba(16, 185, 129, 0);
+      }
+
+      100% {
+        transform: scale(1.03);
+        opacity: 1;
+        background: red;
+        color: white;
+        box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+      }
+
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    @keyframes glow {
+      0% {
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+      }
+
+      100% {
+        box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5);
+      }
+    }
+
+    .past-badge {
+      background: linear-gradient(45deg, #6B7280, #9CA3AF);
+      color: white;
+      font-size: 0.875rem;
+      font-weight: 800;
+      padding: 6px 12px;
+    }
+
+    .result-container {
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      /* padding: 24px !important; */
+    }
+
+    .winning-number {
+      color: #374151;
+      font-weight: 800;
+      letter-spacing: 2px;
+      font-size: 1.3rem;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .winning-number-small {
+      color: #374151;
+      font-weight: 700;
+      letter-spacing: 1px;
+      font-size: 1.05rem;
+    }
+
+    .prize-row {
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .prize-row:hover {
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    .load-more-btn {
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+      transition: all 0.3s ease;
+      border-radius: 12px;
+      font-weight: 600;
+      min-height: 44px;
+    }
+
+    .load-more-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+    }
+
+    .section-title {
+      background: linear-gradient(135deg, #374151 0%, #4B5563 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 800;
+    }
+
+    .bounce-in {
+      animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    @keyframes bounceIn {
+      0% {
+        transform: scale(0.3) translateY(50px);
+        opacity: 0;
+      }
+
+      50% {
+        transform: scale(1.05) translateY(-10px);
+        opacity: 0.8;
+      }
+
+      70% {
+        transform: scale(0.95) translateY(0px);
+        opacity: 0.9;
+      }
+
+      100% {
+        transform: scale(1) translateY(0px);
+        opacity: 1;
+      }
+    }
+
+    .card-text {
+      color: rgb(255, 255, 255);
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-text-secondary {
+      color: rgb(255, 255, 255);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    .countdown-container {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 16px;
+      backdrop-filter: blur(5px);
+      margin-top: 16px;
+    }
+
+    .countdown-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .card-lottery-name {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      line-height: 1.3;
+    }
+
+    .card-date {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .card-prize {
+      font-size: 1.125rem;
+      font-weight: 700;
+    }
+
+    .card-element-spacing>* {
+      margin-bottom: 16px;
+    }
+
+    .card-element-spacing>*:last-child {
+      margin-bottom: 0;
+    }
+
+    .result-card {
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .result-card-header {
+      background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+      color: white;
+      padding: 8px 20px;
+      font-weight: 700;
+      font-size: .96rem;
+      text-align: center;
+    }
+
+    .result-card-content {
+      background: white;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .result-prize-amount {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: #059669;
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+
+    /* .result-winning-number_if_result {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #374151;
+      font-family: "ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New", "monospace";
+      letter-spacing: 2px;
+      border: 3px solid rgb(229, 229, 229);
+      border-radius: 6px;
+      background-color: #d9daeb63;
+      padding: 0px 12px;
+    } */
+
+
+    .result-winning-number_if_no_results {
+      min-height: 36px;
+      min-width: 90px;
+    }
+
+    .result-winning-number {
+      position: relative;
+      display: inline-block;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #374151;
+      font-family: "ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New", "monospace";
+      letter-spacing: 2px;
+      border: 3px solid rgb(229, 229, 229);
+      border-radius: 6px;
+      background-color: #d9daeb63;
+      padding: 3px 22px;
+      overflow: hidden;
+    }
+
+    .underline-animated::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      width: 100%;
+      background: linear-gradient(90deg, #ff8a00, #e52e71, #9b59b6);
+      transform: scaleX(0);
+      transform-origin: left;
+      animation: animateUnderline 1.6s ease-in-out infinite alternate;
+    }
+
+    @keyframes animateUnderline {
+      0% {
+        transform: scaleX(0);
+        transform-origin: left;
+      }
+
+      50% {
+        transform: scaleX(.4);
+      }
+
+      100% {
+
+        transform-origin: right;
+      }
+    }
+
+    /* animation end */
+
+    .result-location {
+      font-size: 0.9rem;
+      color: #6B7280;
+      font-weight: 500;
+    }
+
+    /* Admin specific styles */
+    .admin-btn {
+      background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin: 0 4px;
+    }
+
+    .admin-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+
+    .admin-btn.edit-btn {
+      background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+    }
+
+    .admin-btn.edit-btn:hover {
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .admin-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .create-btn {
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 16px 32px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .create-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+    }
+
+    .settings-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, #6B7280 0%, #4B5563 100%);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
+      z-index: 1000;
+    }
+
+    .settings-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(107, 114, 128, 0.4);
+    }
+
+    /* Enhanced Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+    }
+
+    .modal.show {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 16px;
+      max-width: 700px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      position: relative;
+    }
+
+    .modal-header {
+      background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+      color: white;
+      padding: 24px;
+      border-radius: 16px 16px 0 0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .modal-body {
+      padding: 24px;
+    }
+
+    .form-section {
+      margin-bottom: 32px;
+      padding: 20px;
+      background: #F8FAFC;
+      border-radius: 12px;
+      border: 1px solid #E2E8F0;
+    }
+
+    .form-section-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #374151;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+    }
+
+    .form-section-title i {
+      margin-right: 10px;
+      color: #3B82F6;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #374151;
+      font-size: 0.95rem;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #E5E7EB;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #3B82F6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid #E5E7EB;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.95rem;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-secondary {
+      background: #E5E7EB;
+      color: #374151;
+    }
+
+    .btn-secondary:hover {
+      background: #D1D5DB;
+      transform: translateY(-1px);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Enhanced Prize Item Design */
+    .prize-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding: 16px;
+      background: white;
+      border-radius: 12px;
+      border: 2px solid #E5E7EB;
+      transition: all 0.3s ease;
+    }
+
+    .prize-item:hover {
+      border-color: #3B82F6;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+    }
+
+    .prize-rank-display {
+      background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      min-width: 80px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .prize-amount-input {
+      flex: 1;
+      padding: 10px 14px;
+      border: 2px solid #E5E7EB;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      max-width: 100%;
+    }
+
+    .prize-amount-input:focus {
+      outline: none;
+      border-color: #3B82F6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .remove-prize {
+      background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .remove-prize:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+
+    .add-prize {
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 24px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .add-prize:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    /* Winner Item Design */
+    .winner-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding: 16px;
+      background: white;
+      border-radius: 12px;
+      border: 2px solid #E5E7EB;
+      transition: all 0.3s ease;
+    }
+
+    .winner-item:hover {
+      border-color: #059669;
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.1);
+    }
+
+    .winner-rank-display {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      min-width: 80px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .winner-ticket-input {
+      flex: 1;
+      padding: 10px 14px;
+      border: 2px solid #E5E7EB;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      font-family: "ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New", "monospace";
+      letter-spacing: 1px;
+    }
+
+    .winner-ticket-input:focus {
+      outline: none;
+      border-color: #059669;
+      box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+    }
+
+    .remove-winner {
+      background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .remove-winner:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+
+    .add-winner {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 24px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .add-winner:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+    }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 16px 24px;
+      border-radius: 8px;
+      color: white;
+      font-weight: 600;
+      z-index: 1100;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+    }
+
+    .toast.show {
+      transform: translateX(0);
+    }
+
+    .toast.success {
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    }
+
+    .toast.error {
+      background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+    }
+
+    /* Grid Layout for Form */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .form-grid-full {
+      grid-column: span 2;
+    }
+
+    /* Mobile Responsive Design */
+    @media (max-width: 768px) {
+      .lottery-card {
+        padding: 20px !important;
+      }
+
+      .result-container {
+        /* padding: 16px !important; */
+      }
+
+      .countdown-badge {
+        min-width: 40px;
+        min-height: 40px;
+        font-size: 0.9rem;
+      }
+
+      .card-lottery-name {
+        font-size: 1.25rem;
+      }
+
+      .card-date {
+        font-size: 0.9rem;
+      }
+
+      .card-prize {
+        font-size: 1rem;
+      }
+
+      .modal-content {
+        width: 95%;
+        max-height: 95vh;
+      }
+
+      .modal-header {
+        padding: 16px;
+      }
+
+      .modal-body {
+        padding: 16px;
+      }
+
+      .admin-btn {
+        padding: 6px 12px;
+        font-size: 0.75rem;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-grid-full {
+        grid-column: span 1;
+      }
+
+      .prize-item {
+        flex-wrap: wrap;
+      }
+
+      .prize-rank-display {
+        min-width: 60px;
+      }
+
+      .winner-item {
+        flex-wrap: wrap;
+      }
+
+      .winner-rank-display {
+        min-width: 60px;
+      }
+
+      .form-actions {
+        flex-direction: column;
+      }
+
+      .create-btn {
+        padding: 12px 24px;
+        font-size: 1rem;
+      }
+    }
+
+    /* Mobile Responsive Design */
+    @media (max-width: 768px) {
+      .lottery-card {
+        padding: 24px !important;
+      }
+
+      .result-container {
+        /* padding: 20px !important; */
+      }
+
+      .countdown-badge {
+        min-width: 45px;
+        min-height: 45px;
+        font-size: 1rem;
+      }
+
+      .countdown-container {
+        padding: 14px;
+      }
+
+      .card-lottery-name {
+        font-size: 1.375rem;
+      }
+
+      .card-date {
+        font-size: 1.1rem;
+      }
+
+      .card-prize {
+        font-size: 1.075rem;
+      }
+
+      .result-prize-amount {
+        font-size: 1.2rem;
+      }
+
+      .result-winning-number {
+        font-size: 1.3rem;
+      }
+    }
+  </style>
+  <!-- Adding Moment.js for Date Convertion Management -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.34/moment-timezone-with-data.min.js"></script>
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="app-header text-white sticky top-0 z-50">
+    <div class="px-6 py-5">
+      <div class="flex items-center justify-center">
+        <div class="flex items-center space-x-3">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfvxp4SnnjaYyFQDP8d5D660XMvy4nQfc08ScgqFq3IjufpC1OH-ykrQ6v-SkPsuVCt7w&usqp=CAU" style="height: 34px; width: 34px; border-radius: 50%;" alt="">
+          <h1 class="text-xl font-bold drop-shadow-lg tracking-wide">Agent - Bhutan State Lotteries</h1>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="px-4 py-6 space-y-8 max-w-md mx-auto" >
+    <!-- Create New Lottery Button -->
+    <!-- <div class="text-center">
+      <button onclick="openCreateModal()" class="create-btn">
+        <i class="fas fa-plus mr-2"></i>
+        Create New Lottery
+      </button>
+    </div> -->
+
+    <!-- Create New Lottery Button -->
+    <!-- <div class="text-center">
+      <button onclick="openTicketChargesModal()" class="create-btn">
+        <i class="fas fa-coin mr-2"></i>
+        See Ticket Charges
+      </button>
+    </div> -->
+
+    <div class="text-center">
+      <button onclick="openBookPage()" class="create-btn">
+        <i class="fas fa-ticket mr-2"></i>
+        Book Tickets
+      </button>
+    </div>
+
+    <script>
+      function openBookPage() {
+
+        location.href = '/booking';
+      }
+    </script>
+
+
+    <% 
+    // Calculate section order and next draw times
+    const nowTime = new Date()
+    
+    let shouldSwapSections = false;
+    
+    if (todays && todays.length > 0) {
+        // Process each lottery to add nextDrawTime and check result times
+        todays.forEach(lottery => {
+            // Initialize nextDrawTime as null
+            lottery.nextDrawTime = null;
+            // Initialize lastDrawTime as null
+            lottery.lastDrawTime = null;
+            
+            if (lottery.winners && lottery.winners.length > 0) {
+                // Find all future result times
+                const futureResultTimes = lottery.winners
+                    .filter(winner => winner.resultTime && winner.resultTime > nowTime)
+                    .map(winner => winner.resultTime)
+                    .sort((a, b) => a - b); // Sort ascending (earliest first)
+                
+                // Set the next draw time if there are future draws
+                if (futureResultTimes.length > 0) {
+                    lottery.nextDrawTime = futureResultTimes[0];
+                }
+                
+                // Find all past result times for lastDrawTime
+                const pastResultTimes = lottery.winners
+                    .filter(winner => winner.resultTime && winner.resultTime <= nowTime)
+                    .map(winner => winner.resultTime)
+                    .sort((a, b) => b - a); // Sort descending (most recent first)
+                
+                // Set the last draw time if there are past draws
+                if (pastResultTimes.length > 0) {
+                    lottery.lastDrawTime = pastResultTimes[0];
+                }
+                
+                // Check if ALL resultTimes in this lottery have passed
+                const allResultTimesPassed = lottery.winners.every(winner => {
+                    return winner.resultTime && nowTime > winner.resultTime;
+                });
+                
+                // Add this as a property to the lottery object
+                lottery.allResultsPassed = allResultTimesPassed;
+            } else {
+                lottery.allResultsPassed = false;
+            }
+        });
+        
+        // Swap sections only if ALL lotteries have all their resultTimes passed
+        shouldSwapSections = todays.every(lottery => lottery.allResultsPassed);
+    }
+%>
+
+    <!-- Conditional section ordering -->
+    <% if (!shouldSwapSections) { %>
+    <!-- Original order (before draws) -->
+    <%- include('partials/todays-results') %>
+    <%- include('partials/upcoming-lotteries') %>
+    <% } else { %>
+    <!-- Swapped order (after draws) -->
+    <%- include('partials/upcoming-lotteries') %>
+    <%- include('partials/todays-results') %>
+    <% } %>
+    <%- include('partials/indexScript') %>
+
+    <%- include('partials/past') %>
+  </main>
+
+  <!-- Settings Button -->
+  <!-- <script>
+    // Settings Function
+    function goToSettings() {
+      window.location.href = '/setting';
+    }
+  </script> -->
+  <!-- <button onclick="goToSettings()" class="settings-btn">
+    <i class="fas fa-cog"></i>
+  </button> -->
+
+  <!-- Enhanced Create/Edit Lottery Modal -->
+  <%- include('partials/Edit-create-extention') %>
+
+  <!-- Enhanced Create/Edit Lottery Modal -->
+  <%- include('partials/ticketChargeExtention') %>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast"></div>
+
+  <script>
+    let currentEditId = null;
+    let prizeCounter = 1;
+    let winnerCounter = 1;
+
+    // Toggle result expansion
+    function toggleResult(resultId) {
+      const result = document.getElementById(resultId);
+      let arrowId = 'arrow-' + resultId;
+      const arrow = document.getElementById(arrowId);
+
+      // Close all other results
+      const allResults = document.querySelectorAll('.card-expand');
+      const allArrows = document.querySelectorAll('[id^="arrow"]');
+
+      allResults.forEach((el) => {
+        if (el.id !== resultId) {
+          el.classList.remove('expanded');
+          el.classList.add('collapsed');
+        }
+      });
+
+      allArrows.forEach((el) => {
+        if (el.id !== arrowId) {
+          el.style.transform = 'rotate(0deg)';
+        }
+      });
+
+      // Toggle current result
+      if (result.classList.contains('collapsed')) {
+        result.classList.remove('collapsed');
+        result.classList.add('expanded');
+        if (arrow) arrow.style.transform = 'rotate(180deg)';
+      } else {
+        result.classList.remove('expanded');
+        result.classList.add('collapsed');
+        if (arrow) arrow.style.transform = 'rotate(0deg)';
+      }
+    }
+
+
+    // Helper Functions
+    function getRankDisplay(rank) {
+      const suffixes = ['th', 'st', 'nd', 'rd'];
+      const v = rank % 100;
+      return rank + (suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0]) + ' Prize';
+    }
+
+
+    // Toast Function
+    function showToast(message, type) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = `toast ${type}`;
+      toast.classList.add('show');
+
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // Add bounce effect to cards when they appear
+    window.addEventListener('load', function() {
+      const cards = document.querySelectorAll('.lottery-card');
+      cards.forEach((card, index) => {
+        setTimeout(() => {
+          card.classList.add('bounce-in');
+        }, index * 100);
+      });
+    });
+  </script>
+
+  <script>
+    function renderPastResults(pastLotteries) {
+      alert('past lottery function')
+      const container = document.getElementById('past-lottories-container');
+      if (!container) return;
+
+      pastLotteries.forEach((lottery, i) => {
+        const drawDate = new Date(lottery.drawDate);
+        const formattedDate = drawDate.toLocaleDateString('en-GB', {
+          year: 'numeric',
+          month: 'short',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true,
+          timeZone: 'Asia/Dubai'
+        });
+
+        // Example: always "RESULT" for past draws
+        const status = "RESULT";
+        const badgeClass = "past-badge";
+
+        const elementId = `past-${lottery._id}`;
+
+        // Create card
+        const card = document.createElement('div');
+        card.className = `lottery-card ${lottery.dayName}-card cursor-pointer`;
+        card.setAttribute('onclick', `toggleResult('${elementId}')`);
+
+        // Build HTML
+        card.innerHTML = `
+      <div class="flex items-center justify-between">
+        <div class="flex-1 card-element-spacing">
+          <!-- Badge + date -->
+          <div class="flex flex-wrap items-center" style="row-gap: 9px; column-gap: 20px;">
+            <span class="${badgeClass} rounded-full">${status}</span>
+            <span class="card-text-secondary card-date">${formattedDate}</span>
+          </div>
+
+          <!-- Lottery name -->
+          <h3 class="card-text card-lottery-name">${lottery.name}<br>${lottery.name2 || ''}</h3>
+
+          <!-- Prize listing -->
+          ${lottery.prizes.map(prize => {
+            let rankStatus = 'th';
+            if (prize.rank === 1) rankStatus = 'st';
+            else if (prize.rank === 2) rankStatus = 'nd';
+            else if (prize.rank === 3) rankStatus = 'rd';
+
+            return `
+              <div class="flex items-center card-text-secondary">
+                <i class="fas fa-trophy text-yellow-300 mr-2"></i>
+                <span class="card-prize">
+                  ${prize.rank}${rankStatus} Prize: ₹${prize.amount.toLocaleString('en-IN')}
+                </span>
+              </div>
+            `;
+          }).join('')}
+        </div>
+
+        <div class="text-right ml-4">
+          <i id="arrow-${elementId}" class="fas fa-chevron-down card-text text-xl transition-transform duration-300"></i>
+        </div>
+      </div>
+
+      <!-- Expandable results -->
+      <div id="${elementId}" class="card-expand collapsed mt-6">
+        <div class="result-container space-y-4">
+          ${(() => {
+            // Sort winners like in new design
+            const now = new Date();
+            const sortedWinners = lottery.winners.slice().sort((a, b) => {
+              const dateA = new Date(a.resultTime);
+              const dateB = new Date(b.resultTime);
+
+              const isUpcomingA = dateA > now;
+              const isUpcomingB = dateB > now;
+
+              if (isUpcomingA && !isUpcomingB) return -1;
+              if (!isUpcomingA && isUpcomingB) return 1;
+              if (isUpcomingA && isUpcomingB) return dateA - dateB;
+              return dateB - dateA;
+            });
+
+            return sortedWinners.map(winner => {
+              const resultTime = new Date(winner.resultTime);
+              const formattedTime = resultTime.toLocaleString('en-IN', {
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true,
+                timeZone: 'Asia/Dubai'
+              });
+
+              const firstTicketNumber = winner.winNumbers[0].ticketNumber;
+              const ticketLength = firstTicketNumber.toString().length;
+              const letters = ['A','B','C','D','E','F','G','H','I','J'].slice(0, ticketLength);
+
+              return ` <
+          div class = "result-card" >
+          <
+          div class = "result-card-header" > $ {
+            formattedTime
+          } < /div> <
+        div class = "result-card-content" >
+          <
+          div class = "letter-container" >
+          $ {
+            letters.map(letter => `<div class="letter-box">${letter}</div>`).join('')
+          } <
+          /div>
+
+          <
+          div class = "winning-numbers-container" >
+          <
+          div class = "winning-number-item" >
+          <
+          div class = "winning-number"
+        data - ticket - number = "${firstTicketNumber}" >
+          $ {
+            firstTicketNumber
+          } <
+          /div> < /
+        div > <
+          /div>
+
+          <
+          div class = "otherPrizeContainer" >
+          $ {
+            winner.winNumbers.map((wn, idx) => {
+              let rankStatus2 = 'th';
+              if (wn.prizeRank === 1) rankStatus2 = 'st';
+              else if (wn.prizeRank === 2) rankStatus2 = 'nd';
+              else if (wn.prizeRank === 3) rankStatus2 = 'rd';
+
+              if (idx === 4) {
+                return `<div class="win-items">
+                            <span class="prize-Rank">🎖️5th Prize : <b>(Single number all series)</b></span>
+                          </div>`;
+              } else if (idx < 4) {
+                if (wn.ticketNumber && wn.ticketNumber.split('').every(c => c === '0')) {
+                  return `<div class="win-items">
+                              <span class="prize-Rank">🎖️${wn.prizeRank}${rankStatus2} Prize :</span>
+                              <div class="result-winning-number result-winning-number_if_no_results underline-animated"></div>
+                            </div>`;
+                } else {
+                  return `<div class="win-items">
+                              <span class="prize-Rank">🎖️${wn.prizeRank}${rankStatus2} Prize :</span>
+                              <div class="result-winning-number">${wn.ticketNumber}</div>
+                            </div>`;
+                }
+              }
+              return '';
+            }).join('')
+          } <
+          /div> < /
+        div > <
+          /div>
+        `;
+            }).join('');
+          })()}
+        </div>
+      </div>
+    `;
+
+        // Insert card
+        let loadmoreBtn = document.getElementById('loadmoreBtn');
+        loadmoreBtn.insertAdjacentElement('beforebegin', card);
+      });
+    }
+  </script>
+
+  <%- include('partials/Footer') %>

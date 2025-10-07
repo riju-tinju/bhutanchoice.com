@@ -1,0 +1,409 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found | Bhutan State Lotteries</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .app-header {
+            background: linear-gradient(135deg, #FF6B6B 0%, #6A82FB 50%, #45EBA5 100%);
+            background-size: 300% 300%;
+            animation: gradientShift 6s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .error-container {
+            animation: slideInUp 0.8s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .error-number {
+            font-size: clamp(6rem, 12vw, 12rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #FF6B6B 0%, #6A82FB 50%, #45EBA5 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            line-height: 1;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .lottery-card {
+            background: linear-gradient(135deg, #FF6B6B 0%, #FF8E8E 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.3);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .lottery-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 6px;
+            height: 100%;
+            background: #FF4444;
+            border-radius: 20px 0 0 20px;
+        }
+
+        .lottery-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(255, 107, 107, 0.4);
+        }
+
+        .floating-icons {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .floating-icon {
+            position: absolute;
+            font-size: 2rem;
+            color: rgba(255, 255, 255, 0.1);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .floating-icon:nth-child(1) {
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .floating-icon:nth-child(2) {
+            top: 60%;
+            right: 10%;
+            animation-delay: 2s;
+        }
+
+        .floating-icon:nth-child(3) {
+            bottom: 20%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+
+        .floating-icon:nth-child(4) {
+            top: 40%;
+            right: 30%;
+            animation-delay: 1s;
+        }
+
+        .floating-icon:nth-child(5) {
+            bottom: 40%;
+            right: 20%;
+            animation-delay: 3s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+            }
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6A82FB 0%, #3B82F6 100%);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(106, 130, 251, 0.3);
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(106, 130, 251, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #45EBA5 0%, #10B981 100%);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(69, 235, 165, 0.3);
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(69, 235, 165, 0.4);
+        }
+
+        .glitch {
+            position: relative;
+            animation: glitch 2s infinite;
+        }
+
+        @keyframes glitch {
+            0% {
+                text-shadow: 0 0 0 transparent;
+            }
+            2% {
+                text-shadow: 2px 0 0 #FF6B6B, -2px 0 0 #6A82FB;
+            }
+            4% {
+                text-shadow: 0 0 0 transparent;
+            }
+            6% {
+                text-shadow: 2px 0 0 #45EBA5, -2px 0 0 #FF6B6B;
+            }
+            8% {
+                text-shadow: 0 0 0 transparent;
+            }
+            98% {
+                text-shadow: 0 0 0 transparent;
+            }
+            100% {
+                text-shadow: 2px 0 0 #6A82FB, -2px 0 0 #45EBA5;
+            }
+        }
+
+        .card-text {
+            color: rgb(255, 255, 255);
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        .bounce-in {
+            animation: bounceIn 0.8s ease-out;
+        }
+
+        @keyframes bounceIn {
+            0% {
+                transform: scale(0.3);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .lottery-card {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+            
+            .error-container {
+                padding: 1rem;
+            }
+            
+            .btn-primary, .btn-secondary {
+                padding: 0.8rem 1.5rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Floating Background Icons -->
+    <div class="floating-icons">
+        <div class="floating-icon"><i class="fas fa-coins"></i></div>
+        <div class="floating-icon"><i class="fas fa-trophy"></i></div>
+        <div class="floating-icon"><i class="fas fa-gift"></i></div>
+        <div class="floating-icon"><i class="fas fa-star"></i></div>
+        <div class="floating-icon"><i class="fas fa-ticket-alt"></i></div>
+    </div>
+
+    <!-- Header -->
+    <header class="app-header text-white">
+        <div class="px-6 py-5">
+            <div class="flex items-center justify-center">
+                <div class="flex items-center space-x-3">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfvxp4SnnjaYyFQDP8d5D660XMvy4nQfc08ScgqFq3IjufpC1OH-ykrQ6v-SkPsuVCt7w&usqp=CAU"
+                        style="height: 34px; width: 34px; border-radius: 50%;" alt="Bhutan State Lotteries Logo">
+                    <h1 class="text-xl font-bold drop-shadow-lg tracking-wide">Bhutan State Lotteries</h1>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="min-h-screen flex items-center justify-center px-4 py-8">
+        <div class="error-container text-center max-w-4xl w-full">
+            
+            <!-- 404 Number -->
+            <div class="mb-8">
+                <div class="error-number glitch">404</div>
+            </div>
+
+            <!-- Error Card -->
+            <div class="lottery-card bounce-in mx-auto max-w-2xl">
+                <div class="text-center">
+                    <div class="mb-6">
+                        <i class="fas fa-exclamation-triangle text-6xl card-text mb-4"></i>
+                        <h2 class="text-3xl font-bold card-text mb-2">Oops! Page Not Found</h2>
+                        <p class="text-lg card-text opacity-90 mb-6">
+                            It looks like this page has expired or doesn't exist. 
+                           
+                        </p>
+                    </div>
+
+                    <!-- Fun Lottery Message -->
+                    <!-- <div class="bg-white bg-opacity-20 rounded-lg p-4 mb-6">
+                        <p class="card-text text-sm font-semibold">
+                            🎲 "Even in lottery, sometimes you don't win the page you're looking for!"
+                        </p>
+                    </div> -->
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                        <!-- <button onclick="goBack()" class="btn-primary">
+                            <i class="fas fa-arrow-left"></i>
+                            Go Back
+                        </button> -->
+                        <a href="https://bhutanlotteryresults.com/" class="btn-secondary">
+                            <i class="fas fa-home"></i>
+                            Home Page
+                        </a>
+                    </div>
+
+                    <!-- Additional Info -->
+                    <!-- <div class="mt-8 text-center">
+                        <p class="card-text text-sm opacity-75">
+                            Looking for lottery results? Try checking our main page or contact support.
+                        </p>
+                    </div> -->
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
+                <a href="https://bhutanlotteryresults.com/" class="bg-white bg-opacity-10 hover:bg-opacity-20 rounded-lg p-4 text-center transition-all duration-300 backdrop-blur-sm">
+                    <i class="fas fa-calendar-day text-2xl text-blue-500 mb-2"></i>
+                    <p class="text-gray-700 font-semibold">Today's Results</p>
+                </a>
+                <a href="https://bhutanlotteryresults.com/" class="bg-white bg-opacity-10 hover:bg-opacity-20 rounded-lg p-4 text-center transition-all duration-300 backdrop-blur-sm">
+                    <i class="fas fa-clock text-2xl text-orange-500 mb-2"></i>
+                    <p class="text-gray-700 font-semibold">Upcoming Draws</p>
+                </a>
+                <a href="https://bhutanlotteryresults.com/" class="bg-white bg-opacity-10 hover:bg-opacity-20 rounded-lg p-4 text-center transition-all duration-300 backdrop-blur-sm">
+                    <i class="fas fa-history text-2xl text-purple-500 mb-2"></i>
+                    <p class="text-gray-700 font-semibold">Past Results</p>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Go back function
+        function goBack() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = '/';
+            }
+        }
+
+        // Add some interactive effects
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click effect to floating icons
+            const floatingIcons = document.querySelectorAll('.floating-icon');
+            floatingIcons.forEach(icon => {
+                icon.addEventListener('click', function() {
+                    this.style.animation = 'none';
+                    setTimeout(() => {
+                        this.style.animation = 'float 6s ease-in-out infinite';
+                    }, 100);
+                });
+            });
+
+            // Add some random movement to floating icons
+            setInterval(() => {
+                floatingIcons.forEach(icon => {
+                    const randomX = Math.random() * 20 - 10;
+                    const randomY = Math.random() * 20 - 10;
+                    icon.style.transform = `translate(${randomX}px, ${randomY}px)`;
+                });
+            }, 3000);
+        });
+
+        // Add keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' || e.key === 'Backspace') {
+                goBack();
+            } else if (e.key === 'Enter' || e.key === ' ') {
+                window.location.href = '/';
+            }
+        });
+    </script>
+</body>
+
+</html>

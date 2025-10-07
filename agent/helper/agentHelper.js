@@ -3,7 +3,6 @@ const Charge = require("../model/ticketChargeSchema");
 const Booking = require("../model/bookingsSchema");
 const Agent = require("../model/agentSchema");
 mongoose = require("mongoose");
-const bcrypt= require("bcrypt")
 const moment = require("moment-timezone");
 
 const agentHelper = {
@@ -114,7 +113,7 @@ const agentHelper = {
 
   createAgent: async (req, res) => {
     try {
-      const { name, email, phone, password, avatar, admin_saved, isActive } = req.body;
+      const { name, email, phone, avatar, admin_saved, isActive } = req.body;
 
       // Check if agent with email already exists
       const existingAgent = await Agent.findOne({ email: email.toLowerCase() });
@@ -125,16 +124,11 @@ const agentHelper = {
         });
       }
 
-      // Hash the password before saving
-      const saltRounds = 10; // You can adjust salt rounds as needed (10-12 is recommended)
-      const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-      // Create new agent with hashed password
+      // Create new agent
       const newAgent = new Agent({
         name: name.trim(),
         email: email.toLowerCase().trim(),
         phone: phone ? phone.trim() : undefined,
-        password: hashedPassword, // Use hashed password instead of plain text
         avatar: avatar || '',
         admin_saved: admin_saved || false,
         isActive: isActive !== undefined ? isActive : true
@@ -145,7 +139,6 @@ const agentHelper = {
       // Remove sensitive data from response
       const agentResponse = savedAgent.toObject();
       delete agentResponse.otp;
-      delete agentResponse.password; // Also remove password from response
 
       res.status(201).json({
         success: true,

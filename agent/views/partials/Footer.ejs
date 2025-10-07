@@ -1,0 +1,324 @@
+<style>
+  * {
+    font-family: 'Poppins', sans-serif;
+  }
+
+  /* Remove default tap highlight on mobile for all elements */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    padding-bottom: 80px; /* Space for bottom nav on mobile */
+  }
+
+  /* Toast notification */
+  .toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 16px 24px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    z-index: 1100;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+  }
+
+  .toast.show {
+    transform: translateX(0);
+  }
+
+  .toast.success {
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  }
+
+  .toast.error {
+    background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+  }
+
+  .toast.info {
+    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+  }
+
+  /* Modern Bottom Navigation */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(229, 231, 235, 0.8);
+    padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+    z-index: 1000;
+    box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.1);
+  }
+
+  .nav-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    color: #6b7280;
+    min-width: 60px;
+    position: relative;
+    transform: translateY(0);
+  }
+
+  .nav-item:hover {
+    color: #3b82f6;
+    background: rgba(59, 130, 246, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .nav-item.active {
+    color: #3b82f6;
+    background: rgba(59, 130, 246, 0.15);
+    transform: translateY(-1px);
+  }
+
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    background: #3b82f6;
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
+  }
+
+  .nav-icon {
+    font-size: 1.25rem;
+    margin-bottom: 4px;
+    transition: all 0.2s ease;
+  }
+
+  .nav-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1;
+    transition: all 0.2s ease;
+  }
+
+  .nav-item:active {
+    transform: translateY(0) scale(0.95);
+  }
+
+  /* Desktop Bottom Navigation */
+  @media (min-width: 768px) {
+    body {
+      padding-bottom: 120px;
+    }
+
+    
+
+    .bottom-nav {
+      /* position: absolute; */
+      background: white;
+      border-top: none;
+      border-radius: 16px;
+      margin: 24px auto 0;
+      max-width: 600px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      padding: 16px 0;
+    }
+
+    .nav-container {
+      padding: 0 40px;
+    }
+
+    .nav-item {
+      padding: 12px 20px;
+      min-width: 80px;
+    }
+
+    .nav-icon {
+      font-size: 1.4rem;
+      margin-bottom: 6px;
+    }
+
+    .nav-label {
+      font-size: 0.875rem;
+    }
+
+    .nav-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2);
+    }
+
+    .nav-item.active {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.25);
+    }
+  }
+
+  /* Large Desktop */
+  @media (min-width: 1024px) {
+    body{
+      padding-bottom: 200px;
+    }
+    .bottom-nav {
+      max-width: 700px;
+      padding: 20px 0;
+    }
+
+    .nav-container {
+      padding: 0 60px;
+    }
+
+    .nav-item {
+      padding: 16px 24px;
+      min-width: 100px;
+    }
+
+    .nav-icon {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+    }
+
+    .nav-label {
+      font-size: 0.9rem;
+    }
+  }
+
+  /* Mobile Responsive Design */
+  @media (max-width: 768px) {
+    .nav-container {
+      padding: 0 10px;
+    }
+
+    .nav-item {
+      min-width: 50px;
+      padding: 6px 8px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .nav-item {
+      min-width: 45px;
+      padding: 4px 6px;
+    }
+
+    .nav-icon {
+      font-size: 1.1rem;
+      margin-bottom: 2px;
+    }
+
+    .nav-label {
+      font-size: 0.7rem;
+    }
+  }
+</style>  
+
+<!-- Modern Bottom Navigation -->
+<nav class="bottom-nav">
+  <div class="nav-container">
+    <a href="/" class="nav-item active" data-page="lotteries">
+      <i class="nav-icon fas fa-trophy"></i>
+      <span class="nav-label">Lotteries</span>
+    </a>
+    
+    <!-- <a href="/agent" class="nav-item" data-page="agents">
+      <i class="nav-icon fas fa-users"></i>
+      <span class="nav-label">Agents</span>
+    </a> -->
+    
+    <a href="/bookings" class="nav-item" data-page="bookings" disabled>
+      <i class="nav-icon fas fa-ticket-alt"></i>
+      <span class="nav-label">Bookings</span>
+    </a>
+    
+    <a href="/setting" class="nav-item" data-page="settings">
+      <i class="nav-icon fas fa-cog"></i>
+      <span class="nav-label">Settings</span>
+    </a>
+  </div>
+</nav>
+
+<!-- Toast Notification -->
+<div id="toast" class="toast"></div>
+
+<script>
+  // Navigation Management
+  function initializeNavigation() {
+    const navItems = document.querySelectorAll('.nav-item');
+    const currentPath = window.location.pathname;
+    
+    // Set active state based on current page
+    navItems.forEach(item => {
+      const href = item.getAttribute('href');
+      item.classList.remove('active');
+      
+      if (href === currentPath || 
+          (currentPath === '/' && href === '/') ||
+          (currentPath.includes(href) && href !== '/')) {
+        item.classList.add('active');
+      }
+    });
+  }
+
+  // Toast Function
+  function showToast(message, type = 'info') {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = `toast ${type}`;
+    toast.classList.add('show');
+
+    setTimeout(() => {
+      toast.classList.remove('show');
+    }, 3000);
+  }
+
+  // Handle navigation clicks with smooth transition
+  function handleNavigation(event) {
+    const navItem = event.target.closest('.nav-item');
+    if (!navItem) return;
+
+    // Add loading state
+    navItem.style.opacity = '0.7';
+    
+    // Reset after navigation
+    setTimeout(() => {
+      navItem.style.opacity = '1';
+    }, 200);
+  }
+
+  // Initialize navigation when page loads
+  document.addEventListener('DOMContentLoaded', function() {
+    initializeNavigation();
+    
+    // Add click handlers for navigation items
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', handleNavigation);
+    });
+  });
+
+  // Update active state when navigating with browser back/forward
+  window.addEventListener('popstate', function() {
+    initializeNavigation();
+  });
+
+  // Example usage of toast
+  // showToast('Welcome to the admin panel!', 'success');
+</script>
+</body>
+
+</html>

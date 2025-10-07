@@ -1,0 +1,937 @@
+<!-- Ticket Charges Management Modal -->
+<div id="ticketChargesModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="chargesModalTitle" class="modal-title">Manage Ticket Charges</h2>
+      <button type="button" class="modal-close" onclick="closeChargesModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form id="ticketChargesForm">
+        <!-- Current Charges Section -->
+        <div class="form-section">
+          <h3 class="form-section-title">
+            <i class="fas fa-list-alt"></i>
+            Current Ticket Charges
+          </h3>
+          
+          <div id="chargesContainer">
+            <!-- Loading State -->
+            <div id="chargesLoading" class="charges-loading">
+              <div class="charges-spinner"></div>
+            </div>
+            
+            <!-- Empty State -->
+            <div id="emptyCharges" class="empty-charges" style="display: none;">
+              <i class="fas fa-ticket-alt charges-empty-icon"></i>
+              <p class="charges-empty-text">No ticket charges found. Add your first charge below.</p>
+            </div>
+            
+            <!-- Charges List -->
+            <div id="chargesList">
+              <!-- Charges will be loaded dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Add New Charge Section -->
+        <div class="form-section">
+          <h3 class="form-section-title">
+            <i class="fas fa-plus-circle"></i>
+            Add New Ticket Charge
+          </h3>
+          
+          <div class="add-charge-form">
+            <div class="charge-input-group">
+              <div class="form-group">
+                <label class="form-label">Ticket Type (Numbers)</label>
+                <input type="number" id="newTicketType" class="form-input" min="1" placeholder="e.g., 3, 4, 5" required>
+                <small class="form-helper">Ticket type</small>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Charge Amount (₹)</label>
+                <input type="number" id="newChargeAmount" class="form-input" min="0" step="0.01" placeholder="e.g., 10.00" required>
+                <small class="form-helper">Price for this ticket type</small>
+              </div>
+            </div>
+            
+            <button type="button" class="add-charge-btn" onclick="addNewCharge()">
+              <i class="fas fa-plus"></i>
+              <span class="btn-text">Add Charge</span>
+              <span class="btn-spinner" style="display: none;">
+                <i class="fas fa-spinner fa-spin"></i>
+                Adding...
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeChargesModal()">Close</button>
+          <button type="submit" class="btn btn-primary" id="saveChargesBtn" style="display: none;">Save All Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notification for Charges -->
+<div id="chargesToast" class="toast"></div>
+
+<style>
+/* Base Modal Styles - Keep your original design */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4);
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 5% auto;
+  padding: 0;
+  border: none;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  animation: slideIn 0.3s ease;
+}
+
+.modal-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.modal-close:hover {
+  background-color: rgba(255,255,255,0.2);
+}
+
+.modal-body {
+  padding: 25px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.form-section {
+  margin-bottom: 30px;
+}
+
+.form-section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #E5E7EB;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #E5E7EB;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #3B82F6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid #E5E7EB;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.95rem;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+  color: white;
+}
+
+.btn-secondary {
+  background: #6B7280;
+  color: white;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* Ticket Charges Modal Styles - Your exact design */
+.charges-empty-icon {
+  font-size: 3rem;
+  color: #D1D5DB;
+  margin-bottom: 16px;
+}
+
+.charges-empty-text {
+  color: #6B7280;
+  font-size: 1rem;
+  text-align: center;
+  margin: 0;
+}
+
+.empty-charges {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background: #F9FAFB;
+  border: 2px dashed #E5E7EB;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.empty-charges:hover {
+  border-color: #3B82F6;
+  background: #EFF6FF;
+}
+
+/* Charge Item Design - Your exact design */
+.charge-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  border: 2px solid #E5E7EB;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.charge-item:hover {
+  border-color: #3B82F6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+}
+
+.charge-item.editing {
+  border-color: #F59E0B;
+  background: #FFFBEB;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+}
+
+.ticket-type-display {
+  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 1rem;
+  min-width: 100px;
+  text-align: center;
+  flex-shrink: 0;
+  position: relative;
+}
+
+/* .ticket-type-display::before {
+  content: " digits";
+  font-size: 0.75rem;
+  opacity: 0.9;
+  display: block;
+  margin-top: 2px;
+} */
+
+.charge-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.charge-amount-display {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #059669;
+  margin-bottom: 4px;
+}
+
+.charge-description {
+  color: #6B7280;
+  font-size: 0.9rem;
+}
+
+.charge-input-inline {
+  width: 100%;
+  padding: 8px 12px;
+  border: 2px solid #F59E0B;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #059669;
+  background: white;
+  transition: all 0.3s ease;
+}
+
+.charge-input-inline:focus {
+  outline: none;
+  border-color: #3B82F6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.charge-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.edit-charge-btn, .save-charge-btn, .cancel-edit-btn {
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  min-width: 36px;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.save-charge-btn {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+}
+
+.cancel-edit-btn {
+  background: linear-gradient(135deg, #6B7280 0%, #4B5563 100%);
+}
+
+.edit-charge-btn:hover, .save-charge-btn:hover, .cancel-edit-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.remove-charge-btn {
+  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  min-width: 36px;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.remove-charge-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+/* Add Charge Form - Your exact design */
+.add-charge-form {
+  background: #F8FAFC;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #E2E8F0;
+}
+
+.charge-input-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.form-helper {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.8rem;
+  color: #6B7280;
+  font-style: italic;
+}
+
+.add-charge-btn {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  justify-content: center;
+  min-height: 48px;
+}
+
+.add-charge-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.add-charge-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.add-charge-btn.loading .btn-text {
+  display: none;
+}
+
+.add-charge-btn.loading .btn-spinner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Loading States */
+.charges-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background: #F9FAFB;
+  border-radius: 12px;
+}
+
+.charges-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #E5E7EB;
+  border-top: 3px solid #3B82F6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { transform: translateY(-50px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Mobile Responsive Design - Your exact design */
+@media (max-width: 768px) {
+  .charge-input-group {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .charge-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .ticket-type-display {
+    min-width: auto;
+    text-align: center;
+    padding: 12px 16px;
+  }
+
+  .charge-details {
+    text-align: center;
+  }
+
+  .charge-amount-display {
+    font-size: 1.8rem;
+  }
+
+  .charge-actions {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .edit-charge-btn, .save-charge-btn, .cancel-edit-btn, .remove-charge-btn {
+    min-width: 80px;
+    padding: 10px 16px;
+  }
+
+  .form-input {
+    font-size: 16px; /* Prevents zoom on iOS */
+    min-height: 50px;
+  }
+
+  .charge-input-inline {
+    font-size: 1.5rem;
+    text-align: center;
+    min-height: 50px;
+  }
+
+  .add-charge-btn {
+    min-height: 54px;
+    font-size: 1rem;
+  }
+
+  .modal-content {
+    margin: 2% auto;
+    width: 95%;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 480px) {
+  .charge-actions {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .ticket-type-display {
+    font-size: 0.9rem;
+  }
+
+  .charge-amount-display {
+    font-size: 1.6rem;
+  }
+}
+
+/* Animation for adding/removing items - Your exact design */
+.charge-item-enter {
+  opacity: 0;
+  transform: translateY(-10px);
+  animation: chargeItemEnter 0.3s ease forwards;
+}
+
+@keyframes chargeItemEnter {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.charge-item-exit {
+  animation: chargeItemExit 0.3s ease forwards;
+}
+
+@keyframes chargeItemExit {
+  to {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+}
+
+/* Toast Styles */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 15px 20px;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  z-index: 10000;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+}
+
+.toast.show {
+  transform: translateX(0);
+}
+
+.toast.success { background: #10B981; }
+.toast.error { background: #EF4444; }
+.toast.info { background: #3B82F6; }
+</style>
+
+<script>
+(function() {
+    'use strict';
+    
+    let ticketCharges = [];
+    let editingChargeId = null;
+    
+    // GLOBAL FUNCTIONS FOR MODAL CONTROL
+    window.openTicketChargesModal = function() {
+        document.getElementById('ticketChargesModal').style.display = 'block';
+        loadTicketCharges();
+    };
+    
+    window.showTicketCharges = function() {
+        window.openTicketChargesModal();
+    };
+    
+    window.closeChargesModal = function() {
+        document.getElementById('ticketChargesModal').style.display = 'none';
+        resetForm();
+    };
+    
+    // Load ticket charges from API
+    async function loadTicketCharges() {
+        try {
+            showLoading(true);
+            
+            const response = await fetch('/api/ticket-charges');
+            if (!response.ok) throw new Error('Failed to load ticket charges');
+            
+            const data = await response.json();
+            ticketCharges = data.ticketCharges || [];
+            
+            setTimeout(() => {
+                renderTicketCharges();
+                showLoading(false);
+            }, 500);
+            
+        } catch (error) {
+            console.error('Error loading ticket charges:', error);
+            showLoading(false);
+            showToast('Error loading ticket charges: ' + error.message, 'error');
+        }
+    }
+    
+    // Render ticket charges with your exact design
+    function renderTicketCharges() {
+        const chargesList = document.getElementById('chargesList');
+        const emptyCharges = document.getElementById('emptyCharges');
+        
+        if (ticketCharges.length === 0) {
+            chargesList.innerHTML = '';
+            emptyCharges.style.display = 'flex';
+            return;
+        }
+        
+        emptyCharges.style.display = 'none';
+        
+        // Sort by ticket type
+        const sortedCharges = [...ticketCharges].sort((a, b) => a.ticketType - b.ticketType);
+        
+        const html = sortedCharges.map(charge => `
+            <div class="charge-item charge-item-enter" data-charge-id="${charge._id}">
+                <div class="ticket-type-display">
+                   Ticket ${charge.ticketType}
+                </div>
+                <div class="charge-details">
+                    <div class="charge-amount-display" id="amount-display-${charge._id}">
+                        ₹${parseFloat(charge.chargeAmount).toFixed(2)}
+                    </div>
+                    <input type="number" class="charge-input-inline" id="amount-input-${charge._id}" 
+                           value="${charge.chargeAmount}" step="0.01" min="0" style="display: none;">
+                    <div class="charge-description">
+                        Price for type ${charge.ticketType} lottery tickets
+                    </div>
+                </div>
+                <div class="charge-actions">
+                    <button class="edit-charge-btn" onclick="editCharge('${charge._id}')" id="edit-btn-${charge._id}">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="save-charge-btn" onclick="saveCharge('${charge._id}')" id="save-btn-${charge._id}" style="display: none;">
+                        <i class="fas fa-check"></i>
+                    </button>
+                    <button class="cancel-edit-btn" onclick="cancelEdit('${charge._id}')" id="cancel-btn-${charge._id}" style="display: none;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <button class="remove-charge-btn" onclick="removeCharge('${charge._id}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+        
+        chargesList.innerHTML = html;
+    }
+    
+    // Edit charge inline
+    window.editCharge = function(chargeId) {
+        editingChargeId = chargeId;
+        
+        // Switch to editing mode
+        const item = document.querySelector(`[data-charge-id="${chargeId}"]`);
+        item.classList.add('editing');
+        
+        document.getElementById(`amount-display-${chargeId}`).style.display = 'none';
+        document.getElementById(`amount-input-${chargeId}`).style.display = 'block';
+        document.getElementById(`edit-btn-${chargeId}`).style.display = 'none';
+        document.getElementById(`save-btn-${chargeId}`).style.display = 'flex';
+        document.getElementById(`cancel-btn-${chargeId}`).style.display = 'flex';
+        
+        // Focus the input
+        document.getElementById(`amount-input-${chargeId}`).focus();
+    };
+    
+    // Save charge
+    window.saveCharge = async function(chargeId) {
+        try {
+            const newAmount = document.getElementById(`amount-input-${chargeId}`).value;
+            const charge = ticketCharges.find(c => c._id === chargeId);
+            
+            if (!charge) throw new Error('Charge not found');
+            
+            const response = await fetch(`/api/ticket-charges/${chargeId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ticketType: charge.ticketType,
+                    chargeAmount: parseFloat(newAmount)
+                })
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to update charge');
+            }
+            
+            const result = await response.json();
+            
+            // Update local array
+            const index = ticketCharges.findIndex(c => c._id === chargeId);
+            if (index !== -1) {
+                ticketCharges[index] = result.ticketCharge;
+            }
+            
+            cancelEdit(chargeId);
+            renderTicketCharges();
+            showToast('Charge updated successfully', 'success');
+            
+        } catch (error) {
+            console.error('Error updating charge:', error);
+            showToast('Error: ' + error.message, 'error');
+        }
+    };
+    
+    // Cancel edit
+    window.cancelEdit = function(chargeId) {
+        const item = document.querySelector(`[data-charge-id="${chargeId}"]`);
+        item.classList.remove('editing');
+        
+        document.getElementById(`amount-display-${chargeId}`).style.display = 'block';
+        document.getElementById(`amount-input-${chargeId}`).style.display = 'none';
+        document.getElementById(`edit-btn-${chargeId}`).style.display = 'flex';
+        document.getElementById(`save-btn-${chargeId}`).style.display = 'none';
+        document.getElementById(`cancel-btn-${chargeId}`).style.display = 'none';
+        
+        // Reset input value
+        const charge = ticketCharges.find(c => c._id === chargeId);
+        if (charge) {
+            document.getElementById(`amount-input-${chargeId}`).value = charge.chargeAmount;
+        }
+        
+        editingChargeId = null;
+    };
+    
+    // Remove charge
+    window.removeCharge = async function(chargeId) {
+        const charge = ticketCharges.find(c => c._id === chargeId);
+        if (!charge) return;
+        
+        if (!confirm(`Are you sure you want to delete the charge for ${charge.ticketType}-digit tickets?`)) return;
+        
+        try {
+            const response = await fetch(`/api/ticket-charges/${chargeId}`, {
+                method: 'DELETE'
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to delete charge');
+            }
+            
+            // Animate removal
+            const item = document.querySelector(`[data-charge-id="${chargeId}"]`);
+            item.classList.add('charge-item-exit');
+            
+            setTimeout(() => {
+                // Remove from array
+                ticketCharges = ticketCharges.filter(c => c._id !== chargeId);
+                renderTicketCharges();
+                showToast('Charge deleted successfully', 'success');
+            }, 300);
+            
+        } catch (error) {
+            console.error('Error deleting charge:', error);
+            showToast('Error deleting charge: ' + error.message, 'error');
+        }
+    };
+    
+    // Add new charge
+    window.addNewCharge = async function() {
+        const ticketType = document.getElementById('newTicketType').value;
+        const chargeAmount = document.getElementById('newChargeAmount').value;
+        
+        if (!ticketType || !chargeAmount) {
+            showToast('Please fill in all fields', 'error');
+            return;
+        }
+        
+        // Check for duplicate
+        const existingCharge = ticketCharges.find(c => c.ticketType === parseInt(ticketType));
+        if (existingCharge) {
+            showToast(`Charge for ${ticketType}-digit tickets already exists`, 'error');
+            return;
+        }
+        
+        try {
+            const addButton = document.querySelector('.add-charge-btn');
+            addButton.classList.add('loading');
+            addButton.disabled = true;
+            
+            const response = await fetch('/api/ticket-charges', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ticketType: parseInt(ticketType),
+                    chargeAmount: parseFloat(chargeAmount)
+                })
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to add charge');
+            }
+            
+            const result = await response.json();
+            
+            // Add to array
+            ticketCharges.push(result.ticketCharge);
+            renderTicketCharges();
+            
+            // Reset form
+            document.getElementById('newTicketType').value = '';
+            document.getElementById('newChargeAmount').value = '';
+            
+            showToast('Charge added successfully', 'success');
+            
+        } catch (error) {
+            console.error('Error adding charge:', error);
+            showToast('Error: ' + error.message, 'error');
+        } finally {
+            const addButton = document.querySelector('.add-charge-btn');
+            addButton.classList.remove('loading');
+            addButton.disabled = false;
+        }
+    };
+    
+    // Utility functions
+    function showLoading(show) {
+        document.getElementById('chargesLoading').style.display = show ? 'flex' : 'none';
+        document.getElementById('emptyCharges').style.display = 'none';
+        document.getElementById('chargesList').style.display = show ? 'none' : 'block';
+    }
+    
+    function resetForm() {
+        document.getElementById('newTicketType').value = '';
+        document.getElementById('newChargeAmount').value = '';
+        editingChargeId = null;
+    }
+    
+    function showToast(message, type = 'info') {
+        const toast = document.getElementById('chargesToast');
+        toast.textContent = message;
+        toast.className = `toast ${type}`;
+        toast.classList.add('show');
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3000);
+    }
+    
+    // Event delegation for clicks
+    document.addEventListener('click', function(e) {
+        // Main trigger buttons
+        const triggerElement = e.target.closest('.see-charges-btn, #see-charges-btn, .seeChargesBtn, #seeChargesBtn, [data-action="ticket-charges"]');
+        if (triggerElement) {
+            e.preventDefault();
+            e.stopPropagation();
+            window.openTicketChargesModal();
+            return;
+        }
+        
+        // Close modal when clicking outside
+        if (e.target.id === 'ticketChargesModal') {
+            closeChargesModal();
+        }
+    });
+    
+    // Enter key support for inline editing
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && editingChargeId && e.target.classList.contains('charge-input-inline')) {
+            saveCharge(editingChargeId);
+        } else if (e.key === 'Escape' && editingChargeId) {
+            cancelEdit(editingChargeId);
+        }
+    });
+    
+    console.log('Ticket charges modal loaded with your original design');
+})();
+</script>

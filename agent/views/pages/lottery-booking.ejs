@@ -1,0 +1,2365 @@
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>Admin - Bhutan State Lotteries</title>
+</head>
+<!-- Flexible Ticket Booking Page -->
+<div class="booking-container">
+  <!-- Header Section -->
+  <div class="booking-header">
+    <h1 class="page-title">
+      <i class="fas fa-ticket-alt"></i>
+      Admin Ticket Booking
+    </h1>
+
+  </div>
+
+  <!-- Customer Information Section -->
+  <div class="form-section customer-section">
+    <h2 class="section-title">
+      <i class="fas fa-user"></i>
+      Customer Information
+    </h2>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Customer Name *</label>
+        <input type="text" id="customerName" class="form-input" placeholder="Enter customer name" required>
+        <div class="form-error" id="customerNameError"></div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Phone Number *</label>
+        <input type="tel" id="customerPhone" class="form-input" placeholder="Enter phone number" required>
+        <div class="form-error" id="customerPhoneError"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Add Ticket Section -->
+  <div class="form-section quick-add-section">
+    <h2 class="section-title">
+      <i class="fas fa-plus-circle"></i>
+      Quick Add Ticket
+    </h2>
+
+    <!-- All-in-One Selection Interface -->
+    <div class="quick-add-interface">
+      <!-- Parent Lottery Selection -->
+      <div class="selection-group">
+        <h3 class="selection-title">
+          <i class="fas fa-trophy"></i>
+          Select Parent Lottery
+        </h3>
+
+        <div class="search-container">
+          <div class="search-input-wrapper">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="parentLotterySearch" class="search-input" placeholder="Search parent lottery...">
+            <button type="button" class="search-clear" id="clearParentSearch" style="display: none;">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="lottery-selector" id="parentLotterySelector">
+          <div id="parentLotteryLoading" class="loading-state">
+            <div class="loading-spinner"></div>
+            <p>Loading lotteries...</p>
+          </div>
+
+          <div id="parentLotteryList" class="lottery-options">
+            <!-- Parent lottery options will be inserted here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Child Lottery Selection -->
+      <div class="selection-group" id="childLotteryGroup" style="display: none;">
+        <h3 class="selection-title">
+          <i class="fas fa-clock"></i>
+          Select Draw Time
+        </h3>
+
+        <div class="child-lottery-selector" id="childLotterySelector">
+          <!-- Child lottery options will be inserted here -->
+        </div>
+      </div>
+
+      <!-- Ticket Type Selection -->
+      <div class="selection-group" id="ticketTypeGroup" style="display: none;">
+        <h3 class="selection-title">
+          <i class="fas fa-hashtag"></i>
+          Select Ticket Type
+        </h3>
+
+        <div class="ticket-type-selector" id="ticketTypeSelector">
+          <!-- Ticket type options will be inserted here -->
+        </div>
+      </div>
+
+      <!-- Ticket Number Input -->
+      <div class="selection-group" id="ticketNumberGroup" style="display: none;">
+        <h3 class="selection-title">
+          <i class="fas fa-edit"></i>
+          Enter Ticket Number
+        </h3>
+
+        <div class="ticket-input-area">
+          <div class="input-helper" id="ticketInputHelper">
+            <!-- Dynamic helper text -->
+          </div>
+
+          <div class="number-input-wrapper">
+            <input type="text" id="ticketNumberInput" class="ticket-number-input" placeholder="Enter number">
+            <button type="button" class="add-single-btn" id="addSingleTicket" disabled>
+              <i class="fas fa-plus"></i>
+              <span class="btn-text">Add This Ticket</span>
+            </button>
+          </div>
+
+          <div class="form-error" id="ticketNumberError"></div>
+        </div>
+      </div>
+
+      <!-- Current Selection Summary -->
+      <div class="current-selection" id="currentSelection" style="display: none;">
+        <h4 class="selection-summary-title">Current Selection:</h4>
+        <div class="selection-summary" id="selectionSummary">
+          <!-- Current selection details -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <button type="button" class="btn btn-secondary" id="resetSelection">
+        <i class="fas fa-undo"></i>
+        <span class="btn-text">Reset</span>
+      </button>
+      <!-- <button type="button" class="btn btn-info" id="changeSelections">
+        <i class="fas fa-edit"></i>
+        <span class="btn-text">Change</span>
+      </button> -->
+    </div>
+  </div>
+
+  <!-- Added Tickets Section -->
+  <div class="form-section tickets-section" id="ticketsSection" style="display: none;">
+    <h2 class="section-title">
+      <i class="fas fa-list"></i>
+      Added Tickets (<span id="ticketCounter">0</span>)
+    </h2>
+
+    <!-- Tickets by Lottery Grouping -->
+    <div class="tickets-by-lottery" id="ticketsByLottery">
+      <!-- Grouped tickets will be displayed here -->
+    </div>
+
+    <!-- Overall Summary -->
+    <div class="tickets-summary" id="ticketsSummary">
+      <div class="summary-grid">
+        <div class="summary-item">
+          <span class="summary-label">Total Tickets:</span>
+          <span class="summary-value" id="totalTickets">0</span>
+        </div>
+        <!-- <div class="summary-item">
+          <span class="summary-label">Unique Lotteries:</span>
+          <span class="summary-value" id="uniqueLotteries">0</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Unique Draw Times:</span>
+          <span class="summary-value" id="uniqueDrawTimes">0</span>
+        </div> -->
+        <div class="summary-item total-item">
+          <span class="summary-label">Total Amount:</span>
+          <span class="summary-value" id="totalAmount">Nu0.00</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Final Actions -->
+  <div class="form-actions" id="formActions" style="display: none;">
+    <button type="button" class="btn btn-secondary" id="clearAllTickets">
+      <i class="fas fa-trash"></i>
+      <span class="btn-text">Clear All</span>
+    </button>
+    <button type="button" class="btn btn-primary" id="proceedBooking">
+      <i class="fas fa-check"></i>
+      <span class="btn-text">Complete Booking (<span id="finalTicketCount">0</span>)</span>
+    </button>
+  </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="bookingToast" class="toast"></div>
+
+<!-- Confirmation Modal -->
+<div id="confirmationModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="modal-title">Confirm Multi-Lottery Booking</h2>
+      <button type="button" class="modal-close" onclick="closeConfirmationModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div id="confirmationDetails">
+        <!-- Detailed booking confirmation -->
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" onclick="closeConfirmationModal()">Cancel</button>
+      <button type="button" class="btn btn-primary" id="confirmFinalBooking">
+        <span class="btn-text">
+          <i class="fas fa-check"></i>
+          Confirm Booking
+        </span>
+        <span class="btn-spinner" style="display: none;">
+          <i class="fas fa-spinner fa-spin"></i>
+          Processing...
+        </span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Mobile-First Responsive Base Styles */
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+    color: #1f2937;
+    overflow-x: hidden;
+  }
+
+  .booking-container {
+    padding: 8px;
+    max-width: 100%;
+    margin: 0 auto;
+    background: #f8fafc;
+    min-height: 100vh;
+  }
+
+  /* Header - Mobile Optimized */
+  .booking-header {
+    text-align: center;
+    margin-bottom: 16px;
+    padding: 16px 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    color: white;
+  }
+
+  .page-title {
+    font-size: 1.25rem;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    line-height: 1.2;
+  }
+
+  .page-subtitle {
+    font-size: 0.8rem;
+    opacity: 0.9;
+    line-height: 1.3;
+  }
+
+  /* Form Sections - Mobile First */
+  .form-section {
+    background: white;
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1rem;
+    color: #1e293b;
+    margin-bottom: 16px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #e2e8f0;
+  }
+
+  /* Form Elements - Touch Optimized */
+  .form-row {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .form-label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+  }
+
+  .form-input,
+  .search-input,
+  .ticket-number-input {
+    padding: 12px 14px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 16px;
+    /* Prevents zoom on iOS */
+    background: white;
+    transition: all 0.2s ease;
+    min-height: 44px;
+    /* Touch-friendly minimum */
+  }
+
+  .form-input:focus,
+  .search-input:focus,
+  .ticket-number-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .form-error {
+    color: #ef4444;
+    font-size: 0.8rem;
+    margin-top: 4px;
+    min-height: 18px;
+    word-break: break-word;
+  }
+
+  /* Quick Add Interface - Mobile Stacked */
+  .quick-add-interface {
+    display: grid;
+    gap: 16px;
+  }
+
+  .selection-group {
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 12px;
+    transition: all 0.3s ease;
+  }
+
+  .selection-group.active {
+    border-color: #3b82f6;
+    background: #f8faff;
+  }
+
+  .selection-group.completed {
+    border-color: #10b981;
+    background: #f0fdf4;
+  }
+
+  .selection-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.95rem;
+    color: #475569;
+    margin-bottom: 12px;
+    font-weight: 600;
+    flex-wrap: wrap;
+  }
+
+  /* Search Container - Mobile Optimized */
+  .search-container {
+    margin-bottom: 12px;
+  }
+
+  .search-input-wrapper {
+    position: relative;
+  }
+
+  .search-input {
+    width: 100%;
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6b7280;
+    font-size: 1rem;
+  }
+
+  .search-clear {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    min-width: 32px;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Lottery Options - Mobile Responsive */
+  .lottery-selector {
+    max-height: 250px;
+    overflow-y: auto;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    background: #f9fafb;
+  }
+
+  .loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 16px;
+    color: #6b7280;
+  }
+
+  .loading-spinner {
+    width: 28px;
+    height: 28px;
+    border: 3px solid #e5e7eb;
+    border-top: 3px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 10px;
+  }
+
+  .lottery-options {
+    padding: 8px;
+  }
+
+  .lottery-option {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 48px;
+  }
+
+  .lottery-option:hover,
+  .lottery-option:active {
+    border-color: #3b82f6;
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.1);
+  }
+
+  .lottery-option.selected {
+    border-color: #10b981;
+    background: #f0fdf4;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.2);
+  }
+
+  .lottery-option-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 6px;
+    gap: 8px;
+  }
+
+  .lottery-name {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 0.9rem;
+    line-height: 1.3;
+    flex: 1;
+    word-break: break-word;
+  }
+
+  .lottery-name2 {
+    color: #64748b;
+    font-size: 0.8rem;
+    margin-top: 2px;
+    word-break: break-word;
+  }
+
+  .lottery-draw-badge {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    color: white;
+    padding: 3px 6px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .lottery-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 8px;
+  }
+
+  .lottery-detail {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #64748b;
+    font-size: 0.8rem;
+  }
+
+  .lottery-detail i {
+    color: #3b82f6;
+    width: 12px;
+    flex-shrink: 0;
+  }
+
+  /* Child Lottery Selector - Mobile Stacked */
+  .child-lottery-selector {
+    display: grid;
+    gap: 8px;
+  }
+
+  .child-option {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 44px;
+  }
+
+  .child-option:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.1);
+  }
+
+  .child-option.selected {
+    border-color: #10b981;
+    background: #f0fdf4;
+  }
+
+  .child-name {
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 4px;
+    font-size: 0.9rem;
+  }
+
+  .child-details {
+    color: #64748b;
+    font-size: 0.75rem;
+    line-height: 1.2;
+  }
+
+  /* Ticket Type Selector - Responsive Grid */
+  .ticket-type-selector {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+    gap: 8px;
+  }
+
+  .type-option {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 12px 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .type-option:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+  }
+
+  .type-option.selected {
+    border-color: #10b981;
+    background: #f0fdf4;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+  }
+
+  .type-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 6px;
+  }
+
+  .type-label {
+    color: #64748b;
+    font-size: 0.75rem;
+    margin-bottom: 6px;
+    line-height: 1.2;
+  }
+
+  .type-price {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    padding: 4px 6px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.75rem;
+  }
+
+  /* Ticket Input Area - Mobile Optimized */
+  .ticket-input-area {
+    margin-bottom: 12px;
+  }
+
+  .input-helper {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+    font-size: 0.8rem;
+    color: #475569;
+    line-height: 1.4;
+  }
+
+  .number-input-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .ticket-number-input {
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+    font-family: monospace;
+    padding: 14px;
+  }
+
+  .add-single-btn {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 44px;
+    font-size: 0.9rem;
+  }
+
+  .add-single-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  }
+
+  .add-single-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* Current Selection Summary */
+  .current-selection {
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 12px;
+  }
+
+  .selection-summary-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 10px;
+  }
+
+  .selection-summary {
+    display: grid;
+    gap: 6px;
+  }
+
+  .summary-detail {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    color: #64748b;
+    font-size: 0.8rem;
+    line-height: 1.3;
+  }
+
+  .summary-detail i {
+    color: #3b82f6;
+    width: 14px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .summary-detail .value {
+    color: #1e293b;
+    font-weight: 600;
+    word-break: break-word;
+  }
+
+  /* Quick Actions - Mobile Stacked */
+  .quick-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  /* Added Tickets Display - Mobile Optimized */
+  .tickets-by-lottery {
+    margin-bottom: 16px;
+  }
+
+  .lottery-group {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+
+  .lottery-group-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #e2e8f0;
+    gap: 8px;
+  }
+
+  .lottery-group-title {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 0.9rem;
+    flex: 1;
+    word-break: break-word;
+  }
+
+  .lottery-group-count {
+    background: #3b82f6;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .draw-time-group {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 8px;
+  }
+
+  .draw-time-header {
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 10px;
+    font-size: 0.85rem;
+  }
+
+  .tickets-grid {
+    display: grid;
+    gap: 6px;
+  }
+
+  .ticket-item {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 10px;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 40px;
+  }
+
+  .ticket-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+  }
+
+  .ticket-number {
+    font-family: monospace;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #1e293b;
+  }
+
+  .ticket-type-badge {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .ticket-price {
+    color: #059669;
+    font-weight: 700;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+
+  .remove-ticket-btn {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    transition: all 0.2s ease;
+  }
+
+  .remove-ticket-btn:hover {
+    background: #dc2626;
+    transform: scale(1.1);
+  }
+
+  /* Summary Grid - Mobile Stacked */
+  .tickets-summary {
+    background: #f1f5f9;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 16px;
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+  }
+
+  .summary-item.total-item {
+    /* border-top: 2px solid #e2e8f0; */
+    padding-top: 12px;
+    margin-top: 8px;
+    font-size: 1.05rem;
+  }
+
+  .summary-label {
+    color: #475569;
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+
+  .summary-value {
+    color: #1e293b;
+    font-weight: 700;
+  }
+
+  .total-item .summary-value {
+    color: #059669;
+    font-size: 1.2rem;
+  }
+
+  /* Buttons - Mobile Optimized */
+  .btn {
+    padding: 12px 16px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 0.9rem;
+    min-height: 44px;
+    text-align: center;
+    word-break: break-word;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+  }
+
+  .btn-secondary {
+    background: #6b7280;
+    color: white;
+  }
+
+  .btn-info {
+    background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+    color: white;
+  }
+
+  .btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn.loading .btn-text {
+    display: none;
+  }
+
+  .btn.loading .btn-spinner {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn-spinner {
+    display: none;
+  }
+
+  .btn-text {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* Form Actions - Mobile Stacked */
+  .form-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-top: 16px;
+    padding: 16px 12px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Modal - Mobile Responsive */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 8px;
+    overflow-y: auto;
+  }
+
+  .modal-content {
+    background: white;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 500px;
+    margin: 20px auto;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .modal-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 12px 12px 0 0;
+  }
+
+  .modal-title {
+    margin: 0;
+    font-size: 1.1rem;
+    word-break: break-word;
+    flex: 1;
+    margin-right: 8px;
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .modal-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .modal-body {
+    padding: 16px;
+    font-size: 0.9rem;
+  }
+
+  .modal-footer {
+    padding: 12px 16px;
+    border-top: 1px solid #e2e8f0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  /* Toast - Mobile Positioned */
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100%);
+    padding: 12px 20px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    z-index: 10000;
+    transition: transform 0.3s ease;
+    max-width: calc(100vw - 32px);
+    text-align: center;
+    font-size: 0.9rem;
+  }
+
+  .toast.show {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .toast.success {
+    background: #10b981;
+  }
+
+  .toast.error {
+    background: #ef4444;
+  }
+
+  .toast.info {
+    background: #3b82f6;
+  }
+
+  /* Animations */
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes fadeOut {
+    to {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+  }
+
+  /* Responsive Breakpoints */
+  @media (min-width: 480px) {
+    .booking-container {
+      padding: 12px;
+    }
+
+    .form-section {
+      padding: 16px;
+    }
+
+    .page-title {
+      font-size: 1.5rem;
+    }
+
+    .form-row {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .number-input-wrapper {
+      flex-direction: row;
+      align-items: stretch;
+    }
+
+    .ticket-number-input {
+      flex: 1;
+    }
+
+    .add-single-btn {
+      flex-shrink: 0;
+      min-width: 140px;
+    }
+
+    .quick-actions {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .quick-actions .btn {
+      flex: none;
+      min-width: 120px;
+    }
+
+    .form-actions {
+      grid-template-columns: 1fr 2fr;
+    }
+
+    .toast {
+      top: 20px;
+      bottom: auto;
+      right: 20px;
+      left: auto;
+      transform: translateX(100%);
+      max-width: 400px;
+    }
+
+    .toast.show {
+      transform: translateX(0);
+    }
+  }
+
+  @media (min-width: 768px) {
+    .booking-container {
+      padding: 20px;
+      max-width: 800px;
+    }
+
+    .page-title {
+      font-size: 1.8rem;
+    }
+
+    .form-section {
+      padding: 20px;
+    }
+
+    .tickets-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .ticket-type-selector {
+      grid-template-columns: repeat(5, 1fr);
+    }
+
+    .summary-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .summary-item.total-item {
+      grid-column: 1 / -1;
+    }
+
+    .child-lottery-selector {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .lottery-details {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .modal-content {
+      max-width: 600px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .booking-container {
+      max-width: 900px;
+    }
+
+    .tickets-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .summary-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .summary-item.total-item {
+      grid-column: 3 / -1;
+    }
+  }
+
+  /* Accessibility & Touch Improvements */
+  @media (hover: none) and (pointer: coarse) {
+    .btn:hover {
+      transform: none;
+    }
+
+    .lottery-option:hover,
+    .child-option:hover,
+    .type-option:hover {
+      border-color: #e5e7eb;
+      box-shadow: none;
+    }
+  }
+
+  /* High DPI Displays */
+  @media (-webkit-min-device-pixel-ratio: 2) {
+    .loading-spinner {
+      border-width: 2px;
+      border-top-width: 2px;
+    }
+  }
+
+  /* Landscape Orientation on Small Screens */
+  @media (max-height: 500px) and (orientation: landscape) {
+    .booking-header {
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .page-title {
+      font-size: 1.2rem;
+    }
+
+    .page-subtitle {
+      font-size: 0.75rem;
+    }
+
+    .form-section {
+      padding: 12px;
+      margin-bottom: 8px;
+    }
+
+    .modal-content {
+      margin: 10px auto;
+      max-height: 95vh;
+    }
+  }
+</style>
+
+<script>
+  (function() {
+    'use strict';
+
+    // Global state
+    let lotteries = [];
+    let ticketCharges = [];
+    let addedTickets = [];
+
+    // Current selections
+    let selectedParentLottery = null;
+    let selectedChildLottery = null;
+    let selectedTicketType = null;
+
+    // Search state
+    let parentSearchTimeout = null;
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      initializeFlexibleBooking();
+      setupEventListeners();
+      loadInitialData();
+    });
+
+    function initializeFlexibleBooking() {
+      console.log('Flexible Multi-Lottery Booking System Initialized');
+      activateSelectionGroup('parentLotteryGroup');
+    }
+
+    function setupEventListeners() {
+      // Parent lottery search
+      document.getElementById('parentLotterySearch').addEventListener('input', handleParentSearch);
+      document.getElementById('clearParentSearch').addEventListener('click', clearParentSearch);
+
+      // Customer info
+      document.getElementById('customerName').addEventListener('input', validateCustomerInfo);
+      document.getElementById('customerPhone').addEventListener('input', validateCustomerInfo);
+
+      // Ticket number input
+      document.getElementById('ticketNumberInput').addEventListener('input', validateTicketNumber);
+      document.getElementById('ticketNumberInput').addEventListener('keypress', handleEnterKey);
+
+      // Buttons
+      document.getElementById('resetSelection').addEventListener('click', resetCurrentSelection);
+      // document.getElementById('changeSelections').addEventListener('click', changeSelections);
+      document.getElementById('addSingleTicket').addEventListener('click', addSingleTicket);
+      document.getElementById('clearAllTickets').addEventListener('click', clearAllTickets);
+      document.getElementById('proceedBooking').addEventListener('click', proceedToFinalBooking);
+
+      // Modal
+      document.getElementById('confirmFinalBooking').addEventListener('click', confirmFinalBooking);
+    }
+
+    // Load initial data
+    async function loadInitialData() {
+      try {
+        showParentLotteryLoading(true);
+
+        await Promise.all([
+          loadParentLotteries(),
+          loadTicketCharges()
+        ]);
+
+        showParentLotteryLoading(false);
+
+      } catch (error) {
+        console.error('Error loading initial data:', error);
+        showParentLotteryLoading(false);
+        showToast('Error loading data: ' + error.message, 'error');
+      }
+    }
+
+    // Load parent lotteries
+    async function loadParentLotteries() {
+      try {
+        const response = await fetch('/api/lotteries');
+        if (!response.ok) throw new Error('Failed to load lotteries');
+
+        const data = await response.json();
+        lotteries = data.lotteries || [];
+
+        renderParentLotteries(lotteries);
+
+      } catch (error) {
+        console.error('Error loading parent lotteries:', error);
+        throw error;
+      }
+    }
+
+    // Load ticket charges
+    async function loadTicketCharges() {
+      try {
+        const response = await fetch('/api/booking/ticket-charges');
+        if (!response.ok) throw new Error('Failed to load ticket charges');
+
+        const data = await response.json();
+        ticketCharges = data.ticketCharges || [];
+
+      } catch (error) {
+        console.error('Error loading ticket charges:', error);
+        throw error;
+      }
+    }
+
+    // Handle parent lottery search
+    function handleParentSearch(e) {
+      const searchTerm = e.target.value.trim();
+      const clearBtn = document.getElementById('clearParentSearch');
+
+      clearBtn.style.display = searchTerm ? 'block' : 'none';
+
+      clearTimeout(parentSearchTimeout);
+      parentSearchTimeout = setTimeout(() => {
+        filterParentLotteries(searchTerm);
+      }, 300);
+    }
+
+    function clearParentSearch() {
+      document.getElementById('parentLotterySearch').value = '';
+      document.getElementById('clearParentSearch').style.display = 'none';
+      filterParentLotteries('');
+    }
+
+    function filterParentLotteries(searchTerm) {
+      let filteredLotteries = [...lotteries];
+
+      if (searchTerm) {
+        filteredLotteries = filteredLotteries.filter(lottery => {
+          return (
+            lottery.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            lottery.name2?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            lottery.drawNumber.toString().includes(searchTerm)
+          );
+        });
+      }
+
+      renderParentLotteries(filteredLotteries);
+    }
+
+    // Render parent lotteries
+    function renderParentLotteries(lotteriesData) {
+      const container = document.getElementById('parentLotteryList');
+
+      if (lotteriesData.length === 0) {
+        container.innerHTML = '<p style="text-align: center; padding: 20px; color: #64748b;">No lotteries found</p>';
+        return;
+      }
+
+      const html = lotteriesData.map(lottery => `
+            <div class="lottery-option" onclick="selectParentLottery('${lottery._id}')">
+                <div class="lottery-option-header">
+                    <div>
+                        <div class="lottery-name">${lottery.name}</div>
+                        ${lottery.name2 ? `<div class="lottery-name2">${lottery.name2}</div>` : ''}
+                    </div>
+                    <div class="lottery-draw-badge">
+                        #${lottery.drawNumber}
+                    </div>
+                </div>
+                
+                <div class="lottery-details">
+                    <div class="lottery-detail">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>${new Date(lottery.drawDate).toLocaleDateString()}</span>
+                    </div>
+                    <div class="lottery-detail">
+                        <i class="fas fa-clock"></i>
+                        <span>${lottery.winners?.length || 1} draw times</span>
+                    </div>
+                    <div class="lottery-detail">
+                        <i class="fas fa-trophy"></i>
+                        <span>${lottery.prizes?.length || 0} prizes</span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+      container.innerHTML = html;
+    }
+
+    // Select parent lottery
+    window.selectParentLottery = function(lotteryId) {
+      selectedParentLottery = lotteries.find(l => l._id === lotteryId);
+      if (!selectedParentLottery) return;
+
+      // Update UI
+      document.querySelectorAll('.lottery-option').forEach(option => {
+        option.classList.remove('selected');
+      });
+      event.target.closest('.lottery-option').classList.add('selected');
+
+      // Mark group as completed and show next
+      completeSelectionGroup('parentLotteryGroup');
+      loadChildLotteries();
+      showSelectionGroup('childLotteryGroup');
+      activateSelectionGroup('childLotteryGroup');
+
+      updateSelectionSummary();
+    };
+
+    // Load child lotteries
+    function loadChildLotteries() {
+      const container = document.getElementById('childLotterySelector');
+
+      if (!selectedParentLottery.winners || selectedParentLottery.winners.length === 0) {
+        // Create default draw time
+        const html = `
+                <div class="child-option" onclick="selectChildLottery('main', 'Main Draw')">
+                    <div class="child-name">Main Draw</div>
+                    <div class="child-details">
+                        ${new Date(selectedParentLottery.drawDate).toLocaleString()}
+                    </div>
+                </div>
+            `;
+        container.innerHTML = html;
+      } else {
+        //   winner.resultTime=new Date(winner.resultTime).toLocaleString('en-IN', {
+        //   hour: 'numeric',
+        //   minute: '2-digit',
+        //   hour12: true,
+        //   timeZone: 'Asia/Dubai'
+        // }) 
+        const html = selectedParentLottery.winners.map((winner, index) => `
+                <div class="child-option" onclick="selectChildLottery('${winner._id}', 'Draw Time ${index + 1}')">
+                    <div class="child-name">Draw Time ${index + 1}</div>
+                    <div class="child-details">
+                        ${
+  winner.resultTime 
+    ? new Date(winner.resultTime).toLocaleString('en-IN', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+        timeZone: 'Asia/Dubai'
+      }) 
+    : 'Time TBA'
+}
+                    </div>
+                    <div class="child-details">
+                        ${winner.winNumbers?.length || 0} winning positions
+                    </div>
+                </div>
+            `).join('');
+
+        container.innerHTML = html;
+      }
+    }
+
+    // Select child lottery
+    window.selectChildLottery = function(childId, childName) {
+      selectedChildLottery = {
+        _id: childId,
+        name: childName,
+        data: selectedParentLottery.winners?.find(w => w._id === childId) || {
+          _id: childId
+        }
+      };
+
+      // Update UI
+      document.querySelectorAll('.child-option').forEach(option => {
+        option.classList.remove('selected');
+      });
+      event.target.closest('.child-option').classList.add('selected');
+
+      // Mark group as completed and show next
+      completeSelectionGroup('childLotteryGroup');
+      loadTicketTypes();
+      showSelectionGroup('ticketTypeGroup');
+      activateSelectionGroup('ticketTypeGroup');
+
+      updateSelectionSummary();
+    };
+
+    // Load ticket types
+    function loadTicketTypes() {
+      const container = document.getElementById('ticketTypeSelector');
+
+      if (ticketCharges.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #64748b; grid-column: 1/-1;">No ticket types available</p>';
+        return;
+      }
+
+      const ticketTypeInfo = {
+        5: {
+          label: '5 Digits',
+          example: '12345'
+        },
+        4: {
+          label: '4 Digits',
+          example: '1234'
+        },
+        3: {
+          label: '3 Digits',
+          example: '123'
+        },
+        2: {
+          label: '2 Digits',
+          example: '12'
+        },
+        1: {
+          label: 'Letter+Digit',
+          example: 'A7'
+        }
+      };
+
+      const sortedCharges = [...ticketCharges].sort((a, b) => b.ticketType - a.ticketType);
+
+      const html = sortedCharges.map(charge => `
+            <div class="type-option" onclick="selectTicketType(${charge.ticketType}, ${charge.chargeAmount})">
+                <div class="type-number">${charge.ticketType}</div>
+                <div class="type-label">${ticketTypeInfo[charge.ticketType]?.label || 'Type ' + charge.ticketType}</div>
+                <div class="type-price">Nu${charge.chargeAmount.toFixed(2)}</div>
+            </div>
+        `).join('');
+
+      container.innerHTML = html;
+    }
+
+    // Select ticket type
+    window.selectTicketType = function(ticketType, chargeAmount) {
+      selectedTicketType = {
+        type: ticketType,
+        charge: chargeAmount
+      };
+
+      // Update UI
+      document.querySelectorAll('.type-option').forEach(option => {
+        option.classList.remove('selected');
+      });
+      event.target.closest('.type-option').classList.add('selected');
+
+      // Mark group as completed and show next
+      completeSelectionGroup('ticketTypeGroup');
+      updateInputHelper();
+      showSelectionGroup('ticketNumberGroup');
+      activateSelectionGroup('ticketNumberGroup');
+
+      updateSelectionSummary();
+
+      // Focus input
+      setTimeout(() => {
+        document.getElementById('ticketNumberInput').focus();
+      }, 100);
+    };
+
+    // Update input helper
+    function updateInputHelper() {
+      const helper = document.getElementById('ticketInputHelper');
+
+      const helpers = {
+        5: {
+          text: 'Enter a 5-digit number',
+          example: 'Example: 12345, 67890, 00123',
+          pattern: 'Format: 5 digits (00000-99999)'
+        },
+        4: {
+          text: 'Enter a 4-digit number',
+          example: 'Example: 1234, 5678, 0012',
+          pattern: 'Format: 4 digits (0000-9999)'
+        },
+        3: {
+          text: 'Enter a 3-digit number',
+          example: 'Example: 123, 456, 007',
+          pattern: 'Format: 3 digits (000-999)'
+        },
+        2: {
+          text: 'Enter a 2-digit number',
+          example: 'Example: 12, 34, 07',
+          pattern: 'Format: 2 digits (00-99)'
+        },
+        1: {
+          text: 'Enter one letter (A-E) followed by one digit (0-9)',
+          example: 'Example: A7, B4, C0, D9, E5',
+          pattern: 'Format: Letter(A-E) + Digit(0-9)'
+        }
+      };
+
+      const helperInfo = helpers[selectedTicketType.type];
+      if (helperInfo) {
+        helper.innerHTML = `
+                <div style="font-weight: 600; margin-bottom: 4px;">${helperInfo.text}</div>
+                <div style="opacity: 0.8; margin-bottom: 4px;">${helperInfo.example}</div>
+                <div style="opacity: 0.7; font-size: 0.85rem;">${helperInfo.pattern}</div>
+            `;
+      }
+
+      // Update input placeholder
+      const input = document.getElementById('ticketNumberInput');
+      input.placeholder = helperInfo?.example.split(',')[0].replace('Example: ', '') || 'Enter number';
+      input.value = '';
+    }
+
+    // Validate ticket number
+    function validateTicketNumber() {
+      const input = document.getElementById('ticketNumberInput');
+      const error = document.getElementById('ticketNumberError');
+      const addBtn = document.getElementById('addSingleTicket');
+
+      const value = input.value.trim().toUpperCase();
+      let isValid = false;
+      let errorMessage = '';
+
+      if (!value) {
+        addBtn.disabled = true;
+        error.textContent = '';
+        return;
+      }
+
+      // Check if already exists with same lottery, child lottery, and type
+      const exists = addedTickets.some(ticket =>
+        ticket.number === value &&
+        ticket.lottery.id === selectedParentLottery._id &&
+        ticket.lottery.timeId === selectedChildLottery._id &&
+        ticket.type === selectedTicketType.type
+      );
+
+      if (exists) {
+        errorMessage = 'This exact ticket already exists in your list';
+      } else {
+        // Validate format based on type
+        switch (selectedTicketType.type) {
+          case 5:
+            isValid = /^\d{5}$/.test(value);
+            errorMessage = isValid ? '' : 'Must be exactly 5 digits';
+            break;
+          case 4:
+            isValid = /^\d{4}$/.test(value);
+            errorMessage = isValid ? '' : 'Must be exactly 4 digits';
+            break;
+          case 3:
+            isValid = /^\d{3}$/.test(value);
+            errorMessage = isValid ? '' : 'Must be exactly 3 digits';
+            break;
+          case 2:
+            isValid = /^\d{2}$/.test(value);
+            errorMessage = isValid ? '' : 'Must be exactly 2 digits';
+            break;
+          case 1:
+            isValid = /^[A-E][0-9]$/.test(value);
+            errorMessage = isValid ? '' : 'Must be one letter (A-E) followed by one digit (0-9)';
+            break;
+          default:
+            isValid = false;
+            errorMessage = 'Invalid ticket type';
+        }
+      }
+
+      error.textContent = errorMessage;
+      addBtn.disabled = !isValid || exists;
+
+      // Update input value for type 1 to uppercase
+      if (selectedTicketType.type === 1) {
+        input.value = value;
+      }
+    }
+
+    // Handle enter key
+    function handleEnterKey(e) {
+      if (e.key === 'Enter' && !document.getElementById('addSingleTicket').disabled) {
+        addSingleTicket();
+      }
+    }
+
+    // Add single ticket
+    function addSingleTicket() {
+      const ticketNumber = document.getElementById('ticketNumberInput').value.trim().toUpperCase();
+
+      if (!ticketNumber || !selectedParentLottery || !selectedChildLottery || !selectedTicketType) {
+        showToast('Please complete all selections before adding ticket', 'error');
+        return;
+      }
+
+      const ticket = {
+        id: generateTicketId(),
+        number: ticketNumber,
+        type: selectedTicketType.type,
+        chargeAmount: selectedTicketType.charge,
+        lottery: {
+          id: selectedParentLottery._id,
+          name: selectedParentLottery.name,
+          drawNumber: selectedParentLottery.drawNumber,
+          drawDate: selectedParentLottery.drawDate,
+          timeId: selectedChildLottery._id,
+          timeName: selectedChildLottery.name
+        },
+        drawTime: selectedChildLottery.data,
+        addedAt: new Date()
+      };
+
+      addedTickets.push(ticket);
+
+      // Update UI
+      renderGroupedTickets();
+      updateOverallSummary();
+      showTicketsSection();
+
+      // Reset input for next ticket
+      document.getElementById('ticketNumberInput').value = '';
+      document.getElementById('ticketNumberError').textContent = '';
+      document.getElementById('addSingleTicket').disabled = true;
+
+      // Show success
+      showToast(`Ticket ${ticketNumber} added! You can now add more tickets with different selections.`, 'success');
+
+      // Focus input for next entry
+      setTimeout(() => {
+        document.getElementById('ticketNumberInput').focus();
+      }, 100);
+    }
+
+    // Generate unique ticket ID
+    function generateTicketId() {
+      return 'ticket_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+
+    // Render grouped tickets
+    function renderGroupedTickets() {
+      const container = document.getElementById('ticketsByLottery');
+
+      if (addedTickets.length === 0) {
+        container.innerHTML = '';
+        return;
+      }
+
+      // Group tickets by parent lottery, then by child lottery
+      const grouped = {};
+
+      addedTickets.forEach(ticket => {
+        const lotteryKey = `${ticket.lottery.id}`;
+        const childKey = `${ticket.lottery.timeId}`;
+
+        if (!grouped[lotteryKey]) {
+          grouped[lotteryKey] = {
+            lottery: ticket.lottery,
+            children: {},
+            totalCount: 0
+          };
+        }
+
+        if (!grouped[lotteryKey].children[childKey]) {
+          grouped[lotteryKey].children[childKey] = {
+            timeName: ticket.lottery.timeName,
+            tickets: []
+          };
+        }
+
+        grouped[lotteryKey].children[childKey].tickets.push(ticket);
+        grouped[lotteryKey].totalCount++;
+      });
+
+      let html = '';
+
+      Object.values(grouped).forEach(lotteryGroup => {
+        html += `
+                <div class="lottery-group">
+                    <div class="lottery-group-header">
+                        <div class="lottery-group-title">
+                            ${lotteryGroup.lottery.name} (Draw #${lotteryGroup.lottery.drawNumber})
+                        </div>
+                        <div class="lottery-group-count">${lotteryGroup.totalCount} tickets</div>
+                    </div>
+            `;
+
+        Object.values(lotteryGroup.children).forEach(childGroup => {
+          html += `
+                    <div class="draw-time-group">
+                        <div class="draw-time-header">
+                            ${childGroup.timeName} - ${childGroup.tickets.length} tickets
+                        </div>
+                        
+                        <div class="tickets-grid">
+                `;
+
+          childGroup.tickets.forEach(ticket => {
+            html += `
+                        <div class="ticket-item" id="ticket-${ticket.id}">
+                            <button class="remove-ticket-btn" onclick="removeTicket('${ticket.id}')">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            
+                            <div class="ticket-info">
+                                <div class="ticket-number">${ticket.number}</div>
+                                <div class="ticket-type-badge">Type ${ticket.type}</div>
+                            </div>
+                            
+                            <div class="ticket-price">Nu ${ticket.chargeAmount.toFixed(2)}</div>
+                        </div>
+                    `;
+          });
+
+          html += `
+                        </div>
+                    </div>
+                `;
+        });
+
+        html += '</div>';
+      });
+
+      container.innerHTML = html;
+    }
+
+    // Remove ticket
+    window.removeTicket = function(ticketId) {
+      if (!confirm('Remove this ticket from the list?')) return;
+
+      const ticketElement = document.getElementById(`ticket-${ticketId}`);
+      if (ticketElement) {
+        ticketElement.style.animation = 'fadeOut 0.3s ease forwards';
+        setTimeout(() => {
+          addedTickets = addedTickets.filter(t => t.id !== ticketId);
+          renderGroupedTickets();
+          updateOverallSummary();
+
+          if (addedTickets.length === 0) {
+            hideTicketsSection();
+          }
+
+          showToast('Ticket removed', 'info');
+        }, 300);
+      }
+    };
+
+    // Update overall summary
+    function updateOverallSummary() {
+      const totalTickets = addedTickets.length;
+      const uniqueLotteries = new Set(addedTickets.map(t => t.lottery.id)).size;
+      const uniqueDrawTimes = new Set(addedTickets.map(t => `${t.lottery.id}_${t.lottery.timeId}`)).size;
+      const totalAmount = addedTickets.reduce((sum, ticket) => sum + ticket.chargeAmount, 0);
+
+      document.getElementById('ticketCounter').textContent = totalTickets;
+      document.getElementById('totalTickets').textContent = totalTickets;
+      //document.getElementById('uniqueLotteries').textContent = uniqueLotteries;
+      //document.getElementById('uniqueDrawTimes').textContent = uniqueDrawTimes;
+      document.getElementById('totalAmount').textContent = `Nu${totalAmount.toFixed(2)}`;
+      document.getElementById('finalTicketCount').textContent = totalTickets;
+
+      // Show/hide form actions
+      if (totalTickets > 0) {
+        document.getElementById('formActions').style.display = 'grid';
+      } else {
+        document.getElementById('formActions').style.display = 'none';
+      }
+    }
+
+    // Update selection summary
+    function updateSelectionSummary() {
+      const summary = document.getElementById('selectionSummary');
+      const container = document.getElementById('currentSelection');
+
+      if (!selectedParentLottery) {
+        container.style.display = 'none';
+        return;
+      }
+
+      let html = `
+            <div class="summary-detail">
+                <i class="fas fa-trophy"></i>
+                <span>Parent Lottery: <span class="value">${selectedParentLottery.name}</span></span>
+            </div>
+        `;
+
+      if (selectedChildLottery) {
+        html += `
+                <div class="summary-detail">
+                    <i class="fas fa-clock"></i>
+                    <span>Draw Time: <span class="value">${selectedChildLottery.name}</span></span>
+                </div>
+            `;
+      }
+
+      if (selectedTicketType) {
+        html += `
+                <div class="summary-detail">
+                    <i class="fas fa-hashtag"></i>
+                    <span>Ticket Type: <span class="value">Type ${selectedTicketType.type} (Nu${selectedTicketType.charge})</span></span>
+                </div>
+            `;
+      }
+
+      summary.innerHTML = html;
+      container.style.display = 'block';
+    }
+
+    // Reset current selection
+    function resetCurrentSelection() {
+      selectedParentLottery = null;
+      selectedChildLottery = null;
+      selectedTicketType = null;
+
+      // Reset UI
+      document.querySelectorAll('.lottery-option, .child-option, .type-option').forEach(option => {
+        option.classList.remove('selected');
+      });
+
+      // Reset groups
+      resetSelectionGroups();
+
+      // Hide and show first group
+      hideAllSelectionGroups();
+      showSelectionGroup('parentLotteryGroup');
+      activateSelectionGroup('parentLotteryGroup');
+
+      // Reset input
+      document.getElementById('ticketNumberInput').value = '';
+      document.getElementById('ticketNumberError').textContent = '';
+      document.getElementById('addSingleTicket').disabled = true;
+
+      // Update summary
+      updateSelectionSummary();
+
+      showToast('Selection reset - choose lottery again', 'info');
+    }
+
+    // Change selections (allows going back to change previous selections)
+    function changeSelections() {
+      // Reset groups but keep current selections highlighted
+      resetSelectionGroups();
+
+      // Show all groups for easy modification
+      showSelectionGroup('parentLotteryGroup');
+      showSelectionGroup('childLotteryGroup');
+      showSelectionGroup('ticketTypeGroup');
+      showSelectionGroup('ticketNumberGroup');
+
+      activateSelectionGroup('parentLotteryGroup');
+
+      showToast('You can now modify any selection', 'info');
+    }
+
+    // Clear all tickets
+    function clearAllTickets() {
+      if (!confirm('Remove all tickets from the list? This cannot be undone.')) return;
+
+      addedTickets = [];
+      renderGroupedTickets();
+      updateOverallSummary();
+      hideTicketsSection();
+      showToast('All tickets cleared', 'info');
+    }
+
+    // Proceed to final booking
+    function proceedToFinalBooking() {
+      if (!validateCustomerInfo()) {
+        showToast('Please fill in customer information', 'error');
+        return;
+      }
+
+      if (addedTickets.length === 0) {
+        showToast('Please add at least one ticket', 'error');
+        return;
+      }
+
+      showConfirmationModal();
+    }
+
+    // Validate customer info
+    function validateCustomerInfo() {
+      const name = document.getElementById('customerName').value.trim();
+      const phone = document.getElementById('customerPhone').value.trim();
+
+      let isValid = true;
+
+      // Clear previous errors
+      document.getElementById('customerNameError').textContent = '';
+      document.getElementById('customerPhoneError').textContent = '';
+
+      if (!name) {
+        document.getElementById('customerNameError').textContent = 'Customer name is required';
+        isValid = false;
+      }
+
+      if (!phone) {
+        document.getElementById('customerPhoneError').textContent = 'Phone number is required';
+        isValid = false;
+      } else if (!/^\+?[\d\s-()]+$/.test(phone)) {
+        document.getElementById('customerPhoneError').textContent = 'Invalid phone number format';
+        isValid = false;
+      }
+
+      return isValid;
+    }
+
+    // Show confirmation modal
+    function showConfirmationModal() {
+      const modal = document.getElementById('confirmationModal');
+      const details = document.getElementById('confirmationDetails');
+
+      const customerName = document.getElementById('customerName').value;
+      const customerPhone = document.getElementById('customerPhone').value;
+      const totalAmount = addedTickets.reduce((sum, ticket) => sum + ticket.chargeAmount, 0);
+
+      // Create detailed summary
+      const lotteryGroups = {};
+      addedTickets.forEach(ticket => {
+        const lotteryKey = `${ticket.lottery.name}_${ticket.lottery.timeId}`;
+        if (!lotteryGroups[lotteryKey]) {
+          lotteryGroups[lotteryKey] = {
+            lottery: ticket.lottery.name,
+            drawNumber: ticket.lottery.drawNumber,
+            timeName: ticket.lottery.timeName,
+            tickets: []
+          };
+        }
+        lotteryGroups[lotteryKey].tickets.push(ticket);
+      });
+
+      let lotteryGroupsHtml = '';
+      Object.values(lotteryGroups).forEach(group => {
+        const groupTotal = group.tickets.reduce((sum, ticket) => sum + ticket.chargeAmount, 0);
+
+        lotteryGroupsHtml += `
+                <div style="margin-bottom: 16px; padding: 12px; background: #f8fafc; border-radius: 8px; border-left: 4px solid #3b82f6;">
+                    <div style="font-weight: 600; margin-bottom: 6px; color: #1e293b; font-size: 0.9rem;">
+                        ${group.lottery} (Draw #${group.drawNumber}) - ${group.timeName}
+                    </div>
+                    <div style="margin-bottom: 6px; color: #64748b; font-size: 0.8rem;">
+                        ${group.tickets.length} tickets - Total: Nu ${groupTotal.toFixed(2)}
+                    </div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                        ${group.tickets.map(ticket => `
+                            <span style="background: white; border: 1px solid #e2e8f0; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.75rem;">
+                                ${ticket.number} (T${ticket.type})
+                            </span>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+      });
+
+      const html = `
+            <div style="margin-bottom: 16px;">
+                <h4 style="margin-bottom: 8px; color: #1e293b; font-size: 1rem;">Customer Details</h4>
+                <div style="background: #f1f5f9; padding: 12px; border-radius: 8px; font-size: 0.85rem;">
+                    <div style="margin-bottom: 6px;"><strong>Name:</strong> ${customerName}</div>
+                    <div><strong>Phone:</strong> ${customerPhone}</div>
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 16px;">
+                <h4 style="margin-bottom: 8px; color: #1e293b; font-size: 1rem;">Multi-Lottery Booking Summary</h4>
+                ${lotteryGroupsHtml}
+            </div>
+            
+            <div style="background: #f0fdf4; border: 2px solid #10b981; border-radius: 8px; padding: 12px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; font-size: 0.85rem;">
+                    <div><strong>Total Tickets:</strong> ${addedTickets.length}</div>
+                    <div><strong>Unique Lotteries:</strong> ${new Set(addedTickets.map(t => t.lottery.id)).size}</div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #10b981; padding-top: 12px;">
+                    <span style="font-weight: 600; color: #059669; font-size: 1rem;">Total Amount:</span>
+                    <span style="font-size: 1.2rem; font-weight: 700; color: #059669;">Nu${totalAmount.toFixed(2)}</span>
+                </div>
+            </div>
+        `;
+
+      details.innerHTML = html;
+      modal.style.display = 'block';
+    }
+
+    // Close confirmation modal
+    window.closeConfirmationModal = function() {
+      document.getElementById('confirmationModal').style.display = 'none';
+    };
+
+    // Confirm final booking
+    async function confirmFinalBooking() {
+      try {
+        const btn = document.getElementById('confirmFinalBooking');
+        btn.classList.add('loading');
+        btn.disabled = true;
+
+        let bookRes = await submitMultiLotteryBooking();
+
+        closeConfirmationModal();
+        showToast('Multi-lottery booking completed successfully!', 'success');
+
+        // Reset everything after successful booking
+        setTimeout(() => {
+          resetAllData();
+        }, 2000);
+
+        await downloadBookingReceipt(bookRes.data.ticketNumber);
+
+      } catch (error) {
+        console.error('Error confirming booking:', error);
+        showToast('Error: ' + error.message, 'error');
+      } finally {
+        const btn = document.getElementById('confirmFinalBooking');
+        btn.classList.remove('loading');
+        btn.disabled = false;
+      }
+    }
+
+    // Submit multi-lottery booking
+    async function submitMultiLotteryBooking() {
+      try {
+        const bookingData = {
+          customer: {
+            name: document.getElementById('customerName').value.trim(),
+            phone: document.getElementById('customerPhone').value.trim()
+          },
+          tickets: addedTickets.map(ticket => ({
+            lottery: {
+              id: ticket.lottery.id,
+              name: ticket.lottery.name,
+              drawNumber: ticket.lottery.drawNumber,
+              drawDate: ticket.lottery.drawDate,
+              timeId: ticket.lottery.timeId
+            },
+            number: ticket.number,
+            type: ticket.type,
+            chargeAmount: ticket.chargeAmount
+          })),
+          financial: {
+            quantity: addedTickets.length,
+            subtotal: addedTickets.reduce((sum, ticket) => sum + ticket.chargeAmount, 0),
+            totalAmount: addedTickets.reduce((sum, ticket) => sum + ticket.chargeAmount, 0)
+          },
+          meta: {
+            uniqueLotteries: new Set(addedTickets.map(t => t.lottery.id)).size,
+            uniqueDrawTimes: new Set(addedTickets.map(t => `${t.lottery.id}_${t.lottery.timeId}`)).size
+          }
+        };
+
+        const response = await fetch('/api/bookings', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(bookingData)
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to create booking');
+        }
+
+        const result = await response.json();
+        return result;
+
+      } catch (error) {
+        console.error('Error submitting multi-lottery booking:', error);
+        throw error;
+      }
+    }
+
+    async function downloadBookingReceipt(ticketNumber) {
+      try {
+        const response = await fetch(`/api/download-receipt/${ticketNumber}`, {
+          method: 'GET'
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to download receipt: ${response.statusText}`);
+        }
+
+        // Convert response to Blob (PDF)
+        const blob = await response.blob();
+
+        // Create a download link
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+
+        // Try to get filename from response header
+        const disposition = response.headers.get("Content-Disposition");
+        let fileName = `receipt-${ticketNumber}.pdf`;
+        if (disposition && disposition.includes("filename=")) {
+          fileName = disposition
+            .split("filename=")[1]
+            .replace(/['"]/g, "")
+            .trim();
+        }
+        a.download = fileName;
+
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+
+        showToast('Receipt downloaded successfully!', 'success');
+      } catch (error) {
+        console.error('Error downloading receipt:', error);
+        showToast('Error: ' + error.message, 'error');
+      }
+    }
+    // Reset all data
+    function resetAllData() {
+      // Reset customer info
+      document.getElementById('customerName').value = '';
+      document.getElementById('customerPhone').value = '';
+      document.getElementById('customerNameError').textContent = '';
+      document.getElementById('customerPhoneError').textContent = '';
+
+      // Reset tickets
+      addedTickets = [];
+      renderGroupedTickets();
+      updateOverallSummary();
+      hideTicketsSection();
+
+      // Reset selections
+      resetCurrentSelection();
+
+      showToast('All data reset - ready for new multi-lottery booking', 'info');
+    }
+
+    // Selection group management
+    function showSelectionGroup(groupId) {
+      const group = document.getElementById(groupId.replace('Group', '') + 'Group');
+      if (group) {
+        group.style.display = 'block';
+      }
+    }
+
+    function hideSelectionGroup(groupId) {
+      const group = document.getElementById(groupId);
+      if (group) {
+        group.style.display = 'none';
+      }
+    }
+
+    function hideAllSelectionGroups() {
+      ['childLotteryGroup', 'ticketTypeGroup', 'ticketNumberGroup'].forEach(groupId => {
+        hideSelectionGroup(groupId);
+      });
+    }
+
+    function activateSelectionGroup(groupId) {
+      // Remove active class from all groups
+      document.querySelectorAll('.selection-group').forEach(group => {
+        group.classList.remove('active');
+      });
+
+      // Add active class to target group
+      const group = document.getElementById(groupId.replace('Group', '') + 'Group');
+      if (group) {
+        group.classList.add('active');
+      }
+    }
+
+    function completeSelectionGroup(groupId) {
+      const group = document.getElementById(groupId.replace('Group', '') + 'Group');
+      if (group) {
+        group.classList.remove('active');
+        group.classList.add('completed');
+      }
+    }
+
+    function resetSelectionGroups() {
+      document.querySelectorAll('.selection-group').forEach(group => {
+        group.classList.remove('active', 'completed');
+      });
+    }
+
+    // Utility functions
+    function showParentLotteryLoading(show) {
+      document.getElementById('parentLotteryLoading').style.display = show ? 'flex' : 'none';
+      document.getElementById('parentLotteryList').style.display = show ? 'none' : 'block';
+    }
+
+    function showTicketsSection() {
+      document.getElementById('ticketsSection').style.display = 'block';
+    }
+
+    function hideTicketsSection() {
+      document.getElementById('ticketsSection').style.display = 'none';
+    }
+
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('bookingToast');
+      toast.textContent = message;
+      toast.className = `toast ${type}`;
+      toast.classList.add('show');
+
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 5000);
+    }
+
+    console.log('Flexible Multi-Lottery Booking System Loaded Successfully');
+  })();
+</script>

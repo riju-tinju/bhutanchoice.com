@@ -6,4 +6,6 @@ admin/package-lock.json
 admin/package.json
 customer/node_modules/
 customer/package-lock.json
+agent/node_modules/
+agent/package-lock.json
 upolads/
