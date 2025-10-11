@@ -11,6 +11,12 @@ router.get('/time', async function (req, res, next) {
 
 /* GET home page. */
 router.get('/', async function (req, res, next) {
+ let recentLotteries = await indexFun.getRecentLotteries(req, res);
+ 
+});
+
+/* GET home page. */
+router.get('/results', async function (req, res, next) {
   await indexFun.getLotteries(req, res)
 });
 router.post('/api/refresh-results',async function(req, res, next) {

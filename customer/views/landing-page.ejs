@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>Bhutan Official Lottery - Royal Government Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" />
+  
+
+
+
+
+  <style>
+    * {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      min-height: 100vh;
+      line-height: 1.6;
+      color: #1f2937;
+    }
+
+    .main-container {
+      max-width: 448px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    /* Header */
+    .app-header {
+      background: linear-gradient(135deg, #ff6b6b 0%, #6a82fb 50%, #45eba5 100%);
+      background-size: 300% 300%;
+      animation: gradientShift 6s ease infinite;
+      text-align: center;
+      padding: 24px 16px;
+      border-radius: 20px;
+      color: white;
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    @keyframes gradientShift {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    .header-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+    }
+
+    .main-title {
+      font-size: 1.75rem;
+      font-weight: 800;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      margin-bottom: 8px;
+    }
+
+    .main-description {
+      font-size: 1rem;
+      opacity: 0.95;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      margin-bottom: 20px;
+      max-width: 90%;
+    }
+
+    .cta-button {
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .cta-button:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Section Cards */
+    .section-card {
+      background: white;
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .section-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #374151;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-title i {
+      color: #3b82f6;
+    }
+
+    /* Results Ticker */
+    .result-item {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .result-item::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 4px;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 12px 0 0 12px;
+    }
+
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .lottery-name {
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .result-time {
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+
+    .result-details {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .winning-number {
+      font-family: 'Courier New', monospace;
+      font-weight: 800;
+      font-size: 1.2rem;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 6px 12px;
+      border-radius: 8px;
+      letter-spacing: 2px;
+    }
+
+    .prize-amount {
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .view-link {
+      color: rgba(255, 255, 255, 0.9);
+      text-decoration: underline;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    /* About Section */
+    .subsection {
+      margin-bottom: 24px;
+    }
+
+    .subsection-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .subsection-title i {
+      color: #10b981;
+    }
+
+    .schedule-item {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .day-name {
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .lottery-code {
+      font-family: 'Courier New', monospace;
+      background: #e0e7ff;
+      color: #3730a3;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+
+    /* Table */
+    .ticket-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .ticket-table th {
+      background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+      color: white;
+      padding: 12px 8px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+
+    .ticket-table td {
+      padding: 12px 8px;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 0.85rem;
+    }
+
+    .ticket-table tr:hover {
+      background: #f8fafc;
+    }
+
+    .ticket-type {
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .ticket-format {
+      font-family: 'Courier New', monospace;
+      background: #f1f5f9;
+      padding: 4px 8px;
+      border-radius: 4px;
+      color: #1e40af;
+    }
+
+    /* FAQ Section */
+    .faq-item {
+      margin-bottom: 20px;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .faq-question {
+      background: #f8fafc;
+      padding: 16px;
+      font-weight: 600;
+      color: #374151;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .faq-question i {
+      color: #f59e0b;
+      flex-shrink: 0;
+    }
+
+    .faq-answer {
+      padding: 16px;
+      background: white;
+      color: #4b5563;
+      line-height: 1.6;
+    }
+
+    /* Footer */
+    .footer {
+      background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+      color: white;
+      text-align: center;
+      padding: 24px;
+      border-radius: 20px;
+      margin-top: 32px;
+    }
+
+    .footer-content {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    .footer-title {
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    /* Responsive Design */
+    @media (min-width: 480px) {
+      .main-container {
+        padding: 20px;
+      }
+
+      .main-title {
+        font-size: 2rem;
+      }
+
+      .section-card {
+        padding: 28px;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .main-container {
+        max-width: 640px;
+      }
+
+      .result-details {
+        flex-wrap: nowrap;
+      }
+
+      .ticket-table th,
+      .ticket-table td {
+        padding: 16px 12px;
+        font-size: 0.9rem;
+      }
+    }
+
+    /* Badges */
+    .live-badge {
+      background: linear-gradient(45deg, #ef4444, #dc2626);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    .info-highlight {
+      background: #e0f2fe;
+      border-left: 4px solid #0284c7;
+      padding: 12px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 0.9rem;
+      color: #0f172a;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="main-container">
+    <!-- Hero Section -->
+    <header class="app-header">
+      <div class="header-content">
+        <div class="logo-section">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfvxp4SnnjaYyFQDP8d5D660XMvy4nQfc08ScgqFq3IjufpC1OH-ykrQ6v-SkPsuVCt7w&usqp=CAU" alt="Bhutan Government Logo" class="logo" />
+        </div>
+        <h1 class="main-title">Bhutan Official Lottery</h1>
+        <p class="main-description">
+          Your trusted source for daily official lottery results. Check winning numbers, learn about our various
+          lottery schemes, and play responsibly.
+        </p>
+        <button onclick="openUrl('results')" class="cta-button">
+          <i class="fas fa-ticket-alt"></i>
+          View All Lotteries
+        </button>
+      </div>
+    </header>
+    <script>
+      function openUrl(path) {
+        window.location.href = `/${path}`;
+      }
+    </script>
+    <!-- Quick Lottery Results Ticker -->
+    <section class="section-card">
+      <h2 class="section-title">
+        <i class="fas fa-clock"></i>
+        Today's Latest Results
+      </h2>
+
+      <!-- <div class="result-item">
+        <div class="result-header">
+          <div class="lottery-name">Sunday Choice (SUC-11th Draw) 2:00 PM</div>
+        </div>
+      </div> -->
+
+      <% if (recentLotteries && recentLotteries.length > 0) { %>
+      <% recentLotteries.forEach(function(lottery, index) { %>
+      <div class="result-item">
+        <div class="result-header">
+          <div class="lottery-name">
+            <span class="lottery-title"><%= lottery.name %></span>
+            <span class="lottery-time">
+              <% if (lottery.resultTime) { %>
+              <%= moment(lottery.resultTime).tz("Asia/Dubai").format("h:mm A") %>
+              <% } %>
+            </span>
+          </div>
+        </div>
+      </div>
+      <% }) %>
+      <% } else { %>
+      <div class="no-results">
+        <p>No recent lottery results available</p>
+      </div>
+      <% } %>
+
+    
+
+      
+      </div>
+    </section>
+
+    <!-- About Lotteries Section -->
+    <section class="section-card">
+      <h2 class="section-title">
+        <i class="fas fa-info-circle"></i>
+        About Our Lotteries
+      </h2>
+
+      <!-- Daily Lottery Schedule -->
+      <div class="subsection">
+        <h3 class="subsection-title">
+          <i class="fas fa-calendar-alt"></i>
+          Play Every Day, Every Hour
+        </h3>
+        <p style="margin-bottom: 16px; color: #4b5563">
+          We bring you excitement throughout the day! From 9:00 AM to 9:00 PM, a new draw starts every hour.
+        </p>
+
+        <div class="schedule-item">
+          <div class="day-name">Sunday</div>
+          <div class="lottery-code">SUC</div>
+        </div>
+        <div class="schedule-item">
+          <div class="day-name">Monday</div>
+          <div class="lottery-code">MOC</div>
+        </div>
+        <div class="schedule-item">
+          <div class="day-name">Tuesday</div>
+          <div class="lottery-code">TUC</div>
+        </div>
+        <div class="schedule-item">
+          <div class="day-name">Wednesday</div>
+          <div class="lottery-code">WEC</div>
+        </div>
+        <div class="schedule-item">
+          <div class="day-name">Thursday</div>
+          <div class="lottery-code">THC</div>
+        </div>
+        <div class="schedule-item">
+          <div class="day-name">Friday</div>
+          <div class="lottery-code">FRC</div>
+        </div>
+        <div class="schedule-item">
+          <div class="day-name">Saturday</div>
+          <div class="lottery-code">SAC</div>
+        </div>
+
+        <div class="info-highlight">
+          <strong>Note:</strong> Each day has up to 12 draws, one for each hour. For example, "Sunday Choice Lottery
+          (SUC-11th Draw) 9:00 AM" and "Sunday Choice Lottery (SUC-11th Draw) 2:00 PM" are two separate lotteries with
+          their own draws and prizes.
+        </div>
+      </div>
+
+      <!-- Ticket Types & Prizes -->
+      <div class="subsection">
+        <h3 class="subsection-title">
+          <i class="fas fa-trophy"></i>
+          Ticket Types and Winning Potential
+        </h3>
+        <p style="margin-bottom: 16px; color: #4b5563">
+          You can choose from five different types of tickets, each with its own prize structure.
+        </p>
+
+        <table class="ticket-table">
+          <thead>
+            <tr>
+              <th>Ticket Type</th>
+              <th>Format</th>
+              <th>Example</th>
+              <th>Eligible Prizes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="ticket-type">5th Type</td>
+              <td class="ticket-format">5 Numbers</td>
+              <td class="ticket-format">12345</td>
+              <td>1st Prize</td>
+            </tr>
+            <tr>
+              <td class="ticket-type">4th Type</td>
+              <td class="ticket-format">4 Numbers</td>
+              <td class="ticket-format">1234</td>
+              <td>2nd Prize</td>
+            </tr>
+            <tr>
+              <td class="ticket-type">3rd Type</td>
+              <td class="ticket-format">3 Numbers</td>
+              <td class="ticket-format">123</td>
+              <td>3rd Prize</td>
+            </tr>
+            <tr>
+              <td class="ticket-type">2nd Type</td>
+              <td class="ticket-format">2 Numbers</td>
+              <td class="ticket-format">12</td>
+              <td>4th Prize</td>
+            </tr>
+            <tr>
+              <td class="ticket-type">1st Type</td>
+              <td class="ticket-format">1 Number + Letter</td>
+              <td class="ticket-format">5C</td>
+              <td>5th Prize</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="info-highlight">
+          <strong>Key Takeaway:</strong> The 1st Prize is exclusively available for holders of the 5-number (5th Type)
+          tickets. Similarly, the 2nd Prize is only for 4-number (4th Type) tickets, and so on.
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="section-card">
+      <h2 class="section-title">
+        <i class="fas fa-question-circle"></i>
+        Frequently Asked Questions
+      </h2>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          <i class="fas fa-clock"></i>
+          How often are the lottery draws?
+        </div>
+        <div class="faq-answer">
+          Draws are held every day from 9:00 AM to 9:00 PM, with a new lottery starting every hour. Each day of the
+          week has its own dedicated lottery (e.g., SUC for Sunday, MOC for Monday).
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          <i class="fas fa-code"></i>
+          What do the lottery codes like SUC and MOC mean?
+        </div>
+        <div class="faq-answer">
+          The first two characters represent the day of the week. SU = Sunday, MO = Monday, TU = Tuesday, etc. The C
+          stands for "Choice Lottery."
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          <i class="fas fa-trophy"></i>
+          Which ticket type should I buy to win the 1st Prize?
+        </div>
+        <div class="faq-answer">
+          The 1st Prize is only available for the 5th Type ticket, which has a 5-digit number. Be sure to check your
+          ticket type before purchasing.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          <i class="fas fa-store"></i>
+          Where can I buy an official ticket?
+        </div>
+        <div class="faq-answer">
+          Official tickets are sold through authorized agents across all Dzongkhags. Always ensure you receive a
+          printed, official ticket for your entry.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          <i class="fas fa-shield-alt"></i>
+          Is the Bhutan Lottery legal and official?
+        </div>
+        <div class="faq-answer">
+          Yes. This is the official portal for the state-run Bhutan Lottery Limited (BLL), the only legal lottery
+          operator in Bhutan.
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-title">Royal Government of Bhutan</div>
+        <p>© 2023 Bhutan Lottery Limited. A State-Owned Enterprise. All Rights Reserved.</p>
+        <p style="margin-top: 8px; font-size: 0.8rem; opacity: 0.8">
+          Official portal for Bhutan State Lotteries - Play Responsibly
+        </p>
+      </div>
+    </footer>
+  </div>
+</body>
+
+</html>

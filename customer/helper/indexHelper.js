@@ -2,6 +2,79 @@ const Lottery = require("../model/lotterySchema"); // Your model
 const moment = require("moment-timezone");
 
 const indexHelper = {
+  getRecentLotteries: async (req, res) => {
+    try {
+      const currentTimeDubai = moment().tz("Asia/Dubai");
+      const startOfTodayDubai = moment().tz("Asia/Dubai").startOf('day');
+
+      // Convert Dubai time to UTC for database query
+      const startOfTodayUTC = startOfTodayDubai.utc();
+      const currentTimeUTC = currentTimeDubai.utc();
+
+      const recentLotteries = await Lottery.aggregate([
+        // Unwind the winners array to work with individual winners
+        { $unwind: "$winners" },
+
+        // Match winners where resultTime is between start of today and current time
+        // {
+        //   $match: {
+        //     "winners.resultTime": {
+        //       $gte: startOfTodayUTC.toDate(),
+        //       $lte: currentTimeUTC.toDate()
+        //     }
+        //   }
+        // },
+
+        // Project the required fields
+        {
+          $project: {
+            name: {
+              $cond: {
+                if: { $ne: ["$name2", null] },
+                then: { $concat: ["$name", " ", "$name2"] },
+                else: "$name"
+              }
+            },
+            resultTime: "$winners.resultTime"
+          }
+        },
+
+        // Sort by drawTime descending (most recent first)
+        { $sort: { resultTime: -1 } },
+        
+        // Limit to 5 results
+        { $limit: 5 },
+
+        // Remove the final projection that was creating array format
+        // {
+        //   $project: {
+        //     _id: 0,
+        //     lotteryInfo: [
+        //       "$name",
+        //       { $dateToString: { format: "%Y-%m-%dT%H:%M:%S.%LZ", date: "$drawTime" } }
+        //     ]
+        //   }
+        // }
+      ]);
+
+      // No need to map since we already have array of objects with name and resultTime
+      const result = recentLotteries;
+
+      
+      // res.status(200).json({
+      //   success: true,
+      //   data: result
+      // });
+
+      console.log("Recent lotteries fetched successfully:", result);
+
+      return res.render('landing-page',{ recentLotteries: result || [],moment: moment,  })
+
+    } catch (error) {
+      console.error('Error fetching recent lotteries:', error);
+      return res.render('landing-page',{ recentLotteries:[] })
+    }
+  },
   getLotteries: async (req, res) => {
     try {
       const allLotteries = await Lottery.find({});
