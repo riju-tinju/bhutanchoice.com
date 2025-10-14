@@ -1166,8 +1166,9 @@
       document.getElementById('drawNumber').value = autoCompleteData.nextDrawNumber || '';
 
       if (autoCompleteData.suggestedDate) {
-        const date = new Date(autoCompleteData.suggestedDate);
-        document.getElementById('drawDate').value = date.toISOString().slice(0, 16);
+        // const date = new Date(autoCompleteData.suggestedDate);
+        let date=moment(autoCompleteData.suggestedDate).tz("Asia/Dubai").format("DD MMM YYYY h:mm a")
+        document.getElementById('drawDate').value = date
       }
     }
 
@@ -1191,9 +1192,9 @@
       const utcDate = new Date(lotteryData.drawDate);
       // const istOffset = (5 * 60 * 60 * 1000) + (30 * 60 * 1000);
        const dubaiOffset = 4 * 60 * 60 * 1000;
-      const istDate = new Date(utcDate.getTime());
+      const istDate = new Date(utcDate.getTime()+dubaiOffset);
       const formattedIST = istDate.toISOString().slice(0, 16);
-      document.getElementById('drawDate').value = formattedIST;
+      document.getElementById('drawDate').value = formattedIST
     }
 
     // Fill prizes
@@ -1233,7 +1234,7 @@
         // Set result time
         if (winner.resultTime) {
           const utcDate = new Date(winner.resultTime);
-          const istOffset = (5 * 60 * 60 * 1000) + (30 * 60 * 1000);
+          const istOffset = (4 * 60 * 60 * 1000) ;
           const istDate = new Date(utcDate.getTime() + istOffset);
           const formattedIST = istDate.toISOString().slice(0, 16);
           winnerGroupDiv.querySelector('.winner-group-time input').value = formattedIST;
