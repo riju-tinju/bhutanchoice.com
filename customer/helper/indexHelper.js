@@ -123,6 +123,7 @@ const indexHelper = {
         todays,
         upcoming: filteredUpcoming,
         past: limitedPast,
+        moment: moment,
         currentDateFromServer: today.toDate(),
       });
     } catch (err) {

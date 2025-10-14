@@ -49,6 +49,7 @@ const lotterySchema = new Schema({
       {
        prizeRank: Number,
        ticketNumber: String,
+       resultStatus: { type: Boolean, default: false}
       }
     ],
     

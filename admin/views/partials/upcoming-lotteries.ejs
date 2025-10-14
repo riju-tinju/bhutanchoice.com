@@ -64,6 +64,8 @@
         hour12: true,
         timeZone: 'Asia/Dubai'
     }).replace(',', '');
+
+   
     
    
 %>
@@ -76,7 +78,7 @@
               <%= status %>
             </span>
             <span class="card-text-secondary card-date">
-              <%= nextDrawTime %>
+              <%= moment(nextDrawTime).tz("Asia/Dubai").format("DD MMM YYYY h:mm a") %>
             </span>
           </div>
 

@@ -55,6 +55,7 @@ const indexHelper = {
         upcoming: filteredUpcoming,
         past: limitedPast,
         currentDateFromServer: today.toDate(),
+        moment: moment,
       });
     } catch (err) {
       console.error("Error fetching lotteries:", err);
