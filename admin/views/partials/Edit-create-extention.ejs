@@ -38,7 +38,7 @@
             </div>
           </div>
         </div>
-        
+
 
         <!-- Prize Structure Section -->
         <div class="form-section">
@@ -559,27 +559,27 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
 
-  .toggle-switch input:checked + .toggle-slider {
+  .toggle-switch input:checked+.toggle-slider {
     background: linear-gradient(135deg, #10B981 0%, #059669 100%);
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 8px rgba(16, 185, 129, 0.3);
   }
 
-  .toggle-switch input:focus + .toggle-slider {
+  .toggle-switch input:focus+.toggle-slider {
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
   }
 
-  .toggle-switch input:checked + .toggle-slider:before {
+  .toggle-switch input:checked+.toggle-slider:before {
     transform: translateX(20px);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   }
 
   /* Toggle switch states */
-  .toggle-switch input:disabled + .toggle-slider {
+  .toggle-switch input:disabled+.toggle-slider {
     opacity: 0.6;
     cursor: not-allowed;
   }
 
-  .toggle-switch input:disabled + .toggle-slider:before {
+  .toggle-switch input:disabled+.toggle-slider:before {
     cursor: not-allowed;
   }
 
@@ -866,7 +866,7 @@
       width: 24px;
     }
 
-    .toggle-switch input:checked + .toggle-slider:before {
+    .toggle-switch input:checked+.toggle-slider:before {
       transform: translateX(22px);
     }
 
@@ -1167,7 +1167,7 @@
 
       if (autoCompleteData.suggestedDate) {
         // const date = new Date(autoCompleteData.suggestedDate);
-        let date=moment(autoCompleteData.suggestedDate).tz("Asia/Dubai").format("DD MMM YYYY h:mm a")
+        let date = moment(autoCompleteData.suggestedDate).tz("Asia/Dubai").format("DD MMM YYYY h:mm a")
         document.getElementById('drawDate').value = date
       }
     }
@@ -1191,8 +1191,8 @@
     if (lotteryData.drawDate) {
       const utcDate = new Date(lotteryData.drawDate);
       // const istOffset = (5 * 60 * 60 * 1000) + (30 * 60 * 1000);
-       const dubaiOffset = 4 * 60 * 60 * 1000;
-      const istDate = new Date(utcDate.getTime()+dubaiOffset);
+      const dubaiOffset = 4 * 60 * 60 * 1000;
+      const istDate = new Date(utcDate.getTime() + dubaiOffset);
       const formattedIST = istDate.toISOString().slice(0, 16);
       document.getElementById('drawDate').value = formattedIST
     }
@@ -1234,9 +1234,11 @@
         // Set result time
         if (winner.resultTime) {
           const utcDate = new Date(winner.resultTime);
-          const istOffset = (4 * 60 * 60 * 1000) ;
+          const istOffset = (4 * 60 * 60 * 1000);
           const istDate = new Date(utcDate.getTime() + istOffset);
           const formattedIST = istDate.toISOString().slice(0, 16);
+
+          
           winnerGroupDiv.querySelector('.winner-group-time input').value = formattedIST;
         }
 

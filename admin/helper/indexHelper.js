@@ -411,7 +411,7 @@ const indexHelper = {
       });
     }
   },
-  getLottery: async (req, res) => {
+  getLottery2: async (req, res) => {
     try {
       const { id } = req.params;
 
@@ -438,6 +438,84 @@ const indexHelper = {
       return res.status(200).json({
         success: true,
         data: lottery,
+      });
+    } catch (err) {
+      console.error("Error in getLottery:", err);
+      return res
+        .status(500)
+        .json({ success: false, message: "Failed to fetch lottery" });
+    }
+  },
+  getLottery: async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      if (!id) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Lottery ID is required" });
+      }
+
+      // 1. Fetch the lottery document
+      const lottery = await Lottery.findById(id).select(
+        "_id name name2 drawNumber drawDate prizes winners"
+      ).lean(); // Use .lean() for performance when modifying the result
+
+      if (!lottery) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Lottery not found" });
+      }
+
+      // --- Implementation of the Sorting Logic ---
+
+      // 2. Get the current time in Dubai (GMT+4)
+      // Use the timezone 'Asia/Dubai' for accuracy
+      const nowInDubai = moment().tz("Asia/Dubai");
+
+      // 3. Sort the 'winners' array
+      // We are sorting the array directly on the `lottery` object fetched with `.lean()`
+      lottery.winners.sort((a, b) => {
+        // NOTE: Mongoose stores resultTime as a JS Date object, so no need for 'new Date()' on a.resultTime, 
+        // but we use moment() for accurate comparison against the Dubai time.
+
+        // Convert winner resultTimes to Moment objects for comparison
+        const dateA = moment(a.resultTime);
+        const dateB = moment(b.resultTime);
+
+        // Determine if each event is upcoming relative to Dubai's current time
+        // .isAfter() checks if dateA is strictly in the future compared to nowInDubai
+        const isUpcomingA = dateA.isAfter(nowInDubai);
+        const isUpcomingB = dateB.isAfter(nowInDubai);
+
+        // --- Primary Sort Logic: Prioritize Upcoming Events ---
+
+        // Case 1: 'a' is upcoming, 'b' is past/present.
+        if (isUpcomingA && !isUpcomingB) {
+          return -1; // 'a' comes before 'b'
+        }
+        // Case 2: 'a' is past/present, 'b' is upcoming.
+        if (!isUpcomingA && isUpcomingB) {
+          return 1; // 'b' comes before 'a'
+        }
+
+        // --- Secondary Sort Logic: Sorting within the same category ---
+
+        if (isUpcomingA && isUpcomingB) {
+          // Case 3: Both are upcoming, sort ascending (earliest first).
+          // dateA - dateB (Moment subtraction) returns the difference in milliseconds.
+          return dateA - dateB;
+        } else {
+          // Case 4: Both are past/present, sort descending (most recent first).
+          // dateB - dateA to put the more recent date (larger value) first.
+          return dateB - dateA;
+        }
+      });
+
+      // 4. Return the result with the sorted 'winners' array
+      return res.status(200).json({
+        success: true,
+        data: lottery, // This object now contains the sorted winners array
       });
     } catch (err) {
       console.error("Error in getLottery:", err);
@@ -791,16 +869,16 @@ const indexHelper = {
     }
   },
   getAllTicketCharges: async (req, res) => {
-    try{
-      let charges = await Charge.find({}).sort({ticketType:1})
-      if(!charges){
-       return res.status(404).json({success:false, message:"No ticket charges found"})
+    try {
+      let charges = await Charge.find({}).sort({ ticketType: 1 })
+      if (!charges) {
+        return res.status(404).json({ success: false, message: "No ticket charges found" })
       }
-     return res.status(200).json({success:true, message:"Ticket charges retrieved successfully", ticketCharges: charges, count: charges.length})
+      return res.status(200).json({ success: true, message: "Ticket charges retrieved successfully", ticketCharges: charges, count: charges.length })
 
-     
-    }catch(err){
-      res.status(500).json({success:false, message:"Failed to retrieve ticket charges", error: err.message})
+
+    } catch (err) {
+      res.status(500).json({ success: false, message: "Failed to retrieve ticket charges", error: err.message })
     }
   },
   saveBooking: async (req, res) => {
@@ -867,7 +945,7 @@ const indexHelper = {
         // -------------------------
         // Step 4: Fetch child lottery (inside winners[])
         // -------------------------
-        const timeId =new mongoose.Types.ObjectId(ticket.lottery.timeId);
+        const timeId = new mongoose.Types.ObjectId(ticket.lottery.timeId);
         const childLottery = lottery.winners.find(
           (w) => w._id.toString() === timeId.toString()
         );
@@ -941,7 +1019,7 @@ const indexHelper = {
       return res.status(201).json({
         success: true,
         message: "Booking saved successfully",
-        data:booking,
+        data: booking,
       });
     } catch (err) {
       console.error("Error saving booking:", err);
@@ -953,174 +1031,174 @@ const indexHelper = {
     }
   },
   saveBooking1: async (req, res) => {
-  try {
-    const { customer, tickets } = req.body;
+    try {
+      const { customer, tickets } = req.body;
 
-    // ✅ customer validation
-    if (!customer || !customer.name || !customer.phone) {
-      return res.status(400).json({
-        success: false,
-        message: "Customer name and phone are required",
-      });
-    }
-
-    // ✅ tickets validation
-    if (!tickets || !Array.isArray(tickets) || tickets.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "At least one ticket is required",
-      });
-    }
-
-    const validatedTickets = [];
-
-    for (const ticket of tickets) {
-      if (
-        !ticket.lottery ||
-        !ticket.lottery.id ||
-        !ticket.lottery.timeId ||
-        !ticket.number ||
-        ticket.type === undefined ||
-        ticket.chargeAmount === undefined
-      ) {
+      // ✅ customer validation
+      if (!customer || !customer.name || !customer.phone) {
         return res.status(400).json({
           success: false,
-          message:
-            "Each ticket must have lottery.id, lottery.timeId, number, type, and chargeAmount",
+          message: "Customer name and phone are required",
         });
       }
 
-      if (!mongoose.Types.ObjectId.isValid(ticket.lottery.id)) {
+      // ✅ tickets validation
+      if (!tickets || !Array.isArray(tickets) || tickets.length === 0) {
         return res.status(400).json({
           success: false,
-          message: `Invalid lottery ID format: ${ticket.lottery.id}`,
+          message: "At least one ticket is required",
         });
       }
 
-      const lottery = await Lottery.findById(ticket.lottery.id);
-      if (!lottery) {
-        return res.status(404).json({
-          success: false,
-          message: `Lottery not found with ID: ${ticket.lottery.id}`,
+      const validatedTickets = [];
+
+      for (const ticket of tickets) {
+        if (
+          !ticket.lottery ||
+          !ticket.lottery.id ||
+          !ticket.lottery.timeId ||
+          !ticket.number ||
+          ticket.type === undefined ||
+          ticket.chargeAmount === undefined
+        ) {
+          return res.status(400).json({
+            success: false,
+            message:
+              "Each ticket must have lottery.id, lottery.timeId, number, type, and chargeAmount",
+          });
+        }
+
+        if (!mongoose.Types.ObjectId.isValid(ticket.lottery.id)) {
+          return res.status(400).json({
+            success: false,
+            message: `Invalid lottery ID format: ${ticket.lottery.id}`,
+          });
+        }
+
+        const lottery = await Lottery.findById(ticket.lottery.id);
+        if (!lottery) {
+          return res.status(404).json({
+            success: false,
+            message: `Lottery not found with ID: ${ticket.lottery.id}`,
+          });
+        }
+
+        const timeId = new mongoose.Types.ObjectId(ticket.lottery.timeId);
+        const childLottery = lottery.winners.find(
+          (w) => w._id.toString() === timeId.toString()
+        );
+
+        if (!childLottery) {
+          return res.status(404).json({
+            success: false,
+            message: `Child lottery not found with ID: ${ticket.lottery.timeId}`,
+          });
+        }
+
+        validatedTickets.push({
+          lottery: {
+            id: lottery._id,
+            name: lottery.name,
+            drawNumber: lottery.drawNumber,
+            drawDate: childLottery.resultTime,
+            timeId: timeId,
+          },
+          number: ticket.number.toString().trim(),
+          type: parseInt(ticket.type),
+          chargeAmount: parseFloat(ticket.chargeAmount),
         });
       }
 
-      const timeId =new mongoose.Types.ObjectId(ticket.lottery.timeId);
-      const childLottery = lottery.winners.find(
-        (w) => w._id.toString() === timeId.toString()
+      const quantity = validatedTickets.length;
+      const subtotal = validatedTickets.reduce((s, t) => s + t.chargeAmount, 0);
+      const totalAmount = subtotal;
+
+      const booking = new Booking({
+        ticketNumber: `BOOK-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+        customer: {
+          name: customer.name.trim(),
+          phone: customer.phone.trim(),
+        },
+        agent: {
+          name: "System Agent",
+          id: new mongoose.Types.ObjectId(),
+          phone: "+0000000000",
+          role: ["agent"],
+        },
+        booking: { date: new Date(), status: "active" },
+        tickets: validatedTickets,
+        financial: { quantity, subtotal, totalAmount, currency: "USD" },
+        payment: {
+          method: "cash",
+          status: "paid",
+          reference: `PAY-${Date.now()}`,
+        },
+      });
+
+      await booking.save();
+
+      // -------------------------
+      // 📄 Generate PDF Receipt
+      // -------------------------
+      const doc = new PDFDocument({ margin: 50 });
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename=receipt-${booking.ticketNumber}.pdf`
       );
 
-      if (!childLottery) {
-        return res.status(404).json({
-          success: false,
-          message: `Child lottery not found with ID: ${ticket.lottery.timeId}`,
-        });
-      }
+      // Pipe PDF directly to response
+      doc.pipe(res);
 
-      validatedTickets.push({
-        lottery: {
-          id: lottery._id,
-          name: lottery.name,
-          drawNumber: lottery.drawNumber,
-          drawDate: childLottery.resultTime,
-          timeId: timeId,
-        },
-        number: ticket.number.toString().trim(),
-        type: parseInt(ticket.type),
-        chargeAmount: parseFloat(ticket.chargeAmount),
+      // Title
+      doc.fontSize(20).text("Lottery Booking Receipt", { align: "center" });
+      doc.moveDown();
+
+      // Booking Info
+      doc.fontSize(12).text(`Booking Ref: ${booking.ticketNumber}`);
+      doc.text(`Date: ${booking.booking.date.toDateString()}`);
+      doc.moveDown();
+
+      // Customer Info
+      doc.text(`Customer: ${booking.customer.name}`);
+      doc.text(`Phone: ${booking.customer.phone}`);
+      doc.moveDown();
+
+      // Ticket Table
+      doc.fontSize(14).text("Tickets:", { underline: true });
+      doc.moveDown(0.5);
+
+      booking.tickets.forEach((t, i) => {
+        doc
+          .fontSize(12)
+          .text(
+            `${i + 1}. ${t.lottery.name} | Draw #${t.lottery.drawNumber} | ${new Date(
+              t.lottery.drawDate
+            ).toDateString()} | Number: ${t.number} | Type: ${t.type} | $${t.chargeAmount.toFixed(
+              2
+            )}`
+          );
+      });
+      doc.moveDown();
+
+      // Financials
+      doc.fontSize(14).text("Payment Summary:", { underline: true });
+      doc.fontSize(12).text(`Quantity: ${booking.financial.quantity}`);
+      doc.text(`Subtotal: $${booking.financial.subtotal.toFixed(2)}`);
+      doc.text(`Total: $${booking.financial.totalAmount.toFixed(2)}`);
+      doc.text(`Payment Status: ${booking.payment.status}`);
+      doc.text(`Payment Ref: ${booking.payment.reference}`);
+
+      doc.end(); // 🚀 sends the PDF stream
+
+    } catch (err) {
+      console.error("Error saving booking:", err);
+      res.status(500).json({
+        success: false,
+        message: "Failed to save booking",
+        error: err.message,
       });
     }
-
-    const quantity = validatedTickets.length;
-    const subtotal = validatedTickets.reduce((s, t) => s + t.chargeAmount, 0);
-    const totalAmount = subtotal;
-
-    const booking = new Booking({
-      ticketNumber: `BOOK-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-      customer: {
-        name: customer.name.trim(),
-        phone: customer.phone.trim(),
-      },
-      agent: {
-        name: "System Agent",
-        id: new mongoose.Types.ObjectId(),
-        phone: "+0000000000",
-        role: ["agent"],
-      },
-      booking: { date: new Date(), status: "active" },
-      tickets: validatedTickets,
-      financial: { quantity, subtotal, totalAmount, currency: "USD" },
-      payment: {
-        method: "cash",
-        status: "paid",
-        reference: `PAY-${Date.now()}`,
-      },
-    });
-
-    await booking.save();
-
-    // -------------------------
-    // 📄 Generate PDF Receipt
-    // -------------------------
-    const doc = new PDFDocument({ margin: 50 });
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader(
-      "Content-Disposition",
-      `attachment; filename=receipt-${booking.ticketNumber}.pdf`
-    );
-
-    // Pipe PDF directly to response
-    doc.pipe(res);
-
-    // Title
-    doc.fontSize(20).text("Lottery Booking Receipt", { align: "center" });
-    doc.moveDown();
-
-    // Booking Info
-    doc.fontSize(12).text(`Booking Ref: ${booking.ticketNumber}`);
-    doc.text(`Date: ${booking.booking.date.toDateString()}`);
-    doc.moveDown();
-
-    // Customer Info
-    doc.text(`Customer: ${booking.customer.name}`);
-    doc.text(`Phone: ${booking.customer.phone}`);
-    doc.moveDown();
-
-    // Ticket Table
-    doc.fontSize(14).text("Tickets:", { underline: true });
-    doc.moveDown(0.5);
-
-    booking.tickets.forEach((t, i) => {
-      doc
-        .fontSize(12)
-        .text(
-          `${i + 1}. ${t.lottery.name} | Draw #${t.lottery.drawNumber} | ${new Date(
-            t.lottery.drawDate
-          ).toDateString()} | Number: ${t.number} | Type: ${t.type} | $${t.chargeAmount.toFixed(
-            2
-          )}`
-        );
-    });
-    doc.moveDown();
-
-    // Financials
-    doc.fontSize(14).text("Payment Summary:", { underline: true });
-    doc.fontSize(12).text(`Quantity: ${booking.financial.quantity}`);
-    doc.text(`Subtotal: $${booking.financial.subtotal.toFixed(2)}`);
-    doc.text(`Total: $${booking.financial.totalAmount.toFixed(2)}`);
-    doc.text(`Payment Status: ${booking.payment.status}`);
-    doc.text(`Payment Ref: ${booking.payment.reference}`);
-
-    doc.end(); // 🚀 sends the PDF stream
-
-  } catch (err) {
-    console.error("Error saving booking:", err);
-    res.status(500).json({
-      success: false,
-      message: "Failed to save booking",
-      error: err.message,
-    });
-  }
-},
+  },
 };
 module.exports = indexHelper;
