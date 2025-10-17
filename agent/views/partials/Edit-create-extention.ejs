@@ -50,7 +50,7 @@
           <div id="prizesContainer">
             <div class="prize-item">
               <div class="prize-rank-display">1st Prize</div>
-              <input type="number" placeholder="Amount (₹)" class="prize-amount-input" required min="0">
+              <input type="number" placeholder="Amount (Nu)" class="prize-amount-input" required min="0">
               <button type="button" class="remove-prize" onclick="removePrize(this)">
                 <i class="fas fa-trash"></i>
               </button>
@@ -1147,7 +1147,7 @@
     prizesContainer.innerHTML = `
             <div class="prize-item">
                 <div class="prize-rank-display">1st Prize</div>
-                <input type="number" placeholder="Amount (₹)" class="prize-amount-input" required min="0">
+                <input type="number" placeholder="Amount (Nu)" class="prize-amount-input" required min="0">
                 <button type="button" class="remove-prize" onclick="removePrize(this)">
                     <i class="fas fa-trash"></i>
                 </button>
@@ -1208,7 +1208,7 @@
         prizeDiv.className = 'prize-item';
         prizeDiv.innerHTML = `
                     <div class="prize-rank-display">${getRankDisplay(prizeCounter)}</div>
-                    <input type="number" placeholder="Amount (₹)" class="prize-amount-input" required min="0" value="${prize.amount}">
+                    <input type="number" placeholder="Amount (Nu)" class="prize-amount-input" required min="0" value="${prize.amount}">
                     <button type="button" class="remove-prize" onclick="removePrize(this)">
                         <i class="fas fa-trash"></i>
                     </button>
@@ -1281,7 +1281,7 @@
     prizeDiv.className = 'prize-item';
     prizeDiv.innerHTML = `
             <div class="prize-rank-display">${getRankDisplay(prizeCounter)}</div>
-            <input type="number" placeholder="Amount (₹)" class="prize-amount-input" required min="0">
+            <input type="number" placeholder="Amount (Nu)" class="prize-amount-input" required min="0">
             <button type="button" class="remove-prize" onclick="removePrize(this)">
                 <i class="fas fa-trash"></i>
             </button>

@@ -1464,7 +1464,7 @@ body {
                         <strong>${booking.financial.quantity}</strong>
                     </td>
                     <td>
-                        <div class="amount-display">₹${booking.financial.totalAmount.toLocaleString()}</div>
+                        <div class="amount-display">Nu${booking.financial.totalAmount.toLocaleString()}</div>
                     </td>
                     <td>
                         <span class="status-badge ${booking.booking.status}">
@@ -1534,7 +1534,7 @@ body {
                             </div>
                             <div class="child-ticket-detail">
                                 <div class="child-ticket-label">Amount</div>
-                                <div class="child-ticket-value">₹${ticket.chargeAmount.toLocaleString()}</div>
+                                <div class="child-ticket-value">Nu${ticket.chargeAmount.toLocaleString()}</div>
                             </div>
                         </div>
                     `;
@@ -1618,9 +1618,9 @@ body {
                     <h4 style="margin-bottom: 12px; color: #374151;">Financial Summary</h4>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px;">
                         <div><strong>Quantity:</strong> ${booking.financial.quantity} tickets</div>
-                        <div><strong>Subtotal:</strong> ₹${booking.financial.subtotal.toLocaleString()}</div>
-                        <div><strong>Tax:</strong> ₹${booking.financial.tax.toLocaleString()}</div>
-                        <div><strong>Total:</strong> ₹${booking.financial.totalAmount.toLocaleString()}</div>
+                        <div><strong>Subtotal:</strong> Nu${booking.financial.subtotal.toLocaleString()}</div>
+                        <div><strong>Tax:</strong> Nu${booking.financial.tax.toLocaleString()}</div>
+                        <div><strong>Total:</strong> Nu${booking.financial.totalAmount.toLocaleString()}</div>
                         <div><strong>Currency:</strong> ${booking.financial.currency}</div>
                         <div><strong>Payment Method:</strong> ${booking.payment.method}</div>
                     </div>
@@ -1638,7 +1638,7 @@ body {
                                     <div><strong>Draw #:</strong> ${ticket.lottery.drawNumber}</div>
                                     <div><strong>Draw Date:</strong> ${formatDate(ticket.lottery.drawDate)}</div>
                                     <div><strong>Type:</strong> Type ${ticket.type}</div>
-                                    <div><strong>Amount:</strong> ₹${ticket.chargeAmount.toLocaleString()}</div>
+                                    <div><strong>Amount:</strong> Nu${ticket.chargeAmount.toLocaleString()}</div>
                                 </div>
                             </div>
                         `).join('')}

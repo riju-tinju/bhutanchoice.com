@@ -411,41 +411,6 @@ const indexHelper = {
       });
     }
   },
-  getLottery2: async (req, res) => {
-    try {
-      const { id } = req.params;
-
-      if (!id) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Lottery ID is required" });
-      }
-
-      const lottery = await Lottery.findById(id).select(
-        "_id name name2 drawNumber drawDate prizes winners"
-      );
-
-      if (!lottery) {
-        return res
-          .status(404)
-          .json({ success: false, message: "Lottery not found" });
-      }
-      console.log("Lottery found:", lottery);
-      console.log({
-        success: true,
-        data: lottery,
-      });
-      return res.status(200).json({
-        success: true,
-        data: lottery,
-      });
-    } catch (err) {
-      console.error("Error in getLottery:", err);
-      return res
-        .status(500)
-        .json({ success: false, message: "Failed to fetch lottery" });
-    }
-  },
   getLottery: async (req, res) => {
     try {
       const { id } = req.params;
