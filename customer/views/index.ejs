@@ -1408,41 +1408,6 @@
     let prizeCounter = 1;
     let winnerCounter = 1;
 
-    // Toggle result expansion
-    function toggleResult(resultId) {
-      const result = document.getElementById(resultId);
-      let arrowId = 'arrow-' + resultId;
-      const arrow = document.getElementById(arrowId);
-
-      // Close all other results
-      const allResults = document.querySelectorAll('.card-expand');
-      const allArrows = document.querySelectorAll('[id^="arrow"]');
-
-      allResults.forEach((el) => {
-        if (el.id !== resultId) {
-          el.classList.remove('expanded');
-          el.classList.add('collapsed');
-        }
-      });
-
-      allArrows.forEach((el) => {
-        if (el.id !== arrowId) {
-          el.style.transform = 'rotate(0deg)';
-        }
-      });
-
-      // Toggle current result
-      if (result.classList.contains('collapsed')) {
-        result.classList.remove('collapsed');
-        result.classList.add('expanded');
-        if (arrow) arrow.style.transform = 'rotate(180deg)';
-      } else {
-        result.classList.remove('expanded');
-        result.classList.add('collapsed');
-        if (arrow) arrow.style.transform = 'rotate(0deg)';
-      }
-    }
-
 
     // Helper Functions
     function getRankDisplay(rank) {

@@ -249,7 +249,14 @@ const formattedDate = drawDate.toLocaleDateString('en-GB', {
       &copy; 2018 bhutanlotteryresults.com<br>All rights reserved.
     </div> -->
 
-    <script>
+    
+
+  </div>
+
+  <% } %>
+</section>
+
+<script>
       let currentPageNumber = 1;
 
       async function getPastLottories() {
@@ -290,9 +297,167 @@ const formattedDate = drawDate.toLocaleDateString('en-GB', {
           // Optionally show user-friendly error in the UI
         }
       }
-    </script>
+</script>
 
-  </div>
+<script>
+  // Render Past Lottery Results
+   function renderPastResults(pastLotteries) {
+  const container = document.getElementById('past-lottories-container');
+  if (!container) return;
 
-  <% } %>
-</section>
+  pastLotteries.forEach((lottery, i) => {
+    const drawDate = new Date(lottery.drawDate);
+    const formattedDate = drawDate.toLocaleDateString('en-GB', {
+      year: 'numeric',
+      month: 'short',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+      timeZone: 'Asia/Dubai'
+    });
+
+    // Always "RESULT" for past draws
+    const status = "RESULT";
+    const badgeClass = "past-badge";
+    const elementId = `past-${lottery._id}`;
+
+    // Create card
+    const card = document.createElement('div');
+    card.className = `lottery-card ${lottery.dayName}-card cursor-pointer`;
+    card.setAttribute('onclick', `toggleResult('${elementId}')`);
+
+    // Build HTML
+    card.innerHTML = `
+      <div class="flex items-center justify-between">
+        <div class="flex-1 card-element-spacing">
+          <!-- Badge + date -->
+          <div class="flex flex-wrap items-center" style="row-gap: 9px; column-gap: 20px;">
+            <span class="${badgeClass} rounded-full">${status}</span>
+            <span class="card-text-secondary card-date">${formattedDate}</span>
+          </div>
+
+          <!-- Lottery name -->
+          <h3 class="card-text card-lottery-name">${lottery.name}<br>${lottery.name2 || ''}</h3>
+
+          <!-- Prize listing -->
+          ${lottery.prizes.map(prize => {
+            let rankStatus = 'th';
+            if (prize.rank === 1) rankStatus = 'st';
+            else if (prize.rank === 2) rankStatus = 'nd';
+            else if (prize.rank === 3) rankStatus = 'rd';
+
+            return `
+              <div class="flex items-center card-text-secondary">
+                <i class="fas fa-trophy text-yellow-300 mr-2"></i>
+                <span class="card-prize">
+                  ${prize.rank}${rankStatus} Prize: Nu${prize.amount.toLocaleString('en-IN')}
+                </span>
+              </div>
+            `;
+          }).join('')}
+        </div>
+
+        <div class="text-right ml-4">
+          <i id="arrow-${elementId}" class="fas fa-chevron-down card-text text-xl transition-transform duration-300"></i>
+        </div>
+      </div>
+
+      <!-- Expandable results -->
+      <div id="${elementId}" class="card-expand collapsed mt-6">
+        <div class="result-container space-y-4">
+          ${(() => {
+            const now = new Date();
+            const sortedWinners = lottery.winners.slice().sort((a, b) => {
+              const dateA = new Date(a.resultTime);
+              const dateB = new Date(b.resultTime);
+
+              const isUpcomingA = dateA > now;
+              const isUpcomingB = dateB > now;
+
+              if (isUpcomingA && !isUpcomingB) return -1;
+              if (!isUpcomingA && isUpcomingB) return 1;
+              if (isUpcomingA && isUpcomingB) return dateA - dateB;
+              return dateB - dateA;
+            });
+
+            return sortedWinners.map(winner => {
+              const resultTime = new Date(winner.resultTime);
+              const formattedTime = resultTime.toLocaleString('en-IN', {
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true,
+                timeZone: 'Asia/Dubai'
+              });
+
+              const firstTicketNumber = winner.winNumbers[0].ticketNumber;
+              const ticketLength = firstTicketNumber.toString().length;
+              const letters = ['A','B','C','D','E','F','G','H','I','J'].slice(0, ticketLength);
+
+              return `
+                <div class="result-card">
+                  <div class="result-card-header">${formattedTime}</div>
+                  <div class="result-card-content">
+                    <div class="letter-container">
+                      ${letters.map(letter => `<div class="letter-box">${letter}</div>`).join('')}
+                    </div>
+
+                    <div class="winning-numbers-container">
+                      <div class="winning-number-item">
+                        <div class="winning-number" data-ticket-number="${firstTicketNumber}">
+                          ${firstTicketNumber}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="otherPrizeContainer">
+                      ${winner.winNumbers.map((wn, idx) => {
+                        let rankStatus2 = 'th';
+                        if (wn.prizeRank === 1) rankStatus2 = 'st';
+                        else if (wn.prizeRank === 2) rankStatus2 = 'nd';
+                        else if (wn.prizeRank === 3) rankStatus2 = 'rd';
+
+                        if (idx === 4) {
+                          return `
+                            <div class="win-items">
+                              <span class="prize-Rank">🎖️5th Prize : <b>(Single number all series)</b></span>
+                            </div>
+                          `;
+                        } else if (idx < 4) {
+                          if (wn.ticketNumber && wn.ticketNumber.split('').every(c => c === '0')) {
+                            return `
+                              <div class="win-items">
+                                <span class="prize-Rank">🎖️${wn.prizeRank}${rankStatus2} Prize :</span>
+                                <div class="result-winning-number result-winning-number_if_no_results underline-animated"></div>
+                              </div>
+                            `;
+                          } else {
+                            return `
+                              <div class="win-items">
+                                <span class="prize-Rank">🎖️${wn.prizeRank}${rankStatus2} Prize :</span>
+                                <div class="result-winning-number">${wn.ticketNumber}</div>
+                              </div>
+                            `;
+                          }
+                        }
+                        return '';
+                      }).join('')}
+                    </div>
+                  </div>
+                </div>
+              `;
+            }).join('');
+          })()}
+        </div>
+      </div>
+    `;
+
+    // Insert card before load more button
+    let loadmoreBtn = document.getElementById('loadmoreBtn');
+    loadmoreBtn.insertAdjacentElement('beforebegin', card);
+  });
+}
+
+   
+  
+</script>
