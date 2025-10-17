@@ -52,7 +52,7 @@ const formattedDate = drawDate.toLocaleDateString('en-GB', { // 'en-IN' for Indi
           <div class="flex items-center card-text-secondary">
             <i class="fas fa-trophy text-yellow-300 mr-2"></i>
             <span class="card-prize">
-              <%= prize.rank %> Prize: Nu<%= prize.amount.toLocaleString('en-IN') %>
+              <%= prize.rank %> Prize: Nu <%= prize.amount.toLocaleString('en-IN') %>
             </span><br>
           </div>
           <% }); %>
