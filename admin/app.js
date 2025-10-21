@@ -38,7 +38,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', adminAuthRouter); // custom route for admin authentication
 let verifyAdmin = require("./helper/verifyAdmin");// custom
-app.use('/', indexRouter);//verifyAdmin,
+app.use('/',verifyAdmin, indexRouter);//verifyAdmin,
 app.use('/agent', agentRouter); 
 app.use('/bookings', bookingsRouter); 
 app.use('/', settingsRouter);

@@ -111,6 +111,15 @@
             <option value="financial.quantity_asc">Quantity (Low-High)</option>
           </select>
         </div>
+
+        <div class="filter-group">
+          <label class="filter-label">winner</label>
+          <select id="winnerFilter" class="filter-select">
+            <option value="ALL">All</option>
+            <option value="WON">winners</option>
+            <option value="NOT_WON">non winners</option>
+          </select>
+        </div>
         
         <div class="filter-group">
           <label class="filter-label">Items Per Page</label>
@@ -1334,7 +1343,8 @@ body {
         childLotteryId: '',
         agentId: '',
         status: '',
-        sort: 'booking.date_desc'
+        sort: 'booking.date_desc',
+        win: 'ALL',
     };
     
     // Initialize
@@ -1368,6 +1378,7 @@ body {
         document.getElementById('agentFilter').addEventListener('change', applyFilters);
         document.getElementById('statusFilter').addEventListener('change', applyFilters);
         document.getElementById('sortFilter').addEventListener('change', applyFilters);
+        document.getElementById('winnerFilter').addEventListener('change', applyFilters);
         document.getElementById('itemsPerPageFilter').addEventListener('change', handleItemsPerPageChange);
         document.getElementById('resetFilters').addEventListener('click', resetAllFilters);
         
@@ -1515,6 +1526,7 @@ body {
         currentFilters.agentId = document.getElementById('agentFilter').value;
         currentFilters.status = document.getElementById('statusFilter').value;
         currentFilters.sort = document.getElementById('sortFilter').value;
+        currentFilters.win = document.getElementById('winnerFilter').value;
         
         currentPage = 1;
         loadBookings();
@@ -1527,6 +1539,7 @@ body {
         document.getElementById('childLotteryFilter').value = '';
         document.getElementById('agentFilter').value = '';
         document.getElementById('statusFilter').value = '';
+        document.getElementById('winnerFilter').value = 'ALL';
         document.getElementById('sortFilter').value = 'booking.date_desc';
         setDefaultDateTimeRange();
         
@@ -1574,6 +1587,7 @@ body {
             if (currentFilters.childLotteryId) params.append('childLotteryId', currentFilters.childLotteryId);
             if (currentFilters.agentId) params.append('agentId', currentFilters.agentId);
             if (currentFilters.status) params.append('status', currentFilters.status);
+            if (currentFilters.win) params.append('win', currentFilters.win);
             
             const response = await fetch(`/bookings/api/bookings?${params.toString()}`, {
                 method: 'GET',

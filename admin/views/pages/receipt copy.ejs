@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Receipt - <%= ticketNumber %></title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .receipt-container {
+      max-width: 800px;
+      width: 100%;
+      background: white;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      animation: slideUp 0.6s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Header Section */
+    .receipt-header {
+      background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+      color: white;
+      padding: 40px 30px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .receipt-header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 300px;
+      height: 300px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 50%;
+    }
+
+    .header-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .logo-circle {
+      width: 60px;
+      height: 60px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .logo-circle img {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .brand-text h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-text p {
+      font-size: 13px;
+      opacity: 0.9;
+      font-weight: 400;
+    }
+
+    .receipt-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .meta-label {
+      font-size: 11px;
+      opacity: 0.8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .meta-value {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    /* Content Section */
+    .receipt-content {
+      padding: 40px 30px;
+    }
+
+    .section {
+      margin-bottom: 32px;
+    }
+
+    .section-title {
+      color: #1e3a5f;
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title::before {
+      content: '';
+      width: 4px;
+      height: 20px;
+      background: linear-gradient(180deg, #ff8c42 0%, #ff6b35 100%);
+      border-radius: 2px;
+    }
+
+    /* Info Cards */
+    .info-card {
+      background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+      border: 2px solid #e9ecef;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .info-label {
+      color: #6c757d;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .info-value {
+      color: #1e3a5f;
+      font-size: 14px;
+      font-weight: 600;
+      text-align: right;
+    }
+
+    /* Lottery Cards */
+    .lottery-card {
+      background: white;
+      border: 2px solid #e9ecef;
+      border-left: 6px solid #ff8c42;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .lottery-card:hover {
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .lottery-header {
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 2px dashed #e9ecef;
+    }
+
+    .lottery-name {
+      color: #1e3a5f;
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .lottery-details {
+      color: #6c757d;
+      font-size: 13px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .lottery-details span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .lottery-details span::before {
+      content: '•';
+      color: #ff8c42;
+      font-weight: bold;
+    }
+
+    /* Ticket List */
+    .ticket-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .ticket-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+      border-radius: 10px;
+      border: 1px solid #e9ecef;
+    }
+
+    .ticket-number {
+      color: #1e3a5f;
+      font-size: 18px;
+      font-weight: 700;
+      font-family: 'Courier New', monospace;
+      letter-spacing: 2px;
+    }
+
+    .ticket-amount {
+      color: #28a745;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    /* Summary Section */
+    .summary-card {
+      background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+      border: 2px solid #e9ecef;
+      border-radius: 16px;
+      padding: 24px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+    }
+
+    .summary-label {
+      color: #6c757d;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .summary-value {
+      color: #1e3a5f;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .summary-total {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 2px solid #e9ecef;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .total-label {
+      color: #1e3a5f;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .total-value {
+      color: #28a745;
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    /* QR Code Section - Updated from Barcode */
+    .qrcode-section {
+      text-align: center;
+      padding: 30px;
+      background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+      border-radius: 16px;
+      margin-top: 32px;
+    }
+
+    .qrcode-container {
+      display: inline-block;
+      padding: 20px;
+      background: white;
+      border-radius: 12px;
+      border: 2px solid #e9ecef;
+      margin-bottom: 12px;
+    }
+
+    .qrcode-container canvas {
+      display: block;
+    }
+
+    .qrcode-label {
+      color: #1e3a5f;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .qrcode-number {
+      color: #6c757d;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      font-family: 'Courier New', monospace;
+    }
+
+    /* Footer */
+    .receipt-footer {
+      background: #f8f9fa;
+      padding: 30px;
+      text-align: center;
+      border-top: 3px solid #ff8c42;
+    }
+
+    .footer-message {
+      color: #1e3a5f;
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .footer-note {
+      color: #6c757d;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 24px;
+    }
+
+    .btn {
+      padding: 12px 28px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #ff8c42 0%, #ff6b35 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #1e3a5f;
+      border: 2px solid #1e3a5f;
+    }
+
+    .btn-secondary:hover {
+      background: #1e3a5f;
+      color: white;
+    }
+
+    /* Print Styles */
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+
+      .receipt-container {
+        box-shadow: none;
+        max-width: 100%;
+      }
+
+      .action-buttons {
+        display: none;
+      }
+
+      .receipt-footer {
+        page-break-after: avoid;
+      }
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+
+      .receipt-header {
+        padding: 30px 20px;
+      }
+
+      .brand-text h1 {
+        font-size: 20px;
+      }
+
+      .receipt-content {
+        padding: 30px 20px;
+      }
+
+      .receipt-meta {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .lottery-details {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="receipt-container">
+    <!-- Header -->
+    <div class="receipt-header">
+      <div class="header-content">
+        <div class="brand-section">
+          <div class="logo-circle">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfvxp4SnnjaYyFQDP8d5D660XMvy4nQfc08ScgqFq3IjufpC1OH-ykrQ6v-SkPsuVCt7w&usqp=CAU" alt="Logo" onerror="this.style.display='none'">
+          </div>
+          <div class="brand-text">
+            <h1>BHUTAN STATE LOTTERIES</h1>
+            <p>Official Lottery Booking Receipt</p>
+          </div>
+        </div>
+
+        <div class="receipt-meta">
+          <div class="meta-item">
+            <span class="meta-label">Receipt Number</span>
+            <span class="meta-value">BSL-<%= ticketNumber %></span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Date & Time</span>
+            <span class="meta-value"><%= new Date(booking.booking.date).toLocaleDateString('en-GB') %> • <%= new Date(booking.booking.date).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) %></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="receipt-content">
+      <!-- Customer Information -->
+      <div class="section">
+        <h2 class="section-title">Customer Information</h2>
+        <div class="info-card">
+          <div class="info-row">
+            <span class="info-label">Full Name</span>
+            <span class="info-value"><%= booking.customer.name %></span>
+          </div>
+          <!-- <div class="info-row">
+            <span class="info-label">Address</span>
+            <span class="info-value"><%= booking.customer.address || 'Thimphu, Bhutan' %></span>
+          </div> -->
+          <div class="info-row">
+            <span class="info-label">Contact Number</span>
+            <span class="info-value"><%= booking.customer.phone %></span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Agent Information -->
+      <div class="section">
+        <h2 class="section-title">Agent Information</h2>
+        <div class="info-card">
+          <div class="info-row">
+            <span class="info-label">Full Name</span>
+            <span class="info-value"><%= booking.agent.name || 'N/A' %></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Contact Number</span>
+            <span class="info-value"><%= booking.agent.phone || 'N/A' %></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lottery Tickets -->
+      <div class="section">
+        <h2 class="section-title">Your Lottery Tickets</h2>
+        
+        <% 
+        // Group tickets by lottery
+        const groupedTickets = {};
+        booking.tickets.forEach(ticket => {
+          const key = `${ticket.lottery.id}_${ticket.lottery.timeId}`;
+          if (!groupedTickets[key]) {
+            groupedTickets[key] = {
+              lottery: ticket.lottery,
+              tickets: []
+            };
+          }
+          groupedTickets[key].tickets.push(ticket);
+        });
+        %>
+
+        <% Object.values(groupedTickets).forEach((group, index) => { %>
+          <div class="lottery-card">
+            <div class="lottery-header">
+              <h3 class="lottery-name"><%= group.lottery.name %></h3>
+              <div class="lottery-details">
+                <span><%= new Date(group.lottery.drawDate).toLocaleDateString('en-GB') %></span>
+                <span>Draw #<%= group.lottery.drawNumber %></span>
+                <span><%= group.tickets.length %> Ticket<%= group.tickets.length > 1 ? 's' : '' %></span>
+              </div>
+            </div>
+
+            <div class="ticket-list">
+              <% group.tickets.forEach(ticket => { %>
+                <div class="ticket-item">
+                  <span class="ticket-number"><%= String(ticket.number).padStart(5, '0') %></span>
+                  <span class="ticket-amount">Nu <%= ticket.chargeAmount.toFixed(2) %></span>
+                </div>
+              <% }); %>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+
+      <!-- Summary -->
+      <div class="section">
+        <h2 class="section-title">Payment Summary</h2>
+        <div class="summary-card">
+          <div class="summary-row">
+            <span class="summary-label">Total Tickets</span>
+            <span class="summary-value"><%= booking.financial.quantity %></span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Subtotal</span>
+            <span class="summary-value">Nu <%= booking.financial.subtotal.toFixed(2) %></span>
+          </div>
+          <% if (booking.financial.tax && booking.financial.tax > 0) { %>
+          <div class="summary-row">
+            <span class="summary-label">Tax</span>
+            <span class="summary-value">Nu <%= booking.financial.tax.toFixed(2) %></span>
+          </div>
+          <% } %>
+          <div class="summary-total">
+            <span class="total-label">Total Amount</span>
+            <span class="total-value">Nu <%= booking.financial.totalAmount.toFixed(2) %></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- QR Code - Updated from Barcode -->
+      <div class="qrcode-section">
+        <p class="qrcode-label">Scan to Verify Receipt</p>
+        <div class="qrcode-container">
+          <div id="qrcode"></div>
+        </div>
+        <div class="qrcode-number"><%= ticketNumber %></div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="receipt-footer">
+      <p class="footer-message">🎉 Keep this receipt safe - it's your winning ticket to dreams!</p>
+      <p class="footer-note">
+        This is an official receipt from Bhutan State Lotteries. Please present this receipt when claiming prizes.
+        <br>
+        For queries, contact our customer service or visit our official website.
+      </p>
+
+      <div class="action-buttons">
+        <button class="btn btn-primary" onclick="window.print()">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2H5zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1z"/>
+            <path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2V7zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+          </svg>
+          Print Receipt
+        </button>
+        <button class="btn btn-secondary" onclick="window.location.href='/booking'">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+          </svg>
+          Back to Booking
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QRCode.js Library - Replaced JsBarcode -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script>
+    // Generate QR Code
+    try {
+      // Prepare comprehensive data for QR code
+      // const qrData = {
+      //   ticketNumber: "<%= ticketNumber %>",
+      //   date: "<%= new Date(booking.booking.date).toISOString() %>",
+      //   customer: "<%= booking.customer.name %>",
+      //   totalAmount: <%= booking.financial.totalAmount %>,
+      //   ticketCount: <%= booking.financial.quantity %>,
+      //   verifyUrl: window.location.origin + "/receipt/<%= ticketNumber %>"
+      // };
+
+      // Alternative compact format
+      const qrData = `BSL:<%= ticketNumber %>|C:<%= booking.customer.name %>|A:<%= booking.financial.totalAmount %>|T:<%= booking.financial.quantity %>|D:<%= new Date(booking.booking.date).toISOString().split('T')[0] %>`;
+
+      // Generate QR code with the data
+      new QRCode(document.getElementById("qrcode"), {
+        text: JSON.stringify(qrData),
+        width: 180,
+        height: 180,
+        colorDark: "#1e3a5f",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H // High error correction
+      });
+    } catch (error) {
+      console.error('QR code generation failed:', error);
+      document.querySelector('.qrcode-container').innerHTML = '<p style="color: #6c757d; padding: 20px;">QR code unavailable</p>';
+    }
+  </script>
+</body>
+</html>

@@ -956,10 +956,10 @@ const indexHelper = {
           phone: customer.phone.trim(),
         },
         agent: {
-          name: "Admin", // replace with real logged-in agent later
-          id: new mongoose.Types.ObjectId(),
-          phone: "+0000000000",
-          role: ["agent"],
+          name: req.session.admin.name ,
+          id: req.session.admin.id ,
+          phone: req.session.admin.phone,
+          role: ["admin"],
         },
         booking: {
           date: new Date(),

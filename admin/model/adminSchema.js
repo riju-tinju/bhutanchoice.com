@@ -25,6 +25,9 @@ const adminSchema = new Schema({
     lowercase: true,
     trim: true
   },
+  phone:{
+    type: String,
+  },
   password: {
     type: String,
     required: [true, 'Password is required']

@@ -16,9 +16,9 @@ let transporter = nodemailer.createTransport({
 const adminHelper = {
   createAdmin: async (req, res) => {
     try {
-      const { name, email, password } = req.params;
+      const { name, email, password,phone } = req.params;
 
-      if (!name || !email || !password)
+      if (!name || !email || !password || !phone)
          return res.json({ success: false, message: 'Please input all feilds.' }); 
 
       // Check if admin with this email already exists
@@ -35,6 +35,7 @@ const adminHelper = {
       const newAdmin = new Admin({
         name,
         email,
+        phone,
         password: hashedPassword
       });
 
@@ -63,7 +64,7 @@ const adminHelper = {
       }
 
       // Set session
-      req.session.admin = { id: admin._id };
+      req.session.admin = { id: admin._id,name:admin.name,email:admin.email,phone:admin.phone,roll:'admin' };
       let mailed=await adminHelper.sendOtpEmail(admin.name, admin.email);
       return res.json({ success: true, message: 'Login successful.' });
 

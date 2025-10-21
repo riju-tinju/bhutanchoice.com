@@ -2162,7 +2162,7 @@
           resetAllData();
         }, 2000);
 
-        await downloadBookingReceipt(bookRes.data.ticketNumber);
+        await gotoReceipt(bookRes.data.ticketNumber);
 
       } catch (error) {
         console.error('Error confirming booking:', error);
@@ -2227,46 +2227,15 @@
       }
     }
 
-    async function downloadBookingReceipt(ticketNumber) {
-      try {
-        const response = await fetch(`/api/download-receipt/${ticketNumber}`, {
-          method: 'GET'
-        });
-
-        if (!response.ok) {
-          throw new Error(`Failed to download receipt: ${response.statusText}`);
-        }
-
-        // Convert response to Blob (PDF)
-        const blob = await response.blob();
-
-        // Create a download link
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-
-        // Try to get filename from response header
-        const disposition = response.headers.get("Content-Disposition");
-        let fileName = `receipt-${ticketNumber}.pdf`;
-        if (disposition && disposition.includes("filename=")) {
-          fileName = disposition
-            .split("filename=")[1]
-            .replace(/['"]/g, "")
-            .trim();
-        }
-        a.download = fileName;
-
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        window.URL.revokeObjectURL(url);
-
-        showToast('Receipt downloaded successfully!', 'success');
-      } catch (error) {
-        console.error('Error downloading receipt:', error);
-        showToast('Error: ' + error.message, 'error');
-      }
-    }
+    
+    function gotoReceipt(ticketNumber) {
+  // Simulate a delay before navigation
+  setTimeout(() => {
+    console.log(`Navigating to receipt for ticket: ${ticketNumber}`);
+    location.href = `<%= url %>/receipt/${ticketNumber}`;
+    // No resolve/reject needed, as the script stops here
+  }, 1000);
+}
     // Reset all data
     function resetAllData() {
       // Reset customer info

@@ -13,6 +13,7 @@ const settingHelper = {
                     data: {
                         name: '',
                         email: '',
+                        phone:'',
                     }
                 });
 
@@ -21,6 +22,7 @@ const settingHelper = {
                 success: true, data: {
                     name: adminDetails.name || '',
                     email: adminDetails.email || '',
+                    phone: adminDetails.phone || '',
                 }
             });
         } catch (err) {
@@ -32,7 +34,7 @@ const settingHelper = {
         try {
             console.log("Admin session found:", req.session.admin.id);
             const adminId = req.session.id;
-            const { name, email, currentPassword, newPassword } = req.body;
+            const { name, email,phone, currentPassword, newPassword } = req.body;
 
             if (!adminId) {
                 return res.status(401).json({ success: false, message: 'Unauthorized: Admin session not found' });
@@ -56,6 +58,7 @@ const settingHelper = {
             // Update fields
             if (name) admin.name = name;
             if (email) admin.email = email;
+            if (phone) admin.phone = phone;
             if (newPassword) {
                 const hashedPassword = await bcrypt.hash(newPassword, 10);
                 admin.password = hashedPassword;
@@ -69,7 +72,8 @@ const settingHelper = {
                 data: {
                     _id: admin._id,
                     name: admin.name,
-                    email: admin.email
+                    email: admin.email,
+                    phone: admin.phone
                 }
             });
 

@@ -1,5 +1,6 @@
 const Lottery = require("../model/lotterySchema"); // Your model
 const moment = require("moment-timezone");
+const Booking= require("../model/bookingsSchema")
 
 const indexHelper = {
   getRecentLotteries: async (req, res) => {
@@ -41,7 +42,7 @@ const indexHelper = {
 
         // Sort by drawTime descending (most recent first)
         { $sort: { resultTime: -1 } },
-        
+
         // Limit to 5 results
         { $limit: 5 },
 
@@ -60,7 +61,7 @@ const indexHelper = {
       // No need to map since we already have array of objects with name and resultTime
       const result = recentLotteries;
 
-      
+
       // res.status(200).json({
       //   success: true,
       //   data: result
@@ -68,11 +69,11 @@ const indexHelper = {
 
       console.log("Recent lotteries fetched successfully:", result);
 
-      return res.render('landing-page',{ recentLotteries: result || [],moment: moment,  })
+      return res.render('landing-page', { recentLotteries: result || [], moment: moment, })
 
     } catch (error) {
       console.error('Error fetching recent lotteries:', error);
-      return res.render('landing-page',{ recentLotteries:[] })
+      return res.render('landing-page', { recentLotteries: [] })
     }
   },
   getLotteries: async (req, res) => {
@@ -582,5 +583,18 @@ const indexHelper = {
         .json({ success: false, message: "Failed to delete lottery" });
     }
   },
+  getReceiptPage: async (req, res) => {
+    try {
+      const { ticketNumber } = req.params;
+      const booking = await Booking.findOne({ ticketNumber });
+      if (!booking) {
+        return res.status(404).json({ success: false, message: "Booking not found" });
+      }
+      res.render('pages/receipt', { ticketNumber: req.params.ticketNumber, booking, });
+    
+  }catch(err){
+   res.status(404)
+  }
+}
 };
 module.exports = indexHelper;
