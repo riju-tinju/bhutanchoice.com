@@ -36,6 +36,11 @@ const lotterySchema = new Schema({
   }],
   
   winners: [{
+    _id: {
+      type: String,
+      required: true,
+      unique: true
+    },
     resultTime:{
       type: Date,
       default: Date.now

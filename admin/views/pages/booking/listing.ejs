@@ -1906,10 +1906,7 @@ body {
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px;">
                         <div><strong>Quantity:</strong> ${booking.financial.quantity} tickets</div>
                         <div><strong>Subtotal:</strong> Nu. ${booking.financial.subtotal.toLocaleString()}</div>
-                        <div><strong>Tax:</strong> Nu. ${booking.financial.tax.toLocaleString()}</div>
-                        <div><strong>Total:</strong> Nu. ${booking.financial.totalAmount.toLocaleString()}</div>
-                        <div><strong>Currency:</strong> ${booking.financial.currency}</div>
-                        <div><strong>Payment Method:</strong> ${booking.payment.method}</div>
+                        <div><strong>Total:</strong> Nu. ${booking.financial.totalAmount.toLocaleString()}</div>     
                     </div>
                     ${booking.payment.reference ? `<div style="margin-top: 8px;"><strong>Payment Reference:</strong> ${booking.payment.reference}</div>` : ''}
                 </div>

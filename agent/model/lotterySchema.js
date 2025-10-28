@@ -42,9 +42,9 @@ const lotterySchema = new Schema({
   
   winners: [{
     _id: {
-      type: Schema.Types.ObjectId,
-      default: () => new mongoose.Types.ObjectId(), // Auto-generate unique ID
-      auto: true
+      type: String,
+      required: true,
+      unique: true
     },
     resultTime:{
       type: Date,
