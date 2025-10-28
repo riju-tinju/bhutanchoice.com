@@ -3,6 +3,7 @@ const Charge = require("../model/ticketChargeSchema");
 const Booking = require("../model/bookingsSchema");
 const Agent = require("../model/agentSchema");
 const mongoose = require("mongoose");
+const { ObjectId } = mongoose.Types;
 const moment = require("moment-timezone");
 
 const bookingHelper = {
@@ -49,7 +50,7 @@ const bookingHelper = {
 
       // Child lottery filter
       if (childLotteryId && childLotteryId.trim()) {
-        matchConditions["tickets.lottery.timeId"] = new mongoose.Types.ObjectId(childLotteryId);
+        matchConditions["tickets.lottery.timeId"] = childLotteryId
       }
 
       // Agent filter
@@ -62,21 +63,14 @@ const bookingHelper = {
         matchConditions["booking.status"] = status;
       }
 
-      // Win filter (NEW - based on tickets.isWon field)
-      if (win && win !== 'ALL') {
-        if (win === 'WON') {
-          // At least one ticket in the booking is won
-          matchConditions["tickets.isWon"] = true;
-        } else if (win === 'NOT_WON') {
-          // ALL tickets in the booking must have isWon: false
-          // Using $not and $elemMatch to ensure no tickets have isWon: true
-          matchConditions["tickets.isWon"] = {
-            $not: {
-              $elemMatch: { $eq: true }
-            }
-          };
-          // Alternative approach using $all with false values:
-          // matchConditions["tickets.isWon"] = { $all: [false] };
+      // 🟢 WIN filter (newly added)
+      if (win && win.trim()) {
+        if (win === "WON") {
+          // Get documents having at least one ticket with isWon = true
+          matchConditions["tickets"] = { $elemMatch: { isWon: true } };
+        } else if (win === "NOT_WON") {
+          // Get documents having NO ticket with isWon = true
+          matchConditions["tickets.isWon"] = { $ne: true };
         }
       }
 
@@ -313,7 +307,7 @@ const bookingHelper = {
                   $dateToString: {
                     format: "%H:%M",
                     date: "$winners.resultTime",
-                    timezone: "UTC"
+                    timezone: "Asia/Dubai"
                   }
                 }
               ]
@@ -359,28 +353,47 @@ const bookingHelper = {
   },
 
   // Create new booking
-  createBooking: async (bookingData) => {
+  createBooking: async (bookingData,req,res) => {
     try {
       // Generate unique ticket number
       const ticketNumber = await bookingHelper.generateUniqueTicketNumber();
 
-      // Validate agent exists
-      const agent = await Agent.findById(bookingData.agent.id);
-      if (!agent) {
-        throw new Error('Agent not found');
-      }
-
-      // Validate lottery and child lottery exist for each ticket
+      // Process tickets with validation
+      const processedTickets = [];
+      
       for (const ticket of bookingData.tickets) {
         const lottery = await Lottery.findById(ticket.lottery.id);
         if (!lottery) {
           throw new Error(`Lottery not found for ticket ${ticket.number}`);
         }
 
-        const childLottery = lottery.winners.find(w => w._id.toString() === ticket.lottery.timeId);
-        if (!childLottery) {
-          throw new Error(`Child lottery not found for ticket ${ticket.number}`);
+        // 🚨 VALIDATE: Check if the provided timeId exists in lottery winners
+        if (!ticket.lottery.timeId) {
+          throw new Error(`TimeId is required for ticket ${ticket.number}`);
         }
+
+        const childLottery = lottery.winners.find(w => 
+          w._id.toString() === ticket.lottery.timeId.toString()
+        );
+        
+        if (!childLottery) {
+          throw new Error(`Child lottery not found with timeId: ${ticket.lottery.timeId} for ticket ${ticket.number}`);
+        }
+
+        // Use the validated timeId and child lottery data
+        processedTickets.push({
+          lottery: {
+            id: lottery._id,
+            name: lottery.name,
+            drawNumber: lottery.drawNumber,
+            drawDate: childLottery.resultTime, // Use child lottery's resultTime
+            timeId: childLottery._id // Use the validated child lottery _id
+          },
+          number: ticket.number,
+          type: ticket.type,
+          chargeAmount: ticket.chargeAmount,
+          isWon: false
+        });
       }
 
       // Create booking object
@@ -388,16 +401,16 @@ const bookingHelper = {
         ticketNumber: ticketNumber,
         customer: bookingData.customer,
         agent: {
-          name: agent.name,
-          id: agent._id,
-          phone: agent.phone || bookingData.agent.phone,
-          role: bookingData.agent.role || ['agent']
+          name: req.session.admin.name || 'Agent Name',
+          id: req.session.admin.id || null,
+          phone: 'NA',
+          role: ['admin']
         },
         booking: {
           date: new Date(),
           status: 'active'
         },
-        tickets: bookingData.tickets,
+        tickets: processedTickets,
         financial: bookingData.financial,
         payment: bookingData.payment || {
           method: 'cash',
@@ -413,15 +426,21 @@ const bookingHelper = {
       const bookingObj = savedBooking.toObject();
       bookingObj.displayId = `TKT-${savedBooking.ticketNumber}`;
 
-      return {
+      
+      return res.status(200).json({
         success: true,
-        message: "Booking created successfully",
-        booking: bookingObj
-      };
+        message: "Booking saved successfully",
+        data: bookingObj,
+      });
 
     } catch (error) {
       console.error('Error in createBooking:', error);
-      throw error;
+      // throw error;
+      return res.status(502).json({
+        success: false,
+        message: "An Error Occured..",
+        data: null,
+      });
     }
   },
 

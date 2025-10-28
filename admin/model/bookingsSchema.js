@@ -23,7 +23,7 @@ const ticketSchema = new Schema({
       trim: true
     }
   },
-  
+
   // Agent Information Group
   agent: {
     name: {
@@ -49,7 +49,7 @@ const ticketSchema = new Schema({
       }
     ]
   },
-  
+
   // Booking Information Group
   booking: {
     date: {
@@ -62,7 +62,7 @@ const ticketSchema = new Schema({
       default: "active"
     }
   },
-  
+
   // Ticket Details Group (array of tickets)
   tickets: [
     {
@@ -86,12 +86,11 @@ const ticketSchema = new Schema({
           required: true
         },
         timeId: {
-          type: Schema.Types.ObjectId,
-          ref: "DrawTime",
+          type: String, 
           required: true
         }
       },
-      isWon:{
+      isWon: {
         type: Boolean,
         default: false
       },
@@ -113,7 +112,7 @@ const ticketSchema = new Schema({
       }
     }
   ],
-  
+
   // Financial Information Group
   financial: {
     quantity: {
@@ -144,7 +143,7 @@ const ticketSchema = new Schema({
       trim: true
     }
   },
-  
+
   // Payment Information Group
   payment: {
     method: {
@@ -163,11 +162,11 @@ const ticketSchema = new Schema({
     }
   }
 },
-{ 
-  timestamps: true,
-  toJSON: { virtuals: true },
-  toObject: { virtuals: true }
-});
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
+  });
 
 // Virtual for formatted ticket display
 ticketSchema.virtual("displayId").get(function () {

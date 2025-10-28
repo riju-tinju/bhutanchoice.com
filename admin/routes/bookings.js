@@ -116,7 +116,8 @@ router.get('/api/agents/dropdown', async function (req, res, next) {
 router.post('/api/bookings', async function (req, res, next) {
   try {
     const bookingData = req.body;
-
+    console.log('\n\nArrived in bookings.js \n');
+    console.log('Received booking data:\n', bookingData);
     // Validate required fields
     if (!bookingData.customer || !bookingData.customer.name || !bookingData.customer.phone) {
       return res.status(400).json({
@@ -126,13 +127,13 @@ router.post('/api/bookings', async function (req, res, next) {
       });
     }
 
-    if (!bookingData.agent || !bookingData.agent.id) {
-      return res.status(400).json({
-        "success": false,
-        "message": "Agent information is required",
-        "error": "VALIDATION_ERROR"
-      });
-    }
+    // if (!bookingData.agent || !bookingData.agent.id) {
+    //   return res.status(400).json({
+    //     "success": false,
+    //     "message": "Agent information is required",
+    //     "error": "VALIDATION_ERROR"
+    //   });
+    // }
 
     if (!bookingData.tickets || bookingData.tickets.length === 0) {
       return res.status(400).json({
@@ -141,9 +142,10 @@ router.post('/api/bookings', async function (req, res, next) {
         "error": "VALIDATION_ERROR"
       });
     }
-
-    const result = await bookingFun.createBooking(bookingData);
-    res.status(201).json(result);
+    
+    console.log('Booking Data.tickets:\n\n', bookingData.tickets);
+    const result = await bookingFun.createBooking(bookingData,req,res);
+    // res.status(201).json(result);
   } catch (error) {
     console.error('Error in POST /api/bookings:', error);
     if (error.message.includes('duplicate') || error.message.includes('unique')) {

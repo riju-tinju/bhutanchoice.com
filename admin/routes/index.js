@@ -45,15 +45,11 @@ router.get('/api/lottery-autocomplete', async function (req, res, next) {
 })
 
 router.post('/api/lottery', async function (req, res, next) {
-
   await indexFun.createLottery(req, res)
-
 })
 
 router.put('/api/lottery/:id', async function (req, res, next) {
-
   await indexFun.updateLottery(req, res)
-
 })
 router.get('/api/lottery/:id', async function (req, res, next) {
   await indexFun.getLottery(req, res)
@@ -93,11 +89,11 @@ router.get('/api/booking/ticket-charges', async function (req, res, next) {
   await indexFun.getAllTicketCharges(req, res)
 });
 
-router.post('/api/bookings', async function (req, res, next) {
-  console.log(req.body)
-
-  await indexFun.saveBooking(req, res)
-})
+// router.post('/bookings/api/bookings', async function (req, res, next) {
+//   console.log('\n\nArrived in index.js \n');
+//   console.log(req.body)
+  // await indexFun.saveBooking(req, res)
+// })
 
 
 
@@ -562,7 +558,7 @@ router.get('/receipt/:ticketNumber', async (req, res)=>{
     if (!booking) {
       return res.status(404).json({ success: false, message: "Booking not found" });
     }
-   res.render('pages/receipt', { ticketNumber: req.params.ticketNumber, booking });
+    res.render('pages/receipt', { ticketNumber: req.params.ticketNumber, booking });
 })
 
 module.exports = router;

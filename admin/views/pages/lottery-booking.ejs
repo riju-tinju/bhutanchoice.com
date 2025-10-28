@@ -2204,8 +2204,9 @@
             uniqueDrawTimes: new Set(addedTickets.map(t => `${t.lottery.id}_${t.lottery.timeId}`)).size
           }
         };
-
-        const response = await fetch('/api/bookings', {
+        console.log('Booking Data:\n', bookingData);
+        
+        const response = await fetch('/bookings/api/bookings', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -2217,7 +2218,7 @@
           const errorData = await response.json();
           throw new Error(errorData.message || 'Failed to create booking');
         }
-
+        
         const result = await response.json();
         return result;
 

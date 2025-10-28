@@ -16,12 +16,12 @@ const lotterySchema = new Schema({
     required: [true, 'Draw number is required'],
     min: 1
   },
-  
+
   drawDate: {
     type: Date,
     required: [true, 'Draw date is required']
   },
-  
+
   prizes: [{
     rank: {
       type: Number,
@@ -39,34 +39,34 @@ const lotterySchema = new Schema({
     //   min: 0
     // }
   }],
-  
+
   winners: [{
     _id: {
-      type: Schema.Types.ObjectId,
-      default: () => new mongoose.Types.ObjectId(), // Auto-generate unique ID
-      auto: true
+      type: String,
+      required: true,
+      unique: true
     },
-    resultTime:{
+    resultTime: {
       type: Date,
       default: Date.now
     },
     winNumbers: [
       {
-       prizeRank: Number,
-       ticketNumber: String,
-       resultStatus: { type: Boolean, default: false}
+        prizeRank: Number,
+        ticketNumber: String,
+        resultStatus: { type: Boolean, default: false }
       }
     ],
-    
+
   }],
-  
+
   createdAt: {
     type: Date,
     default: Date.now
   },
-  
+
   updatedAt: Date
-  
+
 }, { timestamps: true });
 
 const Lottery = mongoose.model('Lottery', lotterySchema);

@@ -1414,6 +1414,7 @@
                     day: 'numeric',
                     hour: '2-digit',
                     minute: '2-digit',
+                    timeZone:'Asia/Dubai'
                 });
             }
 
@@ -1480,7 +1481,7 @@
                                 <strong>${booking.financial.quantity}</strong>
                             </td>
                             <td>
-                                <div class="amount-display">Nu${booking.financial.totalAmount.toLocaleString()}</div>
+                                <div class="amount-display">Nu. ${booking.financial.totalAmount.toLocaleString()}</div>
                             </td>
                             <td>
                                 <span class="status-badge ${booking.booking.status}">
@@ -1536,7 +1537,7 @@
                                     </div>
                                     <div class="child-ticket-detail">
                                         <div class="child-ticket-label">Amount</div>
-                                        <div class="child-ticket-value">Nu${ticket.chargeAmount.toLocaleString()}</div>
+                                        <div class="child-ticket-value">Nu. ${ticket.chargeAmount.toLocaleString()}</div>
                                     </div>
                                 </div>
                             `;

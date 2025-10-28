@@ -143,6 +143,7 @@ getBookingsWithFilters: async (queryParams) => {
       childLotteryId,
       agentId,
       status,
+      win,//this may be 'WON' or 'NOT_WON'
       sort = 'booking.date_desc'
     } = queryParams;
 
@@ -170,7 +171,7 @@ getBookingsWithFilters: async (queryParams) => {
 
     // Child lottery filter
     if (childLotteryId && childLotteryId.trim()) {
-      matchConditions["tickets.lottery.timeId"] = new mongoose.Types.ObjectId(childLotteryId);
+      matchConditions["tickets.lottery.timeId"] = childLotteryId
     }
 
     // Agent filter
@@ -417,7 +418,7 @@ getBookingsWithFilters: async (queryParams) => {
                   $dateToString: {
                     format: "%H:%M",
                     date: "$winners.resultTime",
-                    timezone: "UTC"
+                    timezone: "Asia/Dubai"
                   }
                 }
               ]

@@ -259,6 +259,69 @@
       background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
       border-radius: 10px;
       border: 1px solid #e9ecef;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    /* Winning Ticket Styles */
+    .ticket-item.winning {
+      background: linear-gradient(135deg, #fff8e1 0%, #fffbf0 100%);
+      border: 2px solid #ffd700;
+      box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+      animation: winnerGlow 2s infinite;
+    }
+
+    @keyframes winnerGlow {
+      0%, 100% {
+        box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+      }
+      50% {
+        box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
+      }
+    }
+
+    .ticket-item.winning::before {
+      content: '🏆';
+      position: absolute;
+      left: -8px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 24px;
+      animation: trophyBounce 1s infinite;
+    }
+
+    @keyframes trophyBounce {
+      0%, 100% {
+        transform: translateY(-50%) scale(1);
+      }
+      50% {
+        transform: translateY(-50%) scale(1.2);
+      }
+    }
+
+    .ticket-item.winning .ticket-number {
+      color: #d4a017;
+      font-weight: 800;
+    }
+
+    .ticket-item.winning .ticket-amount {
+      color: #d4a017;
+      font-weight: 700;
+    }
+
+    .winning-badge {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+      color: #744210;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .ticket-number {
@@ -323,7 +386,7 @@
       font-weight: 800;
     }
 
-    /* QR Code Section - Updated from Barcode */
+    /* QR Code Section */
     .qrcode-section {
       text-align: center;
       padding: 30px;
@@ -424,6 +487,31 @@
       color: white;
     }
 
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+      color: white;
+      padding: 16px 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+      z-index: 1000;
+      opacity: 0;
+      transform: translateX(100%);
+      transition: all 0.3s ease;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
     /* Print Styles */
     @media print {
       body {
@@ -442,6 +530,10 @@
 
       .receipt-footer {
         page-break-after: avoid;
+      }
+
+      .toast {
+        display: none;
       }
     }
 
@@ -483,6 +575,11 @@
         align-items: flex-start;
         gap: 8px;
       }
+
+      .ticket-item.winning::before {
+        font-size: 20px;
+        left: -6px;
+      }
     }
   </style>
 </head>
@@ -504,11 +601,11 @@
         <div class="receipt-meta">
           <div class="meta-item">
             <span class="meta-label">Receipt Number</span>
-            <span class="meta-value">BSL-<%= ticketNumber %></span>
+            <span class="meta-value"><%= ticketNumber %></span>
           </div>
           <div class="meta-item">
             <span class="meta-label">Date & Time</span>
-            <span class="meta-value"><%= new Date(booking.booking.date).toLocaleDateString('en-GB') %> • <%= new Date(booking.booking.date).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) %></span>
+            <span class="meta-value"><%= new Date(booking.booking.date).toLocaleDateString('en-GB') %> • <%= new Date(booking.booking.date).toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase() %></span>
           </div>
         </div>
       </div>
@@ -524,10 +621,6 @@
             <span class="info-label">Full Name</span>
             <span class="info-value"><%= booking.customer.name %></span>
           </div>
-          <!-- <div class="info-row">
-            <span class="info-label">Address</span>
-            <span class="info-value"><%= booking.customer.address || 'Thimphu, Bhutan' %></span>
-          </div> -->
           <div class="info-row">
             <span class="info-label">Contact Number</span>
             <span class="info-value"><%= booking.customer.phone %></span>
@@ -569,12 +662,21 @@
         });
         %>
 
-        <% Object.values(groupedTickets).forEach((group, index) => { %>
+        <% Object.values(groupedTickets).forEach((group, index) => { 
+          // Format draw date and time in 12-hour format
+          const drawDate = new Date(group.lottery.drawDate);
+          const formattedDate = drawDate.toLocaleDateString('en-GB');
+          const formattedTime = drawDate.toLocaleTimeString('en-GB', { 
+            hour: 'numeric', 
+            minute: '2-digit', 
+            hour12: true 
+          }).toLowerCase();
+        %>
           <div class="lottery-card">
             <div class="lottery-header">
               <h3 class="lottery-name"><%= group.lottery.name %></h3>
               <div class="lottery-details">
-                <span><%= new Date(group.lottery.drawDate).toLocaleDateString('en-GB') %></span>
+                <span><%= formattedDate %> at <%= formattedTime %></span>
                 <span>Draw #<%= group.lottery.drawNumber %></span>
                 <span><%= group.tickets.length %> Ticket<%= group.tickets.length > 1 ? 's' : '' %></span>
               </div>
@@ -582,9 +684,13 @@
 
             <div class="ticket-list">
               <% group.tickets.forEach(ticket => { %>
-                <div class="ticket-item">
-                  <span class="ticket-number"><%= String(ticket.number).padStart(5, '0') %></span>
-                  <span class="ticket-amount">Nu <%= ticket.chargeAmount.toFixed(2) %></span>
+                <div class="ticket-item <%= ticket.isWon ? 'winning' : '' %>">
+                  <% if (ticket.isWon) { %>
+                    <span class="winning-badge">Winner</span>
+                  <% } %>
+                    
+                  <span class="ticket-number"><%= String(ticket.number) %></span>
+                  <span class="ticket-amount">Nu. <%= ticket.chargeAmount.toFixed(2) %></span>
                 </div>
               <% }); %>
             </div>
@@ -602,22 +708,22 @@
           </div>
           <div class="summary-row">
             <span class="summary-label">Subtotal</span>
-            <span class="summary-value">Nu <%= booking.financial.subtotal.toFixed(2) %></span>
+            <span class="summary-value">Nu. <%= booking.financial.subtotal.toFixed(2) %></span>
           </div>
           <% if (booking.financial.tax && booking.financial.tax > 0) { %>
           <div class="summary-row">
             <span class="summary-label">Tax</span>
-            <span class="summary-value">Nu <%= booking.financial.tax.toFixed(2) %></span>
+            <span class="summary-value">Nu. <%= booking.financial.tax.toFixed(2) %></span>
           </div>
           <% } %>
           <div class="summary-total">
             <span class="total-label">Total Amount</span>
-            <span class="total-value">Nu <%= booking.financial.totalAmount.toFixed(2) %></span>
+            <span class="total-value">Nu. <%= booking.financial.totalAmount.toFixed(2) %></span>
           </div>
         </div>
       </div>
 
-      <!-- QR Code - Updated from Barcode -->
+      <!-- QR Code -->
       <div class="qrcode-section">
         <p class="qrcode-label">Scan to Verify Receipt</p>
         <div class="qrcode-container">
@@ -629,62 +735,122 @@
 
     <!-- Footer -->
     <div class="receipt-footer">
-      <p class="footer-message">🎉 Keep this receipt safe - it's your winning ticket to dreams!</p>
+      <p class="footer-message">🎉 Keep this receipt link - it's your winning ticket to dreams!</p>
       <p class="footer-note">
-        This is an official receipt from Bhutan State Lotteries. Please present this receipt when claiming prizes.
+        This is an official receipt from Bhutan State Lotteries. Please present this receipt link when claiming prizes to agent.
         <br>
         For queries, contact our customer service or visit our official website.
       </p>
 
       <div class="action-buttons">
-        <button class="btn btn-primary" onclick="window.print()">
+        <button class="btn btn-primary" onclick="copyReceiptLink()">
           <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-            <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2H5zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1z"/>
-            <path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2V7zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+            <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/>
           </svg>
-          Print Receipt
+          Copy Link
         </button>
-        <button class="btn btn-secondary" onclick="window.location.href='/booking'">
+        <button class="btn btn-secondary" onclick="window.location.href='/view-results'">
           <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
             <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
             <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
           </svg>
-          Back to Booking
+          Back to Result Page
         </button>
       </div>
     </div>
   </div>
 
-  <!-- QRCode.js Library - Replaced JsBarcode -->
+  <!-- Toast Notification -->
+  <div id="toast" class="toast">
+    <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+      <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/>
+    </svg>
+    <span id="toastMessage">Link copied to clipboard!</span>
+  </div>
+
+  <!-- QRCode.js Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script>
     // Generate QR Code
     try {
-      // Prepare comprehensive data for QR code
-      // const qrData = {
-      //   ticketNumber: "<%= ticketNumber %>",
-      //   date: "<%= new Date(booking.booking.date).toISOString() %>",
-      //   customer: "<%= booking.customer.name %>",
-      //   totalAmount: <%= booking.financial.totalAmount %>,
-      //   ticketCount: <%= booking.financial.quantity %>,
-      //   verifyUrl: window.location.origin + "/receipt/<%= ticketNumber %>"
-      // };
+      // Compact format for QR code
+      const qrData = `${window.location.href}`;
 
-      // Alternative compact format
-      const qrData = `BSL:<%= ticketNumber %>|C:<%= booking.customer.name %>|A:<%= booking.financial.totalAmount %>|T:<%= booking.financial.quantity %>|D:<%= new Date(booking.booking.date).toISOString().split('T')[0] %>`;
-
-      // Generate QR code with the data
+      // Generate QR code
       new QRCode(document.getElementById("qrcode"), {
-        text: JSON.stringify(qrData),
+        text: qrData,
         width: 180,
         height: 180,
         colorDark: "#1e3a5f",
         colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.H // High error correction
+        correctLevel: QRCode.CorrectLevel.H
       });
     } catch (error) {
       console.error('QR code generation failed:', error);
       document.querySelector('.qrcode-container').innerHTML = '<p style="color: #6c757d; padding: 20px;">QR code unavailable</p>';
+    }
+
+    // Copy receipt link to clipboard
+    function copyReceiptLink() {
+      const receiptUrl = window.location.href;
+      
+      // Modern clipboard API
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(receiptUrl).then(() => {
+          showToast('Link copied to clipboard!');
+        }).catch(err => {
+          // Fallback for clipboard API failure
+          fallbackCopyTextToClipboard(receiptUrl);
+        });
+      } else {
+        // Fallback for older browsers
+        fallbackCopyTextToClipboard(receiptUrl);
+      }
+    }
+
+    // Fallback copy method for older browsers
+    function fallbackCopyTextToClipboard(text) {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed";
+      textArea.style.top = "-9999px";
+      textArea.style.left = "-9999px";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+          showToast('Link copied to clipboard!');
+        } else {
+          showToast('Failed to copy link', 'error');
+        }
+      } catch (err) {
+        showToast('Failed to copy link', 'error');
+      }
+
+      document.body.removeChild(textArea);
+    }
+
+    // Show toast notification
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toastMessage');
+      
+      toastMessage.textContent = message;
+      
+      if (type === 'error') {
+        toast.style.background = 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)';
+      } else {
+        toast.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
+      }
+      
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
     }
   </script>
 </body>

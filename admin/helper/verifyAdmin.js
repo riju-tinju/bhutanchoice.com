@@ -1,14 +1,23 @@
 const mongoose = require("mongoose");
-const Admin = require("../model/adminSchema"); 
+const Admin = require("../model/adminSchema");
+const moment = require("moment-timezone");
 
 const verifyAdmin = async (req, res, next) => {
   try {
     console.log(req.session.admin);
-    //  req.session.admin= {
-    //   id:'68ab64780b19334de3cec460'
-    // }
-    // req.session.admin={id:'685dbdec92ae3669fbfb7b01'}// For testing purposes, remove this line in production
+    req.session.admin = {
+      id: '68f73081f178cb613258b21e',
+      name: 'Riju',
+      email: 'riju@gmail.com',
+      phone: '+975111112345',
+      roll: 'admin'
+    }// For testing purposes, remove this line in production
     if (req.session.admin && req.session.admin.id) {
+      // let admin = await Admin.findById(req.session.admin.id);
+      // if (!admin) {
+      //   return res.redirect("/not-found");
+      // }
+      // console.log(req.session.admin)
       
       return next(); // Authenticated user
     }

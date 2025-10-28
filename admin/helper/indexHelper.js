@@ -164,7 +164,7 @@ const indexHelper = {
         });
     }
   },
-  createLottery: async (req, res) => {
+  createLottery1: async (req, res) => {
     try {
       console.log("Creating lottery with data:", req.body);
       const { name, name2, drawNumber, drawDate, prizes, winners } = req.body;
@@ -255,53 +255,79 @@ const indexHelper = {
         });
     }
   },
-  updateLottery1: async (req, res) => {
+  createLottery: async (req, res) => {
     try {
-      const lotteryId = req.params.id;
+      console.log("Creating lottery with data:", req.body);
       const { name, name2, drawNumber, drawDate, prizes, winners } = req.body;
 
-      if (!lotteryId) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Lottery ID is required" });
+      // Validate required fields
+      if (!name || !drawNumber || !drawDate || !Array.isArray(prizes)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid input data. Name, drawNumber, drawDate, and prizes are required.",
+        });
       }
 
-      const updateData = {};
+      // Process winners with custom _ids
+      const processedWinners = [];
+      if (winners && Array.isArray(winners)) {
+        for (const winner of winners) {
+          if (!winner.resultTime) {
+            return res.status(400).json({
+              success: false,
+              message: "Each winner entry must have a resultTime.",
+            });
+          }
 
-      if (name) updateData.name = name;
-      if (name2) updateData.name2 = name2;
-      if (drawNumber) updateData.drawNumber = drawNumber;
-      if (drawDate) updateData.drawDate = drawDate;
-      if (prizes) updateData.prizes = prizes;
-      if (winners) updateData.winners = winners;
+          // Generate custom _id for winner
+          const winnerId = `winner-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
 
-      updateData.updatedAt = new Date();
+          const processedWinNumbers = [];
+          if (winner.winNumbers && Array.isArray(winner.winNumbers)) {
+            for (const winNumber of winner.winNumbers) {
+              if (!winNumber.prizeRank || !winNumber.ticketNumber) {
+                return res.status(400).json({
+                  success: false,
+                  message: "Each winNumber must have prizeRank and ticketNumber.",
+                });
+              }
+              processedWinNumbers.push(winNumber);
+            }
+          }
 
-      const updatedLottery = await Lottery.findByIdAndUpdate(
-        lotteryId,
-        { $set: updateData },
-        { new: true, runValidators: true }
-      );
-
-      if (!updatedLottery) {
-        return res
-          .status(404)
-          .json({ success: false, message: "Lottery not found" });
+          processedWinners.push({
+            ...winner,
+            _id: winnerId // Custom stable ID
+          });
+        }
       }
 
+      const newLottery = new Lottery({
+        name,
+        name2: name2 || "",
+        drawNumber,
+        drawDate,
+        prizes,
+        winners: processedWinners,
+      });
+
+      const savedLottery = await newLottery.save();
+      console.log("\nLottery created successfully:\n", savedLottery);
       return res.status(200).json({
         success: true,
-        message: "Lottery updated successfully",
-        data: updatedLottery,
+        message: "Lottery created successfully",
+        data: savedLottery,
       });
     } catch (err) {
-      console.error("Error in updateLottery:", err);
-      return res
-        .status(500)
-        .json({ success: false, message: "Failed to update lottery" });
+      console.error("Error in createLottery:", err);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to create lottery",
+        error: err.message,
+      });
     }
   },
-  updateLottery: async (req, res) => {
+  updateLottery1: async (req, res) => {
     try {
       const lotteryId = req.params.id;
       const { name, name2, drawNumber, drawDate, prizes, winners } = req.body;
@@ -396,6 +422,240 @@ const indexHelper = {
         { $set: updateData },
         { new: true, runValidators: true }
       );
+      console.log("\nLottery updated successfully:\n", updatedLottery);
+
+
+
+      // Start the update booking
+      let lottery = updatedLottery;
+
+      // Only proceed if winners array exists and has entries
+      if (lottery.winners && lottery.winners.length > 0) {
+        const bulkOps = [];
+
+        // Collect all update operations for both true and false resultStatus
+        lottery.winners.forEach(winner => {
+          if (winner.winNumbers && winner.winNumbers.length > 0) {
+            winner.winNumbers.forEach(winNumber => {
+              // Update for ALL resultStatus values (both true and false)
+              bulkOps.push({
+                updateMany: {
+                  filter: {
+                    'tickets.lottery.id': lottery._id,
+                    'tickets.lottery.timeId': winner._id,
+                    'tickets.number': winNumber.ticketNumber
+                  },
+                  update: {
+                    $set: {
+                      'tickets.$[ticket].isWon': winNumber.resultStatus || false,
+                    }
+                  },
+                  arrayFilters: [
+                    {
+                      'ticket.lottery.id': lottery._id,
+                      'ticket.lottery.timeId': winner._id,
+                      'ticket.number': winNumber.ticketNumber
+                    }
+                  ]
+                }
+              });
+            });
+          }
+        });
+
+        if (bulkOps.length === 0) {
+          console.log('No matching tickets found to update');
+        } else {
+          try {
+            // Use Ticket model (not Booking) since your schema is named Ticket
+
+            const result = await Booking.bulkWrite(bulkOps);
+            console.log(`Updated ${result.modifiedCount} tickets with result status`);
+          } catch (bulkError) {
+            console.error('Error updating tickets:', bulkError);
+            // Don't fail the entire request if ticket update fails
+          }
+        }
+      } else {
+        console.log('No winners data to update tickets');
+      }
+
+
+      // End of update booking
+      return res.status(200).json({
+        success: true,
+        message: "Lottery updated successfully",
+        data: updatedLottery,
+      });
+    } catch (err) {
+      console.error("Error in updateLottery:", err);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to update lottery",
+        error: err.message,
+      });
+    }
+  },
+  updateLottery2: async (req, res) => {
+    try {
+      const lotteryId = req.params.id;
+      const { name, name2, drawNumber, drawDate, prizes, winners } = req.body;
+
+      if (!lotteryId) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Lottery ID is required" });
+      }
+
+      // Check if lottery exists
+      const existingLottery = await Lottery.findById(lotteryId);
+      if (!existingLottery) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Lottery not found" });
+      }
+
+      const updateData = {};
+
+      if (name !== undefined) updateData.name = name;
+      if (name2 !== undefined) updateData.name2 = name2;
+      if (drawNumber !== undefined) updateData.drawNumber = drawNumber;
+      if (drawDate !== undefined) updateData.drawDate = drawDate;
+
+      // Validate prizes array structure if provided
+      if (prizes !== undefined) {
+        if (!Array.isArray(prizes)) {
+          return res
+            .status(400)
+            .json({ success: false, message: "Prizes must be an array." });
+        }
+        for (const prize of prizes) {
+          if (!prize.rank || !prize.amount) {
+            return res
+              .status(400)
+              .json({
+                success: false,
+                message: "Each prize must have rank and amount.",
+              });
+          }
+        }
+        updateData.prizes = prizes;
+      }
+
+      // Validate winners array structure if provided
+      if (winners !== undefined) {
+        if (!Array.isArray(winners)) {
+          return res
+            .status(400)
+            .json({ success: false, message: "Winners must be an array." });
+        }
+        for (const winner of winners) {
+          if (!winner.resultTime) {
+            return res
+              .status(400)
+              .json({
+                success: false,
+                message: "Each winner entry must have a resultTime.",
+              });
+          }
+          if (winner.winNumbers && Array.isArray(winner.winNumbers)) {
+            for (const winNumber of winner.winNumbers) {
+              if (!winNumber.prizeRank || !winNumber.ticketNumber) {
+                return res
+                  .status(400)
+                  .json({
+                    success: false,
+                    message:
+                      "Each winNumber must have prizeRank and ticketNumber.",
+                  });
+              }
+              // Validate ticketNumber is exactly 3 digits
+              if (!/^.{1,5}$/.test(winNumber.ticketNumber)) {
+                return res
+                  .status(400)
+                  .json({
+                    success: false,
+                    message: "Ticket number must have at least one character.",
+                  });
+              }
+            }
+          }
+        }
+        updateData.winners = winners;
+      }
+
+      updateData.updatedAt = new Date();
+
+      const updatedLottery = await Lottery.findByIdAndUpdate(
+        lotteryId,
+        { $set: updateData },
+        { new: true, runValidators: true }
+      );
+      // console.log("\nLottery updated successfully:\n", updatedLottery);
+      console.log("\nLottery updated successfully (JSON):\n");
+      console.log(JSON.stringify(updatedLottery, null, 2));
+
+      let currentBookings = await Booking.find({ 'tickets.lottery.id': lotteryId });
+      console.log("\nCurrent all Tickets for debugging (JSON):\n");
+      console.log(JSON.stringify(currentBookings, null, 2));
+
+
+      // Start the update booking
+      let lottery = updatedLottery;
+
+      if (lottery.winners && lottery.winners.length > 0) {
+        let totalUpdated = 0;
+
+        for (const winner of lottery.winners) {
+          if (winner.winNumbers && winner.winNumbers.length > 0) {
+            for (const winNumber of winner.winNumbers) {
+              console.log(`Updating ticket: ${winNumber.ticketNumber}`);
+
+              // Find matching bookings first
+              const matchingBookings = await Booking.find({
+                'tickets.lottery.id': lottery._id,
+                'tickets.lottery.timeId': winner._id,
+                'tickets.number': winNumber.ticketNumber
+              });
+
+              console.log(`Found ${matchingBookings.length} matching bookings`);
+
+              // Update each matching booking
+              for (const booking of matchingBookings) {
+                // Find the index of the matching ticket
+                const ticketIndex = booking.tickets.findIndex(ticket =>
+                  ticket.lottery.id.toString() === lottery._id.toString() &&
+                  ticket.lottery.timeId.toString() === winner._id.toString() &&
+                  ticket.number === winNumber.ticketNumber
+                );
+
+                if (ticketIndex !== -1) {
+                  // Update using positional operator
+                  const updateResult = await Booking.updateOne(
+                    {
+                      _id: booking._id,
+                      [`tickets.${ticketIndex}.number`]: winNumber.ticketNumber
+                    },
+                    {
+                      $set: {
+                        [`tickets.${ticketIndex}.isWon`]: winNumber.resultStatus
+                      }
+                    }
+                  );
+
+                  if (updateResult.modifiedCount > 0) {
+                    totalUpdated++;
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        console.log(`Total tickets updated: ${totalUpdated}`);
+      }
+      // End of update booking
+
 
       return res.status(200).json({
         success: true,
@@ -409,6 +669,228 @@ const indexHelper = {
         message: "Failed to update lottery",
         error: err.message,
       });
+    }
+  },
+  updateLottery: async (req, res) => {
+    try {
+      const lotteryId = req.params.id;
+      const { name, name2, drawNumber, drawDate, prizes, winners } = req.body;
+
+      if (!lotteryId) {
+        return res.status(400).json({ success: false, message: "Lottery ID is required" });
+      }
+
+      // Check if lottery exists
+      const existingLottery = await Lottery.findById(lotteryId);
+      if (!existingLottery) {
+        return res.status(404).json({ success: false, message: "Lottery not found" });
+      }
+
+      const updateData = {};
+
+      if (name !== undefined) updateData.name = name;
+      if (name2 !== undefined) updateData.name2 = name2;
+      if (drawNumber !== undefined) updateData.drawNumber = drawNumber;
+      if (drawDate !== undefined) updateData.drawDate = drawDate;
+
+      // Validate prizes array structure if provided
+      if (prizes !== undefined) {
+        if (!Array.isArray(prizes)) {
+          return res.status(400).json({ success: false, message: "Prizes must be an array." });
+        }
+        for (const prize of prizes) {
+          if (!prize.rank || !prize.amount) {
+            return res.status(400).json({
+              success: false,
+              message: "Each prize must have rank and amount.",
+            });
+          }
+        }
+        updateData.prizes = prizes;
+      }
+
+      // Validate winners array structure if provided
+      if (winners !== undefined) {
+        if (!Array.isArray(winners)) {
+          return res.status(400).json({ success: false, message: "Winners must be an array." });
+        }
+
+        // 🚨 CRITICAL: Preserve existing custom _ids
+        const existingWinners = existingLottery.winners || [];
+
+        const processedWinners = winners.map((winner, index) => {
+          if (!winner.resultTime) {
+            throw new Error("Each winner entry must have a resultTime.");
+          }
+
+          if (winner.winNumbers && Array.isArray(winner.winNumbers)) {
+            for (const winNumber of winner.winNumbers) {
+              if (!winNumber.prizeRank || !winNumber.ticketNumber) {
+                throw new Error("Each winNumber must have prizeRank and ticketNumber.");
+              }
+              if (!/^.{1,5}$/.test(winNumber.ticketNumber)) {
+                throw new Error("Ticket number must have at least one character.");
+              }
+            }
+          }
+
+          // 🚨 PRESERVE existing custom _id or generate new one
+          const existingWinner = existingWinners[index];
+          const winnerId = existingWinner ? existingWinner._id : `winner-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
+
+          return {
+            ...winner,
+            _id: winnerId // Preserve or generate custom ID
+          };
+        });
+
+        updateData.winners = processedWinners;
+      }
+
+      updateData.updatedAt = new Date();
+
+      const updatedLottery = await Lottery.findByIdAndUpdate(
+        lotteryId,
+        { $set: updateData },
+        { new: true, runValidators: true }
+      );
+
+      console.log("\nLottery updated successfully (JSON):\n");
+      console.log(JSON.stringify(updatedLottery, null, 2));
+
+      let currentBookings = await Booking.find({ 'tickets.lottery.id': lotteryId });
+      console.log("\nCurrent all Tickets for debugging (JSON):\n");
+      console.log(JSON.stringify(currentBookings, null, 2));
+
+      // Start the update booking
+      let lottery = updatedLottery;
+
+      if (lottery.winners && lottery.winners.length > 0) {
+        const bulkOps = [];
+
+        // STEP 1: Reset operation for all tickets
+        bulkOps.push({
+          updateMany: {
+            filter: {
+              'tickets.lottery.id': lottery._id,
+              'tickets.lottery.timeId': lottery.winners[0]._id
+            },
+            update: {
+              $set: {
+                'tickets.$[ticket].isWon': false
+              }
+            },
+            arrayFilters: [
+              {
+                'ticket.lottery.id': lottery._id,
+                'ticket.lottery.timeId': lottery.winners[0]._id
+              }
+            ]
+          }
+        });
+
+        // STEP 2: Add operations for current winning tickets
+        for (const winner of lottery.winners) {
+          if (winner.winNumbers && winner.winNumbers.length > 0) {
+            for (const winNumber of winner.winNumbers) {
+              if (winNumber.resultStatus === true) {
+                bulkOps.push({
+                  updateMany: {
+                    filter: {
+                      'tickets.lottery.id': lottery._id,
+                      'tickets.lottery.timeId': winner._id,
+                      'tickets.number': winNumber.ticketNumber
+                    },
+                    update: {
+                      $set: {
+                        'tickets.$[ticket].isWon': true
+                      }
+                    },
+                    arrayFilters: [
+                      {
+                        'ticket.lottery.id': lottery._id,
+                        'ticket.lottery.timeId': winner._id,
+                        'ticket.number': winNumber.ticketNumber
+                      }
+                    ]
+                  }
+                });
+              }
+            }
+          }
+        }
+
+        if (bulkOps.length > 0) {
+          console.log(`Executing ${bulkOps.length} bulk operations`);
+          const result = await Booking.bulkWrite(bulkOps);
+          console.log('Bulk write result:', {
+            matched: result.matchedCount,
+            modified: result.modifiedCount
+          });
+        }
+      }
+      // End of update booking
+
+      return res.status(200).json({
+        success: true,
+        message: "Lottery updated successfully",
+        data: updatedLottery,
+      });
+    } catch (err) {
+      console.error("Error in updateLottery:", err);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to update lottery",
+        error: err.message,
+      });
+    }
+  },
+  updateWinnersFromBooking: async (lottery) => {
+    try {
+
+      const bulkOps = [];
+
+      // Collect all update operations for both true and false resultStatus
+      lottery.winners.forEach(winner => {
+        winner.winNumbers.forEach(winNumber => {
+          // Update for ALL resultStatus values (both true and false)
+          bulkOps.push({
+            updateMany: {
+              filter: {
+                'tickets.lottery.id': lottery._id,
+                'tickets.lottery.timeId': winner._id,
+                'tickets.number': winNumber.ticketNumber
+              },
+              update: {
+                $set: {
+                  'tickets.$[ticket].isWon': winNumber.resultStatus
+                }
+              },
+              arrayFilters: [
+                {
+                  'ticket.lottery.id': lottery._id,
+                  'ticket.lottery.timeId': winner._id,
+                  'ticket.number': winNumber.ticketNumber
+                }
+              ]
+            }
+          });
+        });
+      });
+
+      if (bulkOps.length === 0) {
+        console.log('No matching tickets found to update');
+        return true;
+      }
+
+      const result = await Booking.bulkWrite(bulkOps);
+      console.log(`Updated ${result.modifiedCount} tickets with result status`);
+
+      return true;
+
+    } catch (error) {
+      console.error('Error updating winners from booking:', error);
+      return false;
     }
   },
   getLottery: async (req, res) => {
@@ -910,7 +1392,8 @@ const indexHelper = {
         // -------------------------
         // Step 4: Fetch child lottery (inside winners[])
         // -------------------------
-        const timeId = new mongoose.Types.ObjectId(ticket.lottery.timeId);
+        // const timeId = new mongoose.Types.ObjectId(ticket.lottery.timeId);
+        const timeId = ticket.lottery.timeId
         const childLottery = lottery.winners.find(
           (w) => w._id.toString() === timeId.toString()
         );
@@ -956,10 +1439,10 @@ const indexHelper = {
           phone: customer.phone.trim(),
         },
         agent: {
-          name: req.session.admin.name ,
-          id: req.session.admin.id ,
-          phone: req.session.admin.phone,
-          role: ["admin"],
+          name: 'NA',
+          id: new mongoose.Types.ObjectId(),
+          phone: 'NA',
+          role: ['agent']
         },
         booking: {
           date: new Date(),
