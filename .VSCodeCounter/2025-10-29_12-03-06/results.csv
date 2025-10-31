@@ -1,0 +1,48 @@
+"filename", "language", "JSON", "JavaScript", "HTML", "Properties", "PostCSS", "comment", "blank", "total"
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/.env", "Properties", 0, 0, 0, 5, 0, 0, 0, 5
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/app.js", "JavaScript", 0, 44, 0, 0, 0, 6, 13, 63
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/config/connection.js", "JavaScript", 0, 17, 0, 0, 0, 0, 4, 21
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/helper/adminHelper.js", "JavaScript", 0, 82, 0, 0, 0, 7, 22, 111
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/helper/agentHelper.js", "JavaScript", 0, 270, 0, 0, 0, 19, 48, 337
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/helper/bookingHelper copy.js", "JavaScript", 0, 14, 0, 0, 0, 0, 6, 20
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/helper/bookingHelper.js", "JavaScript", 0, 448, 0, 0, 0, 50, 81, 579
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/helper/indexHelper.js", "JavaScript", 0, 1336, 0, 0, 0, 134, 183, 1653
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/helper/settingHelper.js", "JavaScript", 0, 121, 0, 0, 0, 3, 17, 141
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/helper/startingHelper.js", "JavaScript", 0, 741, 0, 0, 0, 589, 4, 1334
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/helper/verifyAdmin.js", "JavaScript", 0, 23, 0, 0, 0, 6, 6, 35
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/model/adminSchema.js", "JavaScript", 0, 36, 0, 0, 0, 0, 4, 40
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/model/agentSchema.js", "JavaScript", 0, 60, 0, 0, 0, 1, 8, 69
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/model/bookingsSchema.js", "JavaScript", 0, 173, 0, 0, 0, 10, 12, 195
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/model/lotterySchema.js", "JavaScript", 0, 59, 0, 0, 0, 5, 9, 73
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/model/seoSchema.js", "JavaScript", 0, 24, 0, 0, 0, 3, 3, 30
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/model/ticketChargeSchema.js", "JavaScript", 0, 8, 0, 0, 0, 1, 3, 12
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/nodemon.json", "JSON", 16, 0, 0, 0, 0, 0, 0, 16
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/public/stylesheets/style.css", "PostCSS", 0, 0, 0, 0, 7, 0, 2, 9
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/routes/adminAuth.js", "JavaScript", 0, 29, 0, 0, 0, 2, 4, 35
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/routes/agent.js", "JavaScript", 0, 24, 0, 0, 0, 6, 7, 37
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/routes/bookings copy.js", "JavaScript", 0, 633, 0, 0, 0, 22, 37, 692
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/routes/bookings.js", "JavaScript", 0, 177, 0, 0, 0, 19, 15, 211
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/routes/index.js", "JavaScript", 0, 88, 0, 0, 0, 370, 107, 565
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/routes/settings.js", "JavaScript", 0, 21, 0, 0, 0, 1, 6, 28
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/views/error.ejs", "HTML", 0, 0, 336, 0, 0, 23, 51, 410
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/views/index.ejs", "HTML", 0, 0, 1284, 0, 0, 24, 252, 1560
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/views/pages/Auth/admin-login copy.ejs", "HTML", 0, 0, 619, 0, 0, 18, 102, 739
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/views/pages/Auth/admin-login.ejs", "HTML", 0, 0, 619, 0, 0, 2, 100, 721
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/views/pages/agent/listing.ejs", "HTML", 0, 0, 1575, 0, 0, 15, 264, 1854
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/views/pages/booking/listing.ejs", "HTML", 0, 0, 1746, 0, 0, 20, 270, 2036
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/views/pages/lottery-booking.ejs", "HTML", 0, 0, 1958, 0, 0, 36, 341, 2335
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/views/pages/receipt copy.ejs", "HTML", 0, 0, 743, 0, 0, 10, 104, 857
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/views/pages/receipt.ejs", "HTML", 0, 0, 725, 0, 0, 0, 118, 843
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/views/pages/settings/metaSettingPartal.ejs", "HTML", 0, 0, 54, 0, 0, 3, 5, 62
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/views/pages/settings/setting copy.ejs", "HTML", 0, 0, 793, 0, 0, 27, 160, 980
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/views/pages/settings/setting.ejs", "HTML", 0, 0, 815, 0, 0, 4, 161, 980
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/views/partials/Edit-create-extention.ejs", "HTML", 0, 0, 1381, 0, 0, 6, 221, 1608
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/views/partials/Footer.ejs", "HTML", 0, 0, 265, 0, 0, 2, 52, 319
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/views/partials/indexScript.ejs", "HTML", 0, 0, 75, 0, 0, 0, 12, 87
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/views/partials/past.ejs", "HTML", 0, 0, 249, 0, 0, 13, 36, 298
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/views/partials/ticketChargeExtention.ejs", "HTML", 0, 0, 789, 0, 0, 8, 140, 937
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/views/partials/todays-results.ejs", "HTML", 0, 0, 248, 0, 0, 13, 33, 294
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/views/partials/upcoming-lotteries.ejs", "HTML", 0, 0, 215, 0, 0, 14, 38, 267
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/views/partials/winning-numbers.ejs", "HTML", 0, 0, 271, 0, 0, 1, 50, 322
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/admin/views/template.ejs", "HTML", 0, 0, 375, 0, 0, 6, 71, 452
+"Total", "-", 16, 4428, 15135, 5, 7, 1499, 3182, 24272

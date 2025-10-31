@@ -1080,6 +1080,8 @@
   }
 
   async function updateLottery(id, lotteryData) {
+    console.log('Updating lottery with ID:', id, 'Data:', lotteryData);
+    
     try {
       const response = await fetch(`/api/lottery/${id}`, {
         method: 'PUT',

@@ -1,0 +1,24 @@
+"filename", "language", "JavaScript", "JSON", "HTML", "Properties", "PostCSS", "comment", "blank", "total"
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/client/.env", "Properties", 0, 0, 0, 2, 0, 0, 0, 2
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/client/app.js", "JavaScript", 30, 0, 0, 0, 0, 5, 11, 46
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/client/config/connection.js", "JavaScript", 17, 0, 0, 0, 0, 0, 4, 21
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/client/helper/indexHelper.js", "JavaScript", 162, 0, 0, 0, 0, 13, 33, 208
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/client/helper/startingHelper.js", "JavaScript", 261, 0, 0, 0, 0, 729, 6, 996
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/client/model/lotterySchema.js", "JavaScript", 58, 0, 0, 0, 0, 0, 9, 67
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/client/nodemon.json", "JSON", 0, 16, 0, 0, 0, 0, 0, 16
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/client/public/stylesheets/style.css", "PostCSS", 0, 0, 0, 0, 7, 0, 2, 9
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/client/routes/index.js", "JavaScript", 24, 0, 0, 0, 0, 1, 7, 32
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/client/routes/users.js", "JavaScript", 27, 0, 0, 0, 0, 0, 8, 35
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/checkTime.ejs", "HTML", 0, 0, 66, 0, 0, 11, 10, 87
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/error.ejs", "HTML", 0, 0, 339, 0, 0, 23, 49, 411
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/index.ejs", "HTML", 0, 0, 876, 0, 0, 14, 187, 1077
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/partials/Edit-create-extention.ejs", "HTML", 0, 0, 1020, 0, 0, 6, 169, 1195
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/partials/indexScript.ejs", "HTML", 0, 0, 75, 0, 0, 0, 12, 87
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/partials/past copy.ejs", "HTML", 0, 0, 194, 0, 0, 36, 35, 265
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/partials/past.ejs", "HTML", 0, 0, 239, 0, 0, 12, 35, 286
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/partials/pastNeed.ejs", "HTML", 0, 0, 57, 0, 0, 1, 7, 65
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/partials/todays-results.ejs", "HTML", 0, 0, 248, 0, 0, 13, 33, 294
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/partials/upcoming-lotteries copy.ejs", "HTML", 0, 0, 82, 0, 0, 7, 7, 96
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/partials/upcoming-lotteries.ejs", "HTML", 0, 0, 205, 0, 0, 13, 36, 254
+"/home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/partials/winning-numbers.ejs", "HTML", 0, 0, 271, 0, 0, 1, 49, 321
+"Total", "-", 579, 16, 3672, 2, 7, 885, 709, 5870

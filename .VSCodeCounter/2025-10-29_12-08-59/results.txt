@@ -1,0 +1,60 @@
+Date : 2025-10-29 12:08:59
+Directory : /home/jadhu/projects/Demo_Project/bhutanchoice.com/client
+Total : 22 files,  4276 codes, 885 comments, 709 blanks, all 5870 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| HTML       |         12 |      3,672 |        137 |        629 |      4,438 |
+| JavaScript |          7 |        579 |        748 |         78 |      1,405 |
+| JSON       |          1 |         16 |          0 |          0 |         16 |
+| PostCSS    |          1 |          7 |          0 |          2 |          9 |
+| Properties |          1 |          2 |          0 |          0 |          2 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                                 | files      | code       | comment    | blank      | total      |
++------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                    |         22 |      4,276 |        885 |        709 |      5,870 |
+| . (Files)                                                                                            |          3 |         48 |          5 |         11 |         64 |
+| config                                                                                               |          1 |         17 |          0 |          4 |         21 |
+| helper                                                                                               |          2 |        423 |        742 |         39 |      1,204 |
+| model                                                                                                |          1 |         58 |          0 |          9 |         67 |
+| public                                                                                               |          1 |          7 |          0 |          2 |          9 |
+| public/stylesheets                                                                                   |          1 |          7 |          0 |          2 |          9 |
+| routes                                                                                               |          2 |         51 |          1 |         15 |         67 |
+| views                                                                                                |         12 |      3,672 |        137 |        629 |      4,438 |
+| views (Files)                                                                                        |          3 |      1,281 |         48 |        246 |      1,575 |
+| views/partials                                                                                       |          9 |      2,391 |         89 |        383 |      2,863 |
++------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                                             | language   | code       | comment    | blank      | total      |
++------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/.env                                       | Properties |          2 |          0 |          0 |          2 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/app.js                                     | JavaScript |         30 |          5 |         11 |         46 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/config/connection.js                       | JavaScript |         17 |          0 |          4 |         21 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/helper/indexHelper.js                      | JavaScript |        162 |         13 |         33 |        208 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/helper/startingHelper.js                   | JavaScript |        261 |        729 |          6 |        996 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/model/lotterySchema.js                     | JavaScript |         58 |          0 |          9 |         67 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/nodemon.json                               | JSON       |         16 |          0 |          0 |         16 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/public/stylesheets/style.css               | PostCSS    |          7 |          0 |          2 |          9 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/routes/index.js                            | JavaScript |         24 |          1 |          7 |         32 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/routes/users.js                            | JavaScript |         27 |          0 |          8 |         35 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/checkTime.ejs                        | HTML       |         66 |         11 |         10 |         87 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/error.ejs                            | HTML       |        339 |         23 |         49 |        411 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/index.ejs                            | HTML       |        876 |         14 |        187 |      1,077 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/partials/Edit-create-extention.ejs   | HTML       |      1,020 |          6 |        169 |      1,195 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/partials/indexScript.ejs             | HTML       |         75 |          0 |         12 |         87 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/partials/past copy.ejs               | HTML       |        194 |         36 |         35 |        265 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/partials/past.ejs                    | HTML       |        239 |         12 |         35 |        286 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/partials/pastNeed.ejs                | HTML       |         57 |          1 |          7 |         65 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/partials/todays-results.ejs          | HTML       |        248 |         13 |         33 |        294 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/partials/upcoming-lotteries copy.ejs | HTML       |         82 |          7 |          7 |         96 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/partials/upcoming-lotteries.ejs      | HTML       |        205 |         13 |         36 |        254 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/partials/winning-numbers.ejs         | HTML       |        271 |          1 |         49 |        321 |
+| Total                                                                                                |            |      4,276 |        885 |        709 |      5,870 |
++------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+

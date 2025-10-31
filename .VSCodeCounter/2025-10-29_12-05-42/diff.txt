@@ -1,0 +1,122 @@
+Date : 2025-10-29 12:05:42
+Directory : /home/jadhu/projects/Demo_Project/bhutanchoice.com/client
+Total : 66 files,  -11902 codes, -337 comments, -1947 blanks, all -14186 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| PostCSS    |          2 |          0 |          0 |          0 |          0 |
+| Properties |          2 |         -2 |          0 |          0 |         -2 |
+| JSON       |          3 |        -24 |          0 |         -1 |        -25 |
+| JavaScript |         28 |     -2,892 |       -219 |       -404 |     -3,515 |
+| HTML       |         31 |     -8,984 |       -118 |     -1,542 |    -10,644 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                                 | files      | code       | comment    | blank      | total      |
++------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                    |         66 |    -11,902 |       -337 |     -1,947 |    -14,186 |
+| . (Files)                                                                                            |          3 |         48 |          5 |         11 |         64 |
+| ..                                                                                                   |         44 |    -16,178 |     -1,222 |     -2,656 |    -20,056 |
+| ../agent                                                                                             |         44 |    -16,178 |     -1,222 |     -2,656 |    -20,056 |
+| ../agent (Files)                                                                                     |          4 |        -88 |         -6 |        -14 |       -108 |
+| ../agent/config                                                                                      |          1 |        -17 |          0 |         -4 |        -21 |
+| ../agent/helper                                                                                      |          8 |     -2,573 |       -857 |       -304 |     -3,734 |
+| ../agent/model                                                                                       |          6 |       -358 |        -20 |        -39 |       -417 |
+| ../agent/public                                                                                      |          1 |         -7 |          0 |         -2 |         -9 |
+| ../agent/public/stylesheets                                                                          |          1 |         -7 |          0 |         -2 |         -9 |
+| ../agent/routes                                                                                      |          5 |       -479 |        -84 |       -122 |       -685 |
+| ../agent/views                                                                                       |         19 |    -12,656 |       -255 |     -2,171 |    -15,082 |
+| ../agent/views (Files)                                                                               |          3 |     -1,846 |        -61 |       -354 |     -2,261 |
+| ../agent/views/pages                                                                                 |          7 |     -7,021 |       -120 |     -1,180 |     -8,321 |
+| ../agent/views/pages (Files)                                                                         |          1 |     -1,983 |        -36 |       -346 |     -2,365 |
+| ../agent/views/pages/Auth                                                                            |          1 |       -619 |         -2 |       -100 |       -721 |
+| ../agent/views/pages/agent                                                                           |          1 |     -1,538 |        -15 |       -254 |     -1,807 |
+| ../agent/views/pages/booking                                                                         |          1 |     -1,448 |        -17 |       -219 |     -1,684 |
+| ../agent/views/pages/settings                                                                        |          3 |     -1,433 |        -50 |       -261 |     -1,744 |
+| ../agent/views/partials                                                                              |          9 |     -3,789 |        -74 |       -637 |     -4,500 |
+| config                                                                                               |          1 |         17 |          0 |          4 |         21 |
+| helper                                                                                               |          2 |        423 |        742 |         39 |      1,204 |
+| model                                                                                                |          1 |         58 |          0 |          9 |         67 |
+| public                                                                                               |          1 |          7 |          0 |          2 |          9 |
+| public/stylesheets                                                                                   |          1 |          7 |          0 |          2 |          9 |
+| routes                                                                                               |          2 |         51 |          1 |         15 |         67 |
+| views                                                                                                |         12 |      3,672 |        137 |        629 |      4,438 |
+| views (Files)                                                                                        |          3 |      1,281 |         48 |        246 |      1,575 |
+| views/partials                                                                                       |          9 |      2,391 |         89 |        383 |      2,863 |
++------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                                             | language   | code       | comment    | blank      | total      |
++------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/.env                                        | Properties |         -4 |          0 |          0 |         -4 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/app.js                                      | JavaScript |        -44 |         -6 |        -13 |        -63 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/config/connection.js                        | JavaScript |        -17 |          0 |         -4 |        -21 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/helper/agentAuthHelper.js                   | JavaScript |        -58 |         -5 |        -16 |        -79 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/helper/agentHelper.js                       | JavaScript |       -265 |        -18 |        -47 |       -330 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/helper/bookingHelper copy.js                | JavaScript |        -14 |          0 |         -6 |        -20 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/helper/bookingHelper.js                     | JavaScript |       -421 |       -155 |        -89 |       -665 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/helper/indexHelper.js                       | JavaScript |       -930 |        -81 |       -116 |     -1,127 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/helper/settingHelper.js                     | JavaScript |       -118 |         -3 |        -20 |       -141 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/helper/startingHelper.js                    | JavaScript |       -741 |       -589 |         -4 |     -1,334 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/helper/verifyAgent.js                       | JavaScript |        -26 |         -6 |         -6 |        -38 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/model/adminSchema.js                        | JavaScript |        -33 |          0 |         -4 |        -37 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/model/agentSchema.js                        | JavaScript |        -60 |         -1 |         -8 |        -69 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/model/bookingsSchema.js                     | JavaScript |       -174 |        -10 |        -12 |       -196 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/model/lotterySchema.js                      | JavaScript |        -59 |         -5 |         -9 |        -73 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/model/seoSchema.js                          | JavaScript |        -24 |         -3 |         -3 |        -30 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/model/ticketChargeSchema.js                 | JavaScript |         -8 |         -1 |         -3 |        -12 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/nodemon.json                                | JSON       |        -16 |          0 |          0 |        -16 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/package.json                                | JSON       |        -24 |          0 |         -1 |        -25 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/public/stylesheets/style.css                | PostCSS    |         -7 |          0 |         -2 |         -9 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/routes/adminAuth.js                         | JavaScript |        -15 |         -1 |         -4 |        -20 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/routes/agent.js                             | JavaScript |        -24 |         -6 |         -7 |        -37 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/routes/bookings.js                          | JavaScript |       -182 |        -11 |        -16 |       -209 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/routes/index.js                             | JavaScript |       -244 |        -58 |        -89 |       -391 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/routes/settings.js                          | JavaScript |        -14 |         -8 |         -6 |        -28 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/views/error.ejs                             | HTML       |       -336 |        -23 |        -51 |       -410 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/views/index.ejs                             | HTML       |     -1,135 |        -32 |       -232 |     -1,399 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/views/pages/Auth/agent-login.ejs            | HTML       |       -619 |         -2 |       -100 |       -721 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/views/pages/agent/listing.ejs               | HTML       |     -1,538 |        -15 |       -254 |     -1,807 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/views/pages/booking/listing.ejs             | HTML       |     -1,448 |        -17 |       -219 |     -1,684 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/views/pages/lottery-booking.ejs             | HTML       |     -1,983 |        -36 |       -346 |     -2,365 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/views/pages/settings/metaSettingPartal.ejs  | HTML       |        -54 |         -3 |         -5 |        -62 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/views/pages/settings/setting copy.ejs       | HTML       |       -793 |        -45 |       -156 |       -994 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/views/pages/settings/setting.ejs            | HTML       |       -586 |         -2 |       -100 |       -688 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/views/partials/Edit-create-extention.ejs    | HTML       |     -1,380 |         -6 |       -219 |     -1,605 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/views/partials/Footer.ejs                   | HTML       |       -264 |         -6 |        -54 |       -324 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/views/partials/indexScript.ejs              | HTML       |        -75 |          0 |        -12 |        -87 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/views/partials/past.ejs                     | HTML       |       -378 |        -25 |        -60 |       -463 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/views/partials/ticketChargeExtention.ejs    | HTML       |       -789 |         -8 |       -140 |       -937 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/views/partials/todays-results.ejs           | HTML       |       -248 |        -13 |        -33 |       -294 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/views/partials/upcoming-lotteries.ejs       | HTML       |       -215 |        -14 |        -36 |       -265 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/views/partials/winning-numbers copy.ejs     | HTML       |       -169 |         -1 |        -33 |       -203 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/views/partials/winning-numbers.ejs          | HTML       |       -271 |         -1 |        -50 |       -322 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/agent/views/template.ejs                          | HTML       |       -375 |         -6 |        -71 |       -452 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/.env                                       | Properties |          2 |          0 |          0 |          2 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/app.js                                     | JavaScript |         30 |          5 |         11 |         46 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/config/connection.js                       | JavaScript |         17 |          0 |          4 |         21 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/helper/indexHelper.js                      | JavaScript |        162 |         13 |         33 |        208 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/helper/startingHelper.js                   | JavaScript |        261 |        729 |          6 |        996 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/model/lotterySchema.js                     | JavaScript |         58 |          0 |          9 |         67 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/nodemon.json                               | JSON       |         16 |          0 |          0 |         16 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/public/stylesheets/style.css               | PostCSS    |          7 |          0 |          2 |          9 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/routes/index.js                            | JavaScript |         24 |          1 |          7 |         32 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/routes/users.js                            | JavaScript |         27 |          0 |          8 |         35 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/checkTime.ejs                        | HTML       |         66 |         11 |         10 |         87 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/error.ejs                            | HTML       |        339 |         23 |         49 |        411 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/index.ejs                            | HTML       |        876 |         14 |        187 |      1,077 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/partials/Edit-create-extention.ejs   | HTML       |      1,020 |          6 |        169 |      1,195 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/partials/indexScript.ejs             | HTML       |         75 |          0 |         12 |         87 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/partials/past copy.ejs               | HTML       |        194 |         36 |         35 |        265 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/partials/past.ejs                    | HTML       |        239 |         12 |         35 |        286 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/partials/pastNeed.ejs                | HTML       |         57 |          1 |          7 |         65 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/partials/todays-results.ejs          | HTML       |        248 |         13 |         33 |        294 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/partials/upcoming-lotteries copy.ejs | HTML       |         82 |          7 |          7 |         96 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/partials/upcoming-lotteries.ejs      | HTML       |        205 |         13 |         36 |        254 |
+| /home/jadhu/projects/Demo_Project/bhutanchoice.com/client/views/partials/winning-numbers.ejs         | HTML       |        271 |          1 |         49 |        321 |
+| Total                                                                                                |            |    -11,902 |       -337 |     -1,947 |    -14,186 |
++------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
