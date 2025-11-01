@@ -292,7 +292,7 @@ router.get('/api/download-receipt/:ticketNumber', async (req, res) => {
            .fillColor(colors.dark)
            .text(ticket.number, 50, yPos + 4)
            .text(`Type ${ticket.type}`, 200, yPos + 4)
-           .text(`Nu ${ticket.chargeAmount.toFixed(2)}`, 450, yPos + 4);
+           .text(`Nu. ${ticket.chargeAmount.toFixed(2)}`, 450, yPos + 4);
 
         yPos += 22;
       });
@@ -326,9 +326,9 @@ router.get('/api/download-receipt/:ticketNumber', async (req, res) => {
        .text('Total Tickets:', 60, yPos + 15)
        .text(booking.financial.quantity.toString(), 480, yPos + 15)
        .text('Subtotal:', 60, yPos + 35)
-       .text(`Nu ${booking.financial.subtotal.toFixed(2)}`, 450, yPos + 35)
+       .text(`Nu. ${booking.financial.subtotal.toFixed(2)}`, 450, yPos + 35)
        .text('Tax:', 60, yPos + 55)
-       .text(`Nu ${(booking.financial.tax || 0).toFixed(2)}`, 450, yPos + 55);
+       .text(`Nu. ${(booking.financial.tax || 0).toFixed(2)}`, 450, yPos + 55);
 
     yPos += 85;
 
@@ -340,7 +340,7 @@ router.get('/api/download-receipt/:ticketNumber', async (req, res) => {
        .fillColor('#ffffff')
        .text('TOTAL AMOUNT:', 60, yPos + 8)
        .fontSize(16)
-       .text(`Nu ${booking.financial.totalAmount.toFixed(2)}`, 450, yPos + 6);
+       .text(`Nu. ${booking.financial.totalAmount.toFixed(2)}`, 450, yPos + 6);
 
     yPos += 50;
 

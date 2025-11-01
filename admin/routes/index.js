@@ -447,8 +447,8 @@ const fs = require('fs');
 //         // Amount right-aligned
 //         doc.fontSize(fonts.body.size)
 //            .fillColor(colors.text.primary)
-//            .text(`Nu ${ticket.chargeAmount.toFixed(2)}`, 
-//                  rightAlignText(`Nu ${ticket.chargeAmount.toFixed(2)}`, fonts.body.size, margin + spacing.xs), yPos);
+//            .text(`Nu. ${ticket.chargeAmount.toFixed(2)}`, 
+//                  rightAlignText(`Nu. ${ticket.chargeAmount.toFixed(2)}`, fonts.body.size, margin + spacing.xs), yPos);
         
 //         yPos += 12;
 //       });
@@ -462,11 +462,11 @@ const fs = require('fs');
 //     // --- SUMMARY SECTION ---
 //     const summaryItems = [
 //       { label: 'Total Tickets', value: booking.financial.quantity.toString() },
-//       { label: 'Subtotal', value: `Nu ${booking.financial.subtotal.toFixed(2)}` }
+//       { label: 'Subtotal', value: `Nu. ${booking.financial.subtotal.toFixed(2)}` }
 //     ];
 
 //     if (booking.financial.tax && booking.financial.tax > 0) {
-//       summaryItems.push({ label: 'Tax', value: `Nu ${booking.financial.tax.toFixed(2)}` });
+//       summaryItems.push({ label: 'Tax', value: `Nu. ${booking.financial.tax.toFixed(2)}` });
 //     }
 
 //     // Summary items with proper spacing
@@ -494,8 +494,8 @@ const fs = require('fs');
     
 //     doc.fontSize(fonts.title.size)
 //        .fillColor(colors.text.inverse)
-//        .text(`Nu ${booking.financial.totalAmount.toFixed(2)}`, 
-//              rightAlignText(`Nu ${booking.financial.totalAmount.toFixed(2)}`, fonts.title.size, margin + spacing.xs), yPos + 3);
+//        .text(`Nu. ${booking.financial.totalAmount.toFixed(2)}`, 
+//              rightAlignText(`Nu. ${booking.financial.totalAmount.toFixed(2)}`, fonts.title.size, margin + spacing.xs), yPos + 3);
 
 //     yPos += 32;
 

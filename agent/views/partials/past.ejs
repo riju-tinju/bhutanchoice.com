@@ -116,7 +116,7 @@ const formattedDate = drawDate.toLocaleDateString('en-GB', {
                 else if(prize.rank === 3) rankStatus = 'rd';
                 else rankStatus = 'th';
                %>
-              <%= prize.rank %><%= rankStatus %> Prize: Nu <%= prize.amount.toLocaleString('en-IN') %>
+              <%= prize.rank %><%= rankStatus %> Prize: Nu. <%= prize.amount.toLocaleString('en-IN') %>
             </span><br>
           </div>
           <% }); %>
@@ -351,7 +351,7 @@ const formattedDate = drawDate.toLocaleDateString('en-GB', {
               <div class="flex items-center card-text-secondary">
                 <i class="fas fa-trophy text-yellow-300 mr-2"></i>
                 <span class="card-prize">
-                  ${prize.rank}${rankStatus} Prize: Nu ${prize.amount.toLocaleString('en-IN')}
+                  ${prize.rank}${rankStatus} Prize: Nu. ${prize.amount.toLocaleString('en-IN')}
                 </span>
               </div>
             `;

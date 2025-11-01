@@ -1918,7 +1918,7 @@
                                 <div class="ticket-type-badge">Type ${ticket.type}</div>
                             </div>
                             
-                            <div class="ticket-price">Nu ${ticket.chargeAmount.toFixed(2)}</div>
+                            <div class="ticket-price">Nu. ${ticket.chargeAmount.toFixed(2)}</div>
                         </div>
                     `;
           });
@@ -2150,7 +2150,7 @@
                         ${group.lottery} (Draw #${group.drawNumber}) - ${group.timeName}
                     </div>
                     <div style="margin-bottom: 6px; color: #64748b; font-size: 0.8rem;">
-                        ${group.tickets.length} tickets - Total: Nu ${groupTotal.toFixed(2)}
+                        ${group.tickets.length} tickets - Total: Nu. ${groupTotal.toFixed(2)}
                     </div>
                     <div style="display: flex; flex-wrap: wrap; gap: 4px;">
                         ${group.tickets.map(ticket => `
