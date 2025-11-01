@@ -304,12 +304,54 @@ const bookingHelper = {
                 { $cond: [{ $ne: ["$name2", null] }, { $concat: [" - ", "$name2"] }, ""] },
                 " - ",
                 {
+          $let: {
+            vars: {
+              hour24: {
+                $toInt: {
                   $dateToString: {
-                    format: "%H:%M",
+                    format: "%H",
                     date: "$winners.resultTime",
                     timezone: "Asia/Dubai"
                   }
                 }
+              },
+              minute: {
+                $dateToString: {
+                  format: "%M",
+                  date: "$winners.resultTime",
+                  timezone: "Asia/Dubai"
+                }
+              }
+            },
+            in: {
+              $concat: [
+                // 12-hour hour (0-11, then convert 0 to 12)
+                {
+                  $toString: {
+                    $cond: [
+                      // If hour is 0 (midnight), set to 12
+                      { $eq: ["$$hour24", 0] },
+                      12,
+                      // If hour is > 12, subtract 12. Otherwise, keep original hour.
+                      { $cond: [{ $gt: ["$$hour24", 12] }, { $subtract: ["$$hour24", 12] }, "$$hour24"] }
+                    ]
+                  }
+                },
+                ":",
+                "$$minute",
+                " ",
+                // AM/PM designator
+                {
+                  $cond: [
+                    { $lt: ["$$hour24", 12] },
+                    "AM",
+                    "PM"
+                  ]
+                }
+              ]
+            }
+          }
+        }
               ]
             },
             drawDate: "$drawDate"
