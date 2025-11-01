@@ -351,16 +351,57 @@ const bookingHelper = {
       throw error;
     }
   },
+  checkTicketExistence: async (req, res) => {
+    try {
+      const { lotteryId, timeId, number } = req.body;
+      if (!lotteryId || !timeId || !number) {
+        return res.status(400).json({
+          "exists": false,
+          "success": false,
+          "message": "lotteryId, timeId, and Ticket number are required",
+        });
+      }
+
+      const existingTicket = await Booking.findOne(
+        {
+          'tickets.lottery.id': lotteryId,
+          'tickets.lottery.timeId': timeId,
+          'tickets.number': number
+        }
+      );
+      if (existingTicket) {
+        return res.status(200).json({
+          "exists": true,
+          "success": true,
+          "message": "Ticket number exist",
+        });
+      }
+
+      return res.status(200).json({
+        "exists": false,
+        "success": true,
+        "message": "Ticket number does not exist",
+      });
+
+    } catch (error) {
+      console.error('Error in checkTicketExistence:', error);
+      res.status(500).json({
+        "exists": false,
+        "success": false,
+        "message": "Error checking ticket existence",
+      });
+    }
+  },
 
   // Create new booking
-  createBooking: async (bookingData,req,res) => {
+  createBooking: async (bookingData, req, res) => {
     try {
       // Generate unique ticket number
       const ticketNumber = await bookingHelper.generateUniqueTicketNumber();
 
       // Process tickets with validation
       const processedTickets = [];
-      
+
       for (const ticket of bookingData.tickets) {
         const lottery = await Lottery.findById(ticket.lottery.id);
         if (!lottery) {
@@ -372,12 +413,28 @@ const bookingHelper = {
           throw new Error(`TimeId is required for ticket ${ticket.number}`);
         }
 
-        const childLottery = lottery.winners.find(w => 
+        const childLottery = lottery.winners.find(w =>
           w._id.toString() === ticket.lottery.timeId.toString()
         );
-        
+
         if (!childLottery) {
           throw new Error(`Child lottery not found with timeId: ${ticket.lottery.timeId} for ticket ${ticket.number}`);
+        }
+
+        // 🚨 Check for duplicate in database
+        const existingTicket = await Booking.findOne({
+          'tickets.lottery.id': lottery._id,
+          'tickets.lottery.timeId': childLottery._id,
+          'tickets.number': ticket.number
+        });
+
+        if (existingTicket) {
+          console.log(`\nTicket number "${ticket.number}" already exists for this lottery and draw time. Please choose a different number.\n`)
+          return res.status(400).json({
+            success: false,
+            message: `Ticket number "${ticket.number}" already exists for this lottery and draw time. Please choose a different number.`,
+            data: null
+          });
         }
 
         // Use the validated timeId and child lottery data
@@ -426,7 +483,7 @@ const bookingHelper = {
       const bookingObj = savedBooking.toObject();
       bookingObj.displayId = `TKT-${savedBooking.ticketNumber}`;
 
-      
+
       return res.status(200).json({
         success: true,
         message: "Booking saved successfully",

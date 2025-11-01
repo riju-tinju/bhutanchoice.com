@@ -1743,12 +1743,65 @@
       }
     }
 
+    async function checkTicketNumberExists(ticketData) {
+      console.log('Checking ticket existence:', ticketData);
+      // return false;
+
+      try {
+        const response = await fetch('bookings/api/booking/check-ticket-existence', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(ticketData)
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to check ticket existence');
+        }
+
+        const data = await response.json();
+        return data; // Return true if ticket does NOT exist
+
+      } catch (error) {
+        showToast('Error checking ticket existence', 'error');
+        console.error('Error checking ticket existence:', error);
+        
+        return {"exists": false,
+        "success": false,
+        "message": "Error checking ticket existence"};
+      }
+
+    }
+
     // Add single ticket
-    function addSingleTicket() {
+    async function addSingleTicket() {
       const ticketNumber = document.getElementById('ticketNumberInput').value.trim().toUpperCase();
 
       if (!ticketNumber || !selectedParentLottery || !selectedChildLottery || !selectedTicketType) {
         showToast('Please complete all selections before adding ticket', 'error');
+        return;
+      }
+
+      let ticketData = {
+        number: ticketNumber,
+        lotteryId: selectedParentLottery._id,
+        timeId: selectedChildLottery._id,
+        type: selectedTicketType.type
+      };
+
+      let isNumberExistData=await checkTicketNumberExists(ticketData);
+
+      if(!isNumberExistData){
+        showToast('An error occured', 'error');
+        return;
+      }
+      if(isNumberExistData.success==false){
+        showToast('An error occured.. Try another number', 'error');
+        return;
+      }
+      if (isNumberExistData.exists) {
+        showToast('Ticket number already exists in the system. Please choose a different number.', 'error');
         return;
       }
 

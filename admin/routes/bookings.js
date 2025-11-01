@@ -112,6 +112,9 @@ router.get('/api/agents/dropdown', async function (req, res, next) {
   }
 });
 
+router.post('/api/booking/check-ticket-existence', async function (req, res, next) {
+  await bookingFun.checkTicketExistence(req, res);
+});
 // POST /api/bookings - Create new booking (for integration with flexible booking system)
 router.post('/api/bookings', async function (req, res, next) {
   try {
