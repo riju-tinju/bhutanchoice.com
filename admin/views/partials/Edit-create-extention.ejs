@@ -1081,7 +1081,7 @@
 
   async function updateLottery(id, lotteryData) {
     console.log('Updating lottery with ID:', id, 'Data:', lotteryData);
-    
+    //return null
     try {
       const response = await fetch(`/api/lottery/${id}`, {
         method: 'PUT',
@@ -1320,8 +1320,8 @@
     winnerGroupCounter++;
     const winnersContainer = document.getElementById('winnersContainer');
     const winnerGroupDiv = createWinnerGroupElement(winnerGroupCounter);
-    // winnersContainer.appendChild(winnerGroupDiv);
-    winnersContainer.prepend(winnerGroupDiv);
+     winnersContainer.appendChild(winnerGroupDiv);
+    // winnersContainer.prepend(winnerGroupDiv);
 
     // Set default result time (2 hours after draw time)
     const drawDate = document.getElementById('drawDate').value;

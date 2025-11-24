@@ -58,7 +58,7 @@ const ticketSchema = new Schema({
     },
     status: {
       type: String,
-      enum: ["active", "cancelled"],
+      enum: ["active", "cancelled",],
       default: "active"
     }
   },
@@ -86,9 +86,13 @@ const ticketSchema = new Schema({
           required: true
         },
         timeId: {
-          type: String, 
+          type: String,
           required: true
         }
+      },
+      numberId:{
+        type:String,
+        required:true,
       },
       isWon: {
         type: Boolean,
@@ -109,6 +113,11 @@ const ticketSchema = new Schema({
         type: Number,
         required: true,
         min: 0
+      },
+      status: {
+        type: String,
+        enum: ["UNPAID", "NOT_WINNER", "PAID"],
+        default: "NOT_WINNER"
       }
     }
   ],

@@ -17,15 +17,6 @@ router.post('/api/get-past-lottories', async function (req, res, next) {
   await indexFun.getPastLotteries(req, res)
 });
 
-
-router.get('/create-dummy-lottories', async function (req, res, next) {
-  try {
-    let savedLotteries = await startFun.saveDummyLotteries(req, res);
-  } catch (err) {
-    console.error("ERROR FROM 'startFun.saveDummyLotteries(req,res)' Function : \n", err);
-  }
-});
-
 router.get('/api/lottery-autocomplete', async function (req, res, next) {
   let response = {
     "success": true,
@@ -49,7 +40,7 @@ router.post('/api/lottery', async function (req, res, next) {
 })
 
 router.put('/api/lottery/:id', async function (req, res, next) {
-  await indexFun.updateLottery(req, res)
+  await indexFun.updateLottery1(req, res)
 })
 router.get('/api/lottery/:id', async function (req, res, next) {
   await indexFun.getLottery(req, res)

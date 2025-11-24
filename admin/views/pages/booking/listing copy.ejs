@@ -91,13 +91,12 @@
           </select>
         </div>
         
-         <div class="filter-group">
-          <label class="filter-label">Payment Status</label>
+        <div class="filter-group">
+          <label class="filter-label">Booking Status</label>
           <select id="statusFilter" class="filter-select">
-            <option value="ALL" selected>All</option>
-            <option value="PAID">Paid</option>
-            <option value="UNPAID">Unpaid</option>
-            <option value="NOT_WINNER">Not winner</option>
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="cancelled">Cancelled</option>
           </select>
         </div>
       </div>
@@ -121,7 +120,7 @@
         <div class="filter-group">
           <label class="filter-label">winner</label>
           <select id="winnerFilter" class="filter-select">
-            <option value="ALL" selected>All</option>
+            <option value="ALL">All</option>
             <option value="WON">winners</option>
             <option value="NOT_WON">non winners</option>
           </select>
@@ -282,16 +281,12 @@
     <div class="modal-body">
       <form id="statusForm">
         <input type="hidden" id="statusBookingId">
-        <input type="hidden" id="statusBookingTicketNumber">
-        <input type="hidden" id="statusBookingNumberId">
-        <input type="hidden" id="statusBookingTimeId">
         
         <div class="form-group">
           <label class="form-label">Booking Status</label>
           <select id="newBookingStatus" class="form-select">
             <option value="PAID" selected >Paid</option>
             <option value="UNPAID">Unpaid</option>
-            <option value="NOT_WINNER">Not a Winner</option>
           </select>
         </div>
       </form>
@@ -1797,7 +1792,11 @@ body {
                                     title="View Details">
                                 <i class="fas fa-eye"></i>
                             </button>
-                            
+                            <button type="button" class="btn btn-warning btn-sm btn-icon" 
+                                    onclick="openDirectStatusModal('${booking._id}')"
+                                    title="Update Status" >
+                                <i class="fas fa-edit"></i>
+                            </button>
                         </div>
                     </td>
                 </tr>
@@ -1841,21 +1840,10 @@ body {
                                 <div class="child-ticket-label">Type</div>
                                 <div class="child-ticket-value">Type ${ticket.type}</div>
                             </div>
-
-                            <div class="child-ticket-detail">
-                                <div class="child-ticket-label">Status</div>
-                                <div class="child-ticket-value">${ticket.status}</div>
-                            </div>
-
                             <div class="child-ticket-detail">
                                 <div class="child-ticket-label">Amount</div>
                                 <div class="child-ticket-value">Nu. ${ticket.chargeAmount.toLocaleString()}</div>
                             </div>
-
-                            <button type="button" class="btn btn-warning btn-sm btn-icon" onclick="openDirectStatusModal('${booking._id}','${ticket.lottery.timeId}','${ticket.number}','${ticket.numberId}')" title="Update Status" style="max-width:120px;">
-                                <i class="fas fa-edit" ></i>
-                                Edit status
-                            </button>
                         </div>
                     `;
                 });
@@ -1970,19 +1958,13 @@ body {
     };
     
     // Open status modal directly
-    window.openDirectStatusModal = function(bookingId,timeId,ticketNumber,numberId) {
+    window.openDirectStatusModal = function(bookingId) {
         const booking = bookings.find(b => b._id === bookingId);
-        if (!booking){
-          console.log('Booking not found')
-          return;
-        } 
+        if (!booking) return;
         
         currentBookingId = bookingId;
         document.getElementById('statusBookingId').value = bookingId;
-        document.getElementById('statusBookingTicketNumber').value = ticketNumber;
-        document.getElementById('statusBookingNumberId').value = numberId;
-        document.getElementById('statusBookingTimeId').value = timeId;
-        // document.getElementById('newBookingStatus').value = booking.booking.status;
+        document.getElementById('newBookingStatus').value = booking.booking.status;
         document.getElementById('statusModal').style.display = 'block';
     };
     
@@ -2012,16 +1994,6 @@ body {
     async function saveBookingStatus() {
         const bookingId = document.getElementById('statusBookingId').value;
         const newStatus = document.getElementById('newBookingStatus').value;
-        const timeId= document.getElementById('statusBookingTimeId').value;
-        const numberId=document.getElementById('statusBookingNumberId').value;
-        const ticketNumber= document.getElementById('statusBookingTicketNumber').value;
-        const reqObj={
-          bookingId,
-          status:newStatus,
-          timeId,
-          ticketNumber,
-          numberId
-        }
         
         if (!bookingId || !newStatus) return;
         
@@ -2034,7 +2006,7 @@ body {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(reqObj)
+                body: JSON.stringify({ status: newStatus })
             });
             
             if (!response.ok) {

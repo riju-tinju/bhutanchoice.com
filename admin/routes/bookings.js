@@ -51,19 +51,8 @@ router.get('/api/bookings/:id', async function (req, res, next) {
 // PUT /api/bookings/:id/status - Update booking status
 router.put('/api/bookings/:id/status', async function (req, res, next) {
   try {
-    const { bookingStatus } = req.body;
-
-    // Validate status
-    if (!['active', 'cancelled'].includes(bookingStatus)) {
-      return res.status(400).json({
-        "success": false,
-        "message": "Invalid booking status. Must be 'active' or 'cancelled'",
-        "error": "VALIDATION_ERROR"
-      });
-    }
-
-    const result = await bookingFun.updateBookingStatus(req.params.id, bookingStatus);
-    res.status(200).json(result);
+    const result = await bookingFun.updateBookingStatus1(req,res);
+    // res.status(200).json(result);
   } catch (error) {
     console.error('Error in PUT /api/bookings/:id/status:', error);
     if (error.message === 'Booking not found') {

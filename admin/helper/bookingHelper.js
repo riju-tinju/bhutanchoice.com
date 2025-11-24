@@ -60,7 +60,24 @@ const bookingHelper = {
 
       // Status filter
       if (status && status.trim()) {
-        matchConditions["booking.status"] = status;
+        if(status ==="ALL"){
+          // If status is ALL, we don't need to filter by status
+        }
+        else if (status === "PAID" || status === "UNPAID")
+          matchConditions["tickets.status"] = status;
+        else if (status === "NOT_WINNER") {
+          // Get documents where ALL tickets have status "NOT_WINNER"
+          // AND exclude documents that have at least one ticket with "PAID" or "UNPAID"
+          matchConditions["tickets.status"] = "NOT_WINNER";
+          matchConditions["tickets"] = {
+            $not: {
+              $elemMatch: {
+                status: { $in: ["PAID", "UNPAID"] }
+              }
+            }
+          };
+        }
+
       }
 
       // 🟢 WIN filter (newly added)
@@ -247,40 +264,258 @@ const bookingHelper = {
   },
 
   // Update booking status
-  updateBookingStatus: async (bookingId, newStatus) => {
+  updateBookingStatus1: async (req, res) => {
     try {
-      if (!mongoose.Types.ObjectId.isValid(bookingId)) {
-        throw new Error('Invalid booking ID format');
+      let {
+        bookingId,
+        status,
+        timeId,
+        ticketNumber,
+        numberId
+      } = req.body;
+
+      let newStatus = status;
+      console.log('req.body:\n', req.body);
+
+      // Validate required fields
+      if (!bookingId || !newStatus || !timeId || !ticketNumber || !numberId) {
+        return res.status(400).json({
+          message: 'Missing required fields: bookingId, newStatus, timeId, ticketNumber, numberId'
+        });
       }
 
-      const booking = await Booking.findByIdAndUpdate(
-        bookingId,
+      // 1. Define the Query Filter
+      const filter = {
+        _id: bookingId,
+        'tickets.lottery.timeId': timeId,
+        'tickets.number': ticketNumber,
+        'tickets.numberId': numberId
+      };
+
+      // 2. Define the Update Operation
+      const update = {
+        $set: {
+          'tickets.$.status': newStatus
+        }
+      };
+
+      // 3. Execute the Update
+      const updatedBooking = await Booking.findOneAndUpdate(
+        filter,
+        update,
         {
-          "booking.status": newStatus,
-          updatedAt: new Date()
-        },
-        { new: true }
+          new: true,
+          runValidators: true
+        }
       );
 
-      if (!booking) {
-        throw new Error('Booking not found');
+      // 4. Check the Result
+      if (!updatedBooking) {
+        return res.status(404).json({
+          message: 'Booking not found or no ticket matched the specified criteria.'
+        });
       }
 
-      // Add displayId virtual field
-      const bookingObj = booking.toObject();
-      bookingObj.displayId = `TKT-${booking.ticketNumber}`;
+      // Find the updated ticket to verify the change
+      const updatedTicket = updatedBooking.tickets.find(ticket =>
+        ticket.lottery?.timeId === timeId &&
+        ticket.number === ticketNumber &&
+        ticket.numberId === numberId
+      );
 
-      return {
+      if (!updatedTicket) {
+        return res.status(404).json({
+          message: 'Ticket found but criteria not met after update.'
+        });
+      }
+
+      console.log('✅ Booking updated successfully. Updated ticket:', updatedTicket);
+
+      // 5. Send a Success Response
+      return res.status(200).json({
         success: true,
-        message: "Booking status updated successfully",
-        booking: bookingObj
-      };
+        message: 'Ticket status updated successfully.',
+        booking: updatedBooking,
+        updatedTicket: updatedTicket
+      });
 
     } catch (error) {
       console.error('Error in updateBookingStatus:', error);
-      throw error;
+      return res.status(500).json({
+        message: 'Internal server error',
+        error: error.message
+      });
     }
   },
+  // Helper functions (same as before)
+  getBulkStatusChangeReason: (newStatus, ticket) => {
+    const reasons = {
+      'PAID': `Prize payment processed for winning ticket ${ticket.number}`,
+      'UNPAID': `Bulk status reset to UNPAID`,
+      'NOT_WINNER': `Bulk update to NOT_WINNER from lottery results`
+    };
+    return reasons[newStatus] || `Bulk status update to ${newStatus}`;
+  },
+
+  getBulkSuccessMessage: function (newStatus, updatedCount, totalCount) {
+    const messages = {
+      'PAID': `Successfully paid ${updatedCount} winning ticket(s) out of ${totalCount} total tickets`,
+      'UNPAID': `Reset ${updatedCount} ticket(s) to UNPAID status`,
+      'NOT_WINNER': `Marked ${updatedCount} ticket(s) as NOT_WINNER`
+    };
+    return messages[newStatus] || `Updated ${updatedCount} ticket(s) to ${newStatus}`;
+  },
+  updateBookingStatus: async function (req, res) {
+    try {
+      // const { bookingId, newStatus } = req.body;
+      let newStatus = req.body.status;
+      let bookingId = req.params.id;
+      const adminId = req.session.admin?.id || req.user?.id;
+
+      // Validate inputs
+      // if (!bookingId || !newStatus || !adminId) {
+      //   return res.status(400).json({
+      //     success: false,
+      //     message: 'Booking ID, new status, and admin authentication are required'
+      //   });
+      // }
+
+      if (!['PAID', 'UNPAID', 'NOT_WINNER'].includes(newStatus)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid status. Must be PAID, UNPAID, or NOT_WINNER'
+        });
+      }
+
+      // Find the booking
+      const booking = await Booking.findById(bookingId);
+      if (!booking) {
+        return res.status(404).json({
+          success: false,
+          message: 'Booking not found'
+        });
+      }
+
+      // 🛡️ Validate the bulk status change
+      if (newStatus === 'PAID') {
+        // Check if there are any winning tickets to pay
+        const hasWinningTickets = booking.tickets.some(ticket => ticket.isWon);
+        if (!hasWinningTickets) {
+          return res.status(400).json({
+            success: false,
+            message: 'No winning tickets found in this booking to mark as PAID'
+          });
+        }
+
+        // Check if all winning tickets are eligible for payment
+        const ineligibleTickets = booking.tickets.filter(ticket =>
+          ticket.isWon && ticket.status === 'NOT_WINNER'
+        );
+        if (ineligibleTickets.length > 0) {
+          const ticketNumbers = ineligibleTickets.map(t => t.number).join(', ');
+          return res.status(400).json({
+            success: false,
+            message: `Cannot pay NOT_WINNER tickets: ${ticketNumbers}`
+          });
+        }
+      }
+
+      // Prepare bulk update operations for ALL tickets
+      const updateOperations = [];
+      const currentTime = new Date();
+
+      for (let i = 0; i < booking.tickets.length; i++) {
+        const ticket = booking.tickets[i];
+
+        // 🛡️ Individual ticket validation for PAID status
+        if (newStatus === 'PAID') {
+          // Only mark winning tickets as PAID, skip non-winning ones
+          if (!ticket.isWon) {
+            console.log(`⏭️ Skipping non-winning ticket: ${ticket.number}`);
+            continue;
+          }
+
+          // Skip tickets that are already NOT_WINNER
+          if (ticket.status === 'NOT_WINNER') {
+            console.log(`⏭️ Skipping NOT_WINNER ticket: ${ticket.number}`);
+            continue;
+          }
+        }
+
+        // For UNPAID and NOT_WINNER, update all tickets
+        const updateOperation = {
+          updateOne: {
+            filter: {
+              _id: bookingId,
+              [`tickets.${i}.number`]: ticket.number
+            },
+            update: {
+              $set: {
+                [`tickets.${i}.status`]: newStatus,
+                updatedAt: currentTime
+              },
+              $push: {
+                [`tickets.${i}.statusHistory`]: {
+                  status: newStatus,
+                  changedAt: currentTime,
+                  changedBy: adminId,
+                  reason: this.getBulkStatusChangeReason(newStatus, ticket)
+                }
+              }
+            }
+          }
+        };
+
+        updateOperations.push(updateOperation);
+      }
+
+      if (updateOperations.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'No eligible tickets found for status update'
+        });
+      }
+
+      // Perform bulk update
+      const updateResult = await Booking.bulkWrite(updateOperations);
+
+      // Get updated booking with details
+      const updatedBooking = await Booking.findById(bookingId);
+      const ticketObj = updatedBooking.toObject();
+      ticketObj.displayId = `TKT-${updatedBooking.ticketNumber}`;
+
+      // Generate success message with statistics
+      const updatedTickets = updatedBooking.tickets.filter(t =>
+        updateOperations.some(op =>
+          op.updateOne.filter[`tickets.${updatedBooking.tickets.indexOf(t)}.number`] === t.number
+        )
+      );
+
+      const successMessage = this.getBulkSuccessMessage(newStatus, updatedTickets.length, booking.tickets.length);
+
+      return res.status(200).json({
+        success: true,
+        message: successMessage,
+        data: ticketObj,
+        stats: {
+          totalTickets: booking.tickets.length,
+          updatedTickets: updatedTickets.length,
+          skippedTickets: booking.tickets.length - updatedTickets.length
+        }
+      });
+
+    } catch (error) {
+      console.error('Error in updateBookingStatus:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Internal server error',
+        error: error.message
+      });
+    }
+  },
+
+
+
 
   // Get child lotteries for dropdown (winners array items from lottery schema)
   getChildLotteries: async () => {
@@ -304,54 +539,54 @@ const bookingHelper = {
                 { $cond: [{ $ne: ["$name2", null] }, { $concat: [" - ", "$name2"] }, ""] },
                 " - ",
                 {
-          $let: {
-            vars: {
-              hour24: {
-                $toInt: {
-                  $dateToString: {
-                    format: "%H",
-                    date: "$winners.resultTime",
-                    timezone: "Asia/Dubai"
+                  $let: {
+                    vars: {
+                      hour24: {
+                        $toInt: {
+                          $dateToString: {
+                            format: "%H",
+                            date: "$winners.resultTime",
+                            timezone: "Asia/Dubai"
+                          }
+                        }
+                      },
+                      minute: {
+                        $dateToString: {
+                          format: "%M",
+                          date: "$winners.resultTime",
+                          timezone: "Asia/Dubai"
+                        }
+                      }
+                    },
+                    in: {
+                      $concat: [
+                        // 12-hour hour (0-11, then convert 0 to 12)
+                        {
+                          $toString: {
+                            $cond: [
+                              // If hour is 0 (midnight), set to 12
+                              { $eq: ["$$hour24", 0] },
+                              12,
+                              // If hour is > 12, subtract 12. Otherwise, keep original hour.
+                              { $cond: [{ $gt: ["$$hour24", 12] }, { $subtract: ["$$hour24", 12] }, "$$hour24"] }
+                            ]
+                          }
+                        },
+                        ":",
+                        "$$minute",
+                        " ",
+                        // AM/PM designator
+                        {
+                          $cond: [
+                            { $lt: ["$$hour24", 12] },
+                            "AM",
+                            "PM"
+                          ]
+                        }
+                      ]
+                    }
                   }
                 }
-              },
-              minute: {
-                $dateToString: {
-                  format: "%M",
-                  date: "$winners.resultTime",
-                  timezone: "Asia/Dubai"
-                }
-              }
-            },
-            in: {
-              $concat: [
-                // 12-hour hour (0-11, then convert 0 to 12)
-                {
-                  $toString: {
-                    $cond: [
-                      // If hour is 0 (midnight), set to 12
-                      { $eq: ["$$hour24", 0] },
-                      12,
-                      // If hour is > 12, subtract 12. Otherwise, keep original hour.
-                      { $cond: [{ $gt: ["$$hour24", 12] }, { $subtract: ["$$hour24", 12] }, "$$hour24"] }
-                    ]
-                  }
-                },
-                ":",
-                "$$minute",
-                " ",
-                // AM/PM designator
-                {
-                  $cond: [
-                    { $lt: ["$$hour24", 12] },
-                    "AM",
-                    "PM"
-                  ]
-                }
-              ]
-            }
-          }
-        }
               ]
             },
             drawDate: "$drawDate"
@@ -470,14 +705,14 @@ const bookingHelper = {
           'tickets.number': ticket.number
         });
 
-        if (existingTicket) {
-          console.log(`\nTicket number "${ticket.number}" already exists for this lottery and draw time. Please choose a different number.\n`)
-          return res.status(400).json({
-            success: false,
-            message: `Ticket number "${ticket.number}" already exists for this lottery and draw time. Please choose a different number.`,
-            data: null
-          });
-        }
+        // if (existingTicket) {
+        //   console.log(`\nTicket number "${ticket.number}" already exists for this lottery and draw time. Please choose a different number.\n`)
+        //   return res.status(400).json({
+        //     success: false,
+        //     message: `Ticket number "${ticket.number}" already exists for this lottery and draw time. Please choose a different number.`,
+        //     data: null
+        //   });
+        // }
 
         // Use the validated timeId and child lottery data
         processedTickets.push({
@@ -488,6 +723,7 @@ const bookingHelper = {
             drawDate: childLottery.resultTime, // Use child lottery's resultTime
             timeId: childLottery._id // Use the validated child lottery _id
           },
+          numberId: 'NumberId_' + Math.floor(Math.random() * 1000000).toString().padStart(6, '0'),
           number: ticket.number,
           type: ticket.type,
           chargeAmount: ticket.chargeAmount,
@@ -565,6 +801,30 @@ const bookingHelper = {
 
     } catch (error) {
       console.error('Error in generateUniqueTicketNumber:', error);
+      throw error;
+    }
+  },
+  generateUniqueTicketNumberId: async () => {
+    try {
+      let isUnique = false;
+      let ticketNumberId;
+
+      while (!isUnique) {
+        // Generate random 6-digit number
+        const randomNum = Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+        ticketNumberId = `NUMBER_ID_${randomNum}`;
+
+        // Check if it already exists
+        // const existingBooking = await Booking.findOne({ ticketNumberId: ticketNumberId });
+        // if (!existingBooking) {
+        //   isUnique = true;
+        // }
+      }
+
+      return ticketNumberId;
+
+    } catch (error) {
+      console.error('Error in generateUniqueTicketNumberId:', error);
       throw error;
     }
   },

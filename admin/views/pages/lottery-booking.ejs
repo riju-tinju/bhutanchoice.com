@@ -1790,20 +1790,20 @@
         type: selectedTicketType.type
       };
 
-      let isNumberExistData=await checkTicketNumberExists(ticketData);
+      // let isNumberExistData=await checkTicketNumberExists(ticketData);
 
-      if(!isNumberExistData){
-        showToast('An error occured', 'error');
-        return;
-      }
-      if(isNumberExistData.success==false){
-        showToast('An error occured.. Try another number', 'error');
-        return;
-      }
-      if (isNumberExistData.exists) {
-        showToast('Ticket number already exists in the system. Please choose a different number.', 'error');
-        return;
-      }
+      // if(!isNumberExistData){
+      //   showToast('An error occured', 'error');
+      //   return;
+      // }
+      // if(isNumberExistData.success==false){
+      //   showToast('An error occured.. Try another number', 'error');
+      //   return;
+      // }
+      // if (isNumberExistData.exists) {
+      //   showToast('Ticket number already exists in the system. Please choose a different number.', 'error');
+      //   return;
+      // }
 
       const ticket = {
         id: generateTicketId(),
