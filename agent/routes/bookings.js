@@ -7,13 +7,13 @@ var bookingFun = require("../helper/bookingHelper")
 
 /* GET bookings listing page. */
 router.get('/', async function (req, res, next) {
-  res.render('pages/booking/listing')
+  res.render('pages/booking/listingAdmin')
 });
 
 // GET /api/bookings - Retrieve bookings with backend filtering, sorting, and pagination
 router.get('/api/bookings', async function (req, res, next) {
   try {
-    const result = await bookingFun.getBookingsWithFilters(req.query);
+    const result = await bookingFun.getBookingsWithFilters(req.query,req);
     res.status(200).json(result);
   } catch (error) {
     console.error('Error in GET /api/bookings:', error);
@@ -51,19 +51,20 @@ router.get('/api/bookings/:id', async function (req, res, next) {
 // PUT /api/bookings/:id/status - Update booking status
 router.put('/api/bookings/:id/status', async function (req, res, next) {
   try {
-    const { bookingStatus } = req.body;
+    console.log('PUT /api/bookings/:id/status - Request body:', req.body);
+    const { status } = req.body;
 
     // Validate status
-    if (!['active', 'cancelled'].includes(bookingStatus)) {
+    if (!['PAID','IN_AGENT'].includes(status)) {//this filter is very important, otherwise agent may change status unintentionally
       return res.status(400).json({
         "success": false,
-        "message": "Invalid booking status. Must be 'active' or 'cancelled'",
+        "message": "Invalid booking status. Must be 'PAID'",
         "error": "VALIDATION_ERROR"
       });
     }
 
-    const result = await bookingFun.updateBookingStatus(req.params.id, bookingStatus);
-    res.status(200).json(result);
+    const result = await bookingFun.updateBookingStatus(req,res);
+    // res.status(200).json(result);
   } catch (error) {
     console.error('Error in PUT /api/bookings/:id/status:', error);
     if (error.message === 'Booking not found') {
@@ -125,15 +126,7 @@ router.post('/api/bookings', async function (req, res, next) {
         "error": "VALIDATION_ERROR"
       });
     }
-
-    if (!bookingData.agent || !bookingData.agent.id) {
-      return res.status(400).json({
-        "success": false,
-        "message": "Agent information is required",
-        "error": "VALIDATION_ERROR"
-      });
-    }
-
+    
     if (!bookingData.tickets || bookingData.tickets.length === 0) {
       return res.status(400).json({
         "success": false,
@@ -142,8 +135,8 @@ router.post('/api/bookings', async function (req, res, next) {
       });
     }
 
-    const result = await bookingFun.createBooking(bookingData);
-    res.status(201).json(result);
+    const result = await bookingFun.createBooking(bookingData,req,res);
+  
   } catch (error) {
     console.error('Error in POST /api/bookings:', error);
     if (error.message.includes('duplicate') || error.message.includes('unique')) {

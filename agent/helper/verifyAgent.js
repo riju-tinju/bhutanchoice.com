@@ -4,9 +4,9 @@ const Agent = require("../model/agentSchema");
 const verifyAgent = async (req, res, next) => {
   try {
     //  req.session.agent= {
-    //   id:'68ab64780b19334de3cec460'
+    //   id:'69252f9716d3532b2f459626"'
     // }
-    // req.session.agent={id:'68de240883882f81bbc40a5d'}// For testing purposes, remove this line in production
+    // req.session.agent={id:'69252f9716d3532b2f459626'}// For testing purposes, remove this line in production
     if (req.session.agent && req.session.agent.id) {
       let agent= await Agent.findOne({_id: req.session.agent.id});
       if (!agent) {

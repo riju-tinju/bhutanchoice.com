@@ -119,14 +119,6 @@ router.post('/api/bookings', async function (req, res, next) {
       });
     }
 
-    // if (!bookingData.agent || !bookingData.agent.id) {
-    //   return res.status(400).json({
-    //     "success": false,
-    //     "message": "Agent information is required",
-    //     "error": "VALIDATION_ERROR"
-    //   });
-    // }
-
     if (!bookingData.tickets || bookingData.tickets.length === 0) {
       return res.status(400).json({
         "success": false,

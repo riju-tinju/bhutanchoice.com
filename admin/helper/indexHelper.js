@@ -768,6 +768,8 @@ if (lottery.winners && lottery.winners.length > 0) {
                       totalStatusUpdated++;
                     } else if (currentTicket.status === "PAID") {
                       console.log(`      ⏭️ Status already "PAID", no change needed`);
+                    } else if (currentTicket.status === "IN_AGENT") {
+                      console.log(`      ⏭️ Status is "IN_AGENT", no change needed`);
                     } else {
                       console.log(`      ℹ️ Current status: "${currentTicket.status}", no automatic update`);
                     }

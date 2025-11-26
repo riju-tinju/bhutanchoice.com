@@ -83,13 +83,7 @@
           </select>
         </div>
         
-        <div class="filter-group">
-          <label class="filter-label">Agent</label>
-          <select id="agentFilter" class="filter-select">
-            <option value="">All Agents</option>
-            <!-- Options populated from backend -->
-          </select>
-        </div>
+        
         
          <div class="filter-group">
           <label class="filter-label">Payment Status</label>
@@ -98,7 +92,6 @@
             <option value="PAID">Paid</option>
             <option value="UNPAID">Unpaid</option>
             <option value="NOT_WINNER">Not winner</option>
-            <option value="IN_AGENT">In Agent</option>
           </select>
         </div>
       </div>
@@ -201,7 +194,6 @@
             <th class="expand-col"></th>
             <th class="booking-id-col">Booking ID</th>
             <th class="customer-col">Customer</th>
-            <th class="agent-col">Agent</th>
             <th class="quantity-col">Qty</th>
             <th class="amount-col">Amount</th>
             <th class="status-col">Status</th>
@@ -291,9 +283,7 @@
           <label class="form-label">Booking Status</label>
           <select id="newBookingStatus" class="form-select">
             <option value="PAID" selected >Paid</option>
-            <option value="UNPAID">Unpaid</option>
-            <option value="NOT_WINNER">Not a Winner</option>
-            <option value="IN_AGENT">In Agent</option>
+            <option value="IN_AGENT">IN_AGENT</option>
           </select>
         </div>
       </form>
@@ -766,12 +756,10 @@ body {
   background: #fef2f2;
   color: #991b1b;
 }
-
 .status-badge.IN_AGENT {
   background: #e0f2fe; /* Light blue/indigo background */
   color: #1e40af;     /* Darker blue/indigo text color */
 }
-
 .status-dot {
   width: 6px;
   height: 6px;
@@ -788,7 +776,6 @@ body {
 .status-badge.NOT_WINNER .status-dot {
   background: #ef4444;
 }
-
 .status-badge.IN_AGENT .status-dot {
   background: #3b82f6; /* Matching medium blue dot color */
 }
@@ -1411,7 +1398,7 @@ body {
         document.getElementById('fromDateTime').addEventListener('change', applyFilters);
         document.getElementById('toDateTime').addEventListener('change', applyFilters);
         document.getElementById('childLotteryFilter').addEventListener('change', applyFilters);
-        document.getElementById('agentFilter').addEventListener('change', applyFilters);
+        // document.getElementById('agentFilter').addEventListener('change', applyFilters);
         document.getElementById('statusFilter').addEventListener('change', applyFilters);
         document.getElementById('sortFilter').addEventListener('change', applyFilters);
         document.getElementById('winnerFilter').addEventListener('change', applyFilters);
@@ -1528,14 +1515,14 @@ body {
         });
         
         // Populate agent filter
-        const agentFilter = document.getElementById('agentFilter');
-        agentFilter.innerHTML = '<option value="">All Agents</option>';
-        agents.forEach(agent => {
-            const option = document.createElement('option');
-            option.value = agent._id;
-            option.textContent = agent.name;
-            agentFilter.appendChild(option);
-        });
+        // const agentFilter = document.getElementById('agentFilter');
+        // agentFilter.innerHTML = '<option value="">All Agents</option>';
+        // agents.forEach(agent => {
+        //     const option = document.createElement('option');
+        //     option.value = agent._id;
+        //     option.textContent = agent.name;
+        //     agentFilter.appendChild(option);
+        // });
     }
     
     // Handle search button click
@@ -1559,7 +1546,7 @@ body {
         currentFilters.fromDateTime = document.getElementById('fromDateTime').value;
         currentFilters.toDateTime = document.getElementById('toDateTime').value;
         currentFilters.childLotteryId = document.getElementById('childLotteryFilter').value;
-        currentFilters.agentId = document.getElementById('agentFilter').value;
+        // currentFilters.agentId = document.getElementById('agentFilter').value;
         currentFilters.status = document.getElementById('statusFilter').value;
         currentFilters.sort = document.getElementById('sortFilter').value;
         currentFilters.win = document.getElementById('winnerFilter').value;
@@ -1573,7 +1560,7 @@ body {
         document.getElementById('customerSearch').value = '';
         document.getElementById('clearSearch').style.display = 'none';
         document.getElementById('childLotteryFilter').value = '';
-        document.getElementById('agentFilter').value = '';
+        // document.getElementById('agentFilter').value = '';
         document.getElementById('statusFilter').value = '';
         document.getElementById('winnerFilter').value = 'ALL';
         document.getElementById('sortFilter').value = 'booking.date_desc';
@@ -1752,25 +1739,22 @@ body {
         
         bookings.forEach(booking => {
             const isExpanded = expandedRows.has(booking._id);
-            let calculatedStatus = 'NOT_WINNER'; // as default
+           let calculatedStatus = 'NOT_WINNER'; // as default
     
     // Logic to determine overall booking status from tickets
     const hasUnpaid = booking.tickets.some(ticket => ticket.status === 'UNPAID');
     const hasPaid = booking.tickets.some(ticket => ticket.status === 'PAID');
     const hasInAgent= booking.tickets.some(ticket => ticket.status === 'IN_AGENT');
-
-    console.log(hasUnpaid,hasInAgent, hasPaid, )
     // NOTE: If all tickets are NOT_WINNER, both hasUnpaid and hasPaid will be false.
     
     if (hasUnpaid) {
         calculatedStatus = 'UNPAID';
     }else if (hasInAgent) {
         calculatedStatus = 'IN_AGENT';
-    }
-     else if (hasPaid) {
+    }else if (hasPaid) {
         calculatedStatus = 'PAID';
     } else {
-        // If there's no UNPAID and no PAID, then all must be NOT_WINNER.
+        // If there's no UNPAID, IN_AGENT and no PAID, then all must be NOT_WINNER.
         calculatedStatus = 'NOT_WINNER';
     }
             html += `
@@ -1790,9 +1774,7 @@ body {
                             <div class="customer-phone">${booking.customer.phone}</div>
                         </div>
                     </td>
-                    <td>
-                        <div class="agent-name">${booking.agent.name}</div>
-                    </td>
+                    
                     <td class="text-center">
                         <strong>${booking.financial.quantity}</strong>
                     </td>
@@ -1871,11 +1853,11 @@ body {
                                 <div class="child-ticket-label">Amount</div>
                                 <div class="child-ticket-value">Nu. ${ticket.chargeAmount.toLocaleString()}</div>
                             </div>
-
-                            <button type="button" class="btn btn-warning btn-sm btn-icon" onclick="openDirectStatusModal('${booking._id}','${ticket.lottery.timeId}','${ticket.number}','${ticket.numberId}')" title="Update Status" style="max-width:120px;">
+                            ${ticket.isWon ?
+                            `<button type="button" class="btn btn-warning btn-sm btn-icon" onclick="openDirectStatusModal('${booking._id}','${ticket.lottery.timeId}','${ticket.number}','${ticket.numberId}')" title="Update Status" style="max-width:120px;">
                                 <i class="fas fa-edit" ></i>
                                 Edit status
-                            </button>
+                            </button>`:'' }
                         </div>
                     `;
                 });

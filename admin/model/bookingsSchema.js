@@ -116,7 +116,7 @@ const ticketSchema = new Schema({
       },
       status: {
         type: String,
-        enum: ["UNPAID", "NOT_WINNER", "PAID"],
+        enum: ["UNPAID", "NOT_WINNER", "IN_AGENT", "PAID"],
         default: "NOT_WINNER"
       }
     }

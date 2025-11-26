@@ -628,6 +628,41 @@
             background: #ef4444;
         }
 
+        .status-badge.PAID {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-badge.UNPAID {
+            background: #fef2f2;
+            color: #991b1b;
+        }
+        .status-badge.IN_AGENT {
+           background: #e0f2fe; /* Light blue/indigo background */
+           color: #1e40af;     /* Darker blue/indigo text color */
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .status-badge.PAID .status-dot {
+            background: #22c55e;
+        }
+
+        .status-badge.UNPAID .status-dot {
+            background: #ef4444;
+        }
+
+        .status-badge.IN_AGENT .status-dot {
+            background: #3b82f6; /* Matching medium blue dot color */
+        }
+
+        
+
+
         /* Amount Display */
         .amount-display {
             font-weight: 700;
@@ -1460,6 +1495,25 @@
                 bookings.forEach((booking) => {
                     const isExpanded = expandedRows.has(booking._id);
 
+                    let calculatedStatus = 'NOT_WINNER'; // as default
+    
+    // Logic to determine overall booking status from tickets
+    const hasUnpaid = booking.tickets.some(ticket => ticket.status === 'UNPAID');
+    const hasPaid = booking.tickets.some(ticket => ticket.status === 'PAID');
+    const hasInAgent= booking.tickets.some(ticket => ticket.status === 'IN_AGENT');
+    // NOTE: If all tickets are NOT_WINNER, both hasUnpaid and hasPaid will be false.
+    
+    if (hasUnpaid) {
+        calculatedStatus = 'UNPAID';
+    }else if (hasInAgent) {
+        calculatedStatus = 'IN_AGENT';
+    }else if (hasPaid) {
+        calculatedStatus = 'PAID';
+    } else {
+        // If there's no UNPAID, IN_AGENT and no PAID, then all must be NOT_WINNER.
+        calculatedStatus = 'NOT_WINNER';
+    }
+
                     html += `
                         <tr class="booking-row ${isExpanded ? 'expanded' : ''}" data-booking-id="${booking._id}">
                             <td>
@@ -1483,12 +1537,14 @@
                             <td>
                                 <div class="amount-display">Nu. ${booking.financial.totalAmount.toLocaleString()}</div>
                             </td>
-                            <td>
-                                <span class="status-badge ${booking.booking.status}">
-                                    <span class="status-dot"></span>
-                                    ${booking.booking.status.charAt(0).toUpperCase() + booking.booking.status.slice(1)}
-                                </span>
+
+                            <td>      
+                             <span class="status-badge ${calculatedStatus}">
+                                 <span class="status-dot"></span>
+                                 ${calculatedStatus}
+                             </span>
                             </td>
+
                             <td>
                                 <div class="date-display">
                                     ${formatDateTime(booking.booking.date)}
@@ -1539,6 +1595,12 @@
                                         <div class="child-ticket-label">Amount</div>
                                         <div class="child-ticket-value">Nu. ${ticket.chargeAmount.toLocaleString()}</div>
                                     </div>
+
+                                    <button type="button" class="btn btn-warning btn-sm btn-icon" onclick="openDirectStatusModal('${booking._id}','${ticket.lottery.timeId}','${ticket.number}','${ticket.numberId}')" title="Update Status" style="max-width:120px;">
+                                       <i class="fas fa-edit" ></i>
+                                       Edit status
+                                    </button>
+
                                 </div>
                             `;
                         });

@@ -84,7 +84,7 @@ router.delete('/api/ticket-charges/:chargeId', async function (req, res, next) {
 });
 
 router.get('/booking', async function (req, res, next) {
-  res.render('pages/lottery-booking')
+  res.render('pages/lottery-bookingAdmin',{url: process.env.URL})
 })
 
 
@@ -97,11 +97,11 @@ router.get('/api/booking/ticket-charges', async function (req, res, next) {
   await indexFun.getAllTicketCharges(req, res)
 });
 
-router.post('/api/bookings', async function (req, res, next) {
-  console.log(req.body)
+// router.post('/api/bookings', async function (req, res, next) {
+//   console.log(req.body)
   
- await indexFun.saveBooking(req, res)
-})
+//  await indexFun.saveBooking(req, res)
+// })
 
 // const PDFDocument = require('pdfkit');
 // const Booking = require('../model/bookingsSchema');

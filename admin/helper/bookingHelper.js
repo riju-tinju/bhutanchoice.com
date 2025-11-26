@@ -63,7 +63,7 @@ const bookingHelper = {
         if(status ==="ALL"){
           // If status is ALL, we don't need to filter by status
         }
-        else if (status === "PAID" || status === "UNPAID")
+        else if (status === "PAID" || status === "UNPAID" || status === "IN_AGENT")
           matchConditions["tickets.status"] = status;
         else if (status === "NOT_WINNER") {
           // Get documents where ALL tickets have status "NOT_WINNER"
