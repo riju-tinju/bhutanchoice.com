@@ -60,7 +60,7 @@ const bookingHelper = {
 
       // Status filter
       if (status && status.trim()) {
-        if(status ==="ALL"){
+        if (status === "ALL") {
           // If status is ALL, we don't need to filter by status
         }
         else if (status === "PAID" || status === "UNPAID" || status === "IN_AGENT")
@@ -857,6 +857,37 @@ const bookingHelper = {
     } catch (error) {
       console.error('Error in cancelBooking:', error);
       throw error;
+    }
+  },
+
+  deleteBooking: async (bookingId,req,res) => {
+    try {
+      if (!mongoose.Types.ObjectId.isValid(bookingId)) {
+        throw new Error('Invalid booking ID format');
+      }
+
+      // Find and delete the booking document
+      const booking = await Booking.findByIdAndDelete(bookingId);
+
+      if (!booking) {
+        return res.status(404).json({
+          success: false,
+          message: 'Booking not found'
+        })
+      }
+
+
+      return res.status(200).json({
+        success: true,
+        message: "Booking deleted successfully"
+      })
+
+    } catch (error) {
+      console.log(error)
+      return res.status(502).json({
+          success: false,
+          message: 'An Err Occured'
+        })
     }
   },
 

@@ -157,8 +157,8 @@ router.post('/api/bookings', async function (req, res, next) {
 // DELETE /api/bookings/:id - Cancel/delete booking
 router.delete('/api/bookings/:id', async function (req, res, next) {
   try {
-    const result = await bookingFun.cancelBooking(req.params.id);
-    res.status(200).json(result);
+    const result = await bookingFun.deleteBooking(req.params.id,req,res);
+    
   } catch (error) {
     console.error('Error in DELETE /api/bookings/:id:', error);
     if (error.message === 'Booking not found') {

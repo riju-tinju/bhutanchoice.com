@@ -9,7 +9,7 @@
   <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.3/moment-with-locales.min.js"></script> -->
   <script>
     // Function that will take the UTC date string and return a Dubai-time formatted string
-
+    
   </script>
 </head>
 <body>
@@ -316,6 +316,42 @@
 
 <!-- Toast Notification -->
 <div id="bookingToast" class="toast"></div>
+
+<script>
+  async function removeBooking(bookingId){
+      let bookingRemovalConfirm= confirm('Are you sure you want to remove this booking?')
+      if(!bookingRemovalConfirm)
+       {
+         return null;
+       }
+        try {
+            const response = await fetch(`/bookings/api/bookings/${bookingId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                showToast('Booking removed successfully', 'success');
+                document.querySelector('[data-booking-id="' + bookingId + '"]').remove()
+            } else {
+                throw new Error(result.message || 'Failed to remove booking');
+            }
+            
+        } catch (error) {
+            console.error('Error removing booking:', error);
+            showToast('Error removing booking: ' + error.message, 'error');
+        }
+    }
+
+</script>
 
 <%- include('../../partials/Footer') %>
 
@@ -1817,6 +1853,12 @@ body {
                                     title="View Details">
                                 <i class="fas fa-eye"></i>
                             </button>
+
+                            <button type="button" style="background-color: red;color:white" class="btn btn-sm btn-icon" 
+                                    onclick="removeBooking('${booking._id}')"
+                                    title="Remove Booking">
+                                <i class="fas fa-trash"></i>
+                            </button>
                             
                         </div>
                     </td>
@@ -2080,6 +2122,7 @@ body {
         }
     }
     
+   
     // Show toast notification
     function showToast(message, type = 'info') {
         const toast = document.getElementById('bookingToast');
