@@ -25,7 +25,7 @@ const bookingHelper = {
         // Build match conditions
         const matchConditions = {};
 
-        // matchConditions["agent.id"]=req.session.agent.id
+        matchConditions["agent.id"]=req.session.agent.id
   
         // Customer search (name or phone)
         if (customerSearch && customerSearch.trim()) {
