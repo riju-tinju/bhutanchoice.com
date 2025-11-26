@@ -25,7 +25,7 @@ const bookingHelper = {
         // Build match conditions
         const matchConditions = {};
 
-        matchConditions["agent.id"]=req.session.agent.id
+        matchConditions["agent.id"]= new mongoose.Types.ObjectId(req.session.agent.id);
   
         // Customer search (name or phone)
         if (customerSearch && customerSearch.trim()) {
@@ -51,11 +51,6 @@ const bookingHelper = {
         // Child lottery filter
         if (childLotteryId && childLotteryId.trim()) {
           matchConditions["tickets.lottery.timeId"] = childLotteryId
-        }
-  
-        // Agent filter
-        if (agentId && agentId.trim()) {
-          matchConditions["agent.id"] = new mongoose.Types.ObjectId(agentId);
         }
   
         // Status filter
