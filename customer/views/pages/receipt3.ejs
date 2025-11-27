@@ -617,24 +617,23 @@
         </div>
 
         <div class="receipt-meta">
-          <div class="meta-item">
-            <span class="meta-label">Receipt Number</span>
-            <span class="meta-value"><%= ticketNumber %></span>
-          </div>
 
           <div class="date-item-container" style="">
             <div class="meta-item">
-            <span class="meta-label">Date & Time</span>
-            <span class="meta-value"><%= new Date(booking.booking.date).toLocaleDateString('en-GB',{day: 'numeric',month: 'short',year: 'numeric'}) %></span>
-          </div>
+              <span class="meta-label">Date & Time</span>
+              <span class="meta-value"><%= new Date(booking.booking.date).toLocaleDateString('en-GB',{day: 'numeric',month: 'short',year: 'numeric'}) %></span>
+            </div>
 
-          <div class="meta-item">
-            <span class="meta-label">Time</span>
-            <span class="meta-value"> <%= new Date(booking.booking.date).toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase() %></span>
-          </div>
+             <div class="meta-item">
+               <span class="meta-label">Time</span>
+               <span class="meta-value"> <%= new Date(booking.booking.date).toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase() %></span>
+             </div>
 
+           </div>
+           <div class="meta-item">
+            <span class="meta-label">Receipt Number</span>
+            <span class="meta-value"><%= ticketNumber %></span>
           </div>
-          
 
         </div>
       </div>
