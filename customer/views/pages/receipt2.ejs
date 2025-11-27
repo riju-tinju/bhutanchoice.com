@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Receipt - <%= ticketNumber %></title>
+
+  <!-- Poppins font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* =========== MOBILE-FIRST BASE =========== */
+    :root{
+      --navy-1: #07284a;
+      --navy-2: #0d3b6a;
+      --accent-orange: #ff8c42;
+      --accent-orange-2: #ff6b35;
+      --accent-green: #25D366;
+      --muted: #6c757d;
+      --card-bg: #ffffff;
+      --surface: #f6f8fb;
+      --glass: rgba(255,255,255,0.88);
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --shadow-1: 0 12px 36px rgba(12,20,40,0.08);
+      --shadow-2: 0 8px 22px rgba(12,20,40,0.06);
+      --max-width: 460px;
+    }
+
+    /* Reset */
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(180deg, #eaf4ff 0%, #f7fbff 100%);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      color: #0b2740;
+      padding: 18px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      -webkit-font-feature-settings: "liga" 1;
+      font-size: 16px; /* base, accessible */
+      line-height: 1.45;
+    }
+
+    /* Page wrapper (centered single column) */
+    .page {
+      width: 100%;
+      max-width: var(--max-width); /* option B */
+      margin: 30px auto;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-1);
+      transition: transform .18s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .card:active { transform: translateY(1px); }
+
+    /* ===================== HEADER ===================== */
+    .card-header {
+      background: linear-gradient(135deg, var(--navy-1) 0%, var(--navy-2) 100%);
+      color: #fff;
+      padding: 22px;
+      position: relative;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      flex-direction: column; /* mobile-first: brand stacked, then meta */
+      text-align: center;
+    }
+
+    /* subtle decorative circle like old */
+    .card-header::before {
+      content: '';
+      position: absolute;
+      top: -30%;
+      right: -10%;
+      width: 260px;
+      height: 260px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .brand {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .logo {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--glass);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-2);
+      flex-shrink: 0;
+    }
+    .logo img {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .brand-text {
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+      align-items:center;
+      justify-content:center;
+    }
+    .brand-text h1 {
+      font-size: 22px; /* increased for accessibility */
+      margin: 0;
+      font-weight: 800;
+      letter-spacing: 0.6px;
+    }
+    .brand-text p {
+      margin: 0;
+      font-size: 14px;
+      opacity: 0.96;
+      font-weight: 600;
+    }
+
+    /* header meta block (ticket number + date/time)
+       On mobile we want this stacked under the brand exactly like old design */
+    .header-meta {
+      width: 100%;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .meta-row {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      font-size: 15px;
+    }
+
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .meta-label {
+      font-size: 12px;
+      opacity: 0.9;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.95);
+    }
+
+    .meta-value {
+      font-size: 18px; /* larger for low-vision */
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: 1px;
+    }
+
+    /* For very small screens ensure readable sizes */
+    @media (max-width: 360px) {
+      .brand-text h1 { font-size: 20px; }
+      .meta-value { font-size: 16px; }
+    }
+
+    /* ===================== BODY (single-column) ===================== */
+    .card-body {
+      padding: 22px;
+      background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+      display: block; /* single-column */
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      color: var(--navy-1);
+      font-size: 18px; /* larger */
+      margin-bottom: 16px;
+    }
+    .section-title::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 24px;
+      background: linear-gradient(180deg, var(--accent-orange) 0%, var(--accent-orange-2) 100%);
+      border-radius: 2px;
+    }
+
+    /* Info card (customer/agent) */
+    .info-card {
+      /* background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); */
+      background: linear-gradient(135deg, #e5edf4 0%, #fff 100%);
+      border: 2px solid #e9ecef;
+      border-radius: 16px;
+      padding: 18px 20px;
+      margin-bottom: 18px;
+    }
+
+    .row {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      padding:12px 0;
+      border-bottom:1px solid #e9ecef;
+      font-size:16px;
+    }
+    .row:last-child { border-bottom:none; padding-bottom:0; }
+    .label { color: #6c757d; font-weight:700; font-size:15px; }
+    .value { color: #1e3a5f; font-weight:800; font-size:16px; text-align:right; }
+
+    /* Lottery / tickets */
+    .lottery {
+      background: #fff;
+      border-radius: 16px;
+      padding: 18px;
+      border-left: 6px solid var(--accent-orange);
+      box-shadow: var(--shadow-2);
+      margin-bottom: 16px;
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+    .lottery:hover { transform: translateY(-2px); box-shadow: 0 12px 36px rgba(12,20,40,0.08); }
+
+    .lottery-head { margin-bottom: 12px; }
+    .lottery-name { font-weight:900; color:var(--navy-1); font-size:18px; margin-bottom:6px; }
+    .lottery-sub { color:var(--muted); font-size:14px; display:flex; gap:12px; flex-wrap:wrap; }
+
+    .ticket-list { display:flex; flex-direction:column; gap:10px; margin-top:8px; }
+    .ticket {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:14px;
+      background: linear-gradient(180deg,#fbfdff 0%, #ffffff 100%);
+      border-radius:12px;
+      border:1px solid #e9ecef;
+      font-weight:800;
+      font-size:18px;
+      position:relative;
+    }
+
+    /* winning ticket */
+    .ticket.winning {
+      background: linear-gradient(180deg,#fff8e1 0%, #fffbf0 100%);
+      border: 2px solid #ffd700;
+      box-shadow: 0 10px 28px rgba(255,215,0,0.12);
+    }
+    .ticket.winning::before {
+      content: '🏆';
+      position: absolute;
+      left: -10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size:22px;
+    }
+
+    .ticket-number {
+      font-family: 'Courier New', monospace;
+      letter-spacing: 2px;
+      color: var(--navy-1);
+      font-size: 20px;
+      font-weight: 900;
+    }
+    .ticket-amount {
+      color: #16a34a;
+      font-weight: 900;
+      font-size: 16px;
+    }
+
+    /* ========== PAYMENT SUMMARY / QR / ACTIONS (KEEP NEW STYLE BUT LARGER ON DESKTOP) ========== */
+    /* We keep new design appearance but on larger screens style/padding is similar to old page */
+    .summary {
+      background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+      border: 2px solid #e9ecef; /* like old */
+      border-radius: 16px;
+      padding: 22px; /* increased */
+      margin-bottom: 18px;
+    }
+    .summary-row {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:12px 0;
+      font-size:16px;
+    }
+    .summary-label { color:#6c757d; font-weight:700; font-size:15px; }
+    .summary-value { color:#1e3a5f; font-weight:800; font-size:16px; }
+
+    .summary-total {
+      margin-top:16px;
+      padding-top:16px;
+      border-top:2px solid #e9ecef; /* thicker like old */
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+    .total-label { color:#1e3a5f; font-size:20px; font-weight:900; }
+    .total-value { color:#28a745; font-size:26px; font-weight:900; }
+
+    /* QR section */
+    .qrcode-wrap {
+      margin-top: 12px;
+      text-align:center;
+      padding: 24px; /* larger to match old desktop spacing */
+      background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+      border-radius: 16px;
+      border: 2px solid #e9ecef;
+      margin-bottom: 18px;
+    }
+    #qrcode { display:inline-block; width:180px; height:180px; }
+    .qrcode-note { font-size:16px; color:var(--muted); margin-top:10px; font-weight:700; letter-spacing:2px; font-family: 'Courier New', monospace; }
+
+    /* actions */
+    .actions {
+      display:flex;
+      gap:12px;
+      margin-top:12px;
+      flex-direction:column; /* mobile stacked (you said mobile perfect) */
+    }
+    .btn {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:14px;
+      border-radius:12px;
+      border:none;
+      cursor:pointer;
+      font-weight:800;
+      font-size:16px;
+      box-shadow: var(--shadow-2);
+      width:100%;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg,var(--accent-orange) 0%, var(--accent-orange-2) 100%);
+      color:white;
+    }
+    .btn-green {
+      background: linear-gradient(135deg,#25D366 0%, #128C7E 100%);
+      color:white;
+    }
+    .btn-outline {
+      background: white;
+      color: var(--navy-1);
+      border: 2px solid rgba(11,39,64,0.06);
+      font-weight:800;
+    }
+
+    /* footer */
+    .card-footer {
+      background: #fff;
+      padding: 16px;
+      border-top: 3px solid var(--accent-orange);
+      text-align: center;
+    }
+    .footer-message { font-weight:900; color:var(--navy-1); font-size:16px; margin-bottom:6px; }
+    .footer-note { color:var(--muted); font-size:14px; line-height:1.45; }
+
+    /* floating whatsapp/help button (kept) */
+    .float-btn {
+      position: fixed;
+      left: 18px;
+      bottom: 18px;
+      background: linear-gradient(135deg,#25D366 0%, #128C7E 100%);
+      color: white;
+      width:52px;
+      height:52px;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow: 0 12px 36px rgba(12,20,40,0.12);
+      z-index: 1100;
+      border:none;
+      cursor:pointer;
+    }
+    .float-btn:active{ transform: translateY(1px); }
+
+    /* toast */
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      background: linear-gradient(135deg,#28a745 0%, #20c997 100%);
+      color: white;
+      padding: 12px 18px;
+      border-radius: 12px;
+      box-shadow: 0 12px 36px rgba(12,20,40,0.12);
+      z-index: 1200;
+      opacity:0;
+      transform: translateY(8px);
+      transition: all .28s ease;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:800;
+      font-size:15px;
+    }
+    .toast.show { opacity:1; transform: translateY(0); }
+
+    /* print rules */
+    @media print {
+      body { background: #fff; padding:0; }
+      .float-btn, .actions { display:none !important; }
+      .card { box-shadow:none; border-radius:0; max-width:100%; }
+    }
+
+    /* ===================== DESKTOP (still single column but more spacious) ===================== */
+    @media (min-width: 768px) {
+      body { padding: 28px; }
+      .card-header {
+        padding: 28px;
+        flex-direction: row; /* brand + meta side-by-side on wider screens */
+        text-align: left;
+        align-items: center;
+      }
+      .brand { justify-content: flex-start; }
+      .brand-text h1 { font-size: 24px; }
+      .brand-text p { font-size: 15px; }
+
+      .header-meta {
+        margin-top: 0;
+        padding-top: 0;
+        border-top: none;
+        width: auto;
+        margin-left: auto;
+        display: flex;
+        flex-direction: row;
+        gap: 22px;
+        align-items: center;
+      }
+      .meta-row { width: auto; gap: 18px; font-size: 15px; }
+      .meta-item { align-items: flex-end; }
+
+      .card-body { padding: 28px; }
+
+      /* Info cards and lottery widen with more padding */
+      .info-card { padding: 20px 22px; }
+      .lottery { padding: 20px; }
+      .ticket { padding: 16px; font-size: 19px; }
+      .ticket-number { font-size: 22px; }
+
+      /* Payment summary, QR — bigger, centered like old arrangement */
+      .summary { padding: 24px; margin-left: auto; margin-right: auto; max-width: 620px; }
+      .qrcode-wrap { padding: 28px; max-width: 620px; margin-left: auto; margin-right: auto; }
+
+      /* actions in one row but centered */
+      .actions { flex-direction: row; justify-content: center; gap:14px; }
+      .btn { width: auto; padding: 12px 18px; font-size:15px; }
+      .btn-primary, .btn-green { min-width: 160px; }
+    }
+
+    /* Larger desktop spacing */
+    @media (min-width: 1100px) {
+      body { padding: 40px; }
+      .page { max-width: 700px; } /* ensure center column */
+      .card { border-radius: 20px; }
+      .brand-text h1 { font-size: 26px; }
+      .meta-value { font-size: 20px; }
+      .total-value { font-size: 28px; }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="card" role="article" aria-labelledby="receiptTitle">
+
+      <!-- HEADER -->
+      <div class="card-header">
+        <div class="brand" aria-hidden="true">
+          <div class="logo" aria-hidden="true">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfvxp4SnnjaYyFQDP8d5D660XMvy4nQfc08ScgqFq3IjufpC1OH-ykrQ6v-SkPsuVCt7w&usqp=CAU" alt="Logo" onerror="this.style.display='none'">
+          </div>
+          <div class="brand-text">
+            <h1 id="receiptTitle">BHUTAN STATE LOTTERIES</h1>
+            <p>Official Lottery Booking Receipt</p>
+          </div>
+        </div>
+
+        <!-- HEADER META (ticket number + date/time) -->
+        <div class="header-meta" role="region" aria-label="Receipt information">
+          <div class="meta-item">
+            <div class="meta-label">Receipt Number</div>
+            <div class="meta-value"><%= ticketNumber %></div>
+          </div>
+
+          <div class="meta-item" style="text-align:center;">
+            <div class="meta-label">Date</div>
+            <div class="meta-value" style="font-weight:800; font-size:16px;">
+              <%= new Date(booking.booking.date).toLocaleDateString('en-GB') %>
+            </div>
+          </div>
+
+          <div class="meta-item" style="text-align:center;">
+            <div class="meta-label">Time</div>
+            <div class="meta-value" style="font-weight:800; font-size:16px;">
+              <%= new Date(booking.booking.date).toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase() %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BODY: single column stacking -->
+      <div class="card-body">
+
+        <!-- CUSTOMER -->
+        <div style="margin-bottom:10px;">
+          <div class="section-title">Customer Information</div>
+          <div class="info-card" role="group" aria-label="Customer information">
+            <div class="row">
+              <div class="label">Full name</div>
+              <div class="value"><%= booking.customer.name %></div>
+            </div>
+            <div class="row">
+              <div class="label">Contact</div>
+              <div class="value"><%= booking.customer.phone %></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AGENT -->
+        <div style="margin-bottom:10px;">
+          <div class="section-title">Agent Information</div>
+          <div class="info-card" role="group" aria-label="Agent information">
+            <div class="row">
+              <div class="label">Agent name</div>
+              <div class="value"><%= booking.agent.name || 'N/A' %></div>
+            </div>
+            <div class="row">
+              <div class="label">Agent contact</div>
+              <div class="value"><%= booking.agent.phone || 'N/A' %></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TICKETS -->
+        <div style="margin-bottom:10px;">
+          <div class="section-title">Your Lottery Tickets</div>
+
+          <%
+            const groupedTickets = {};
+            booking.tickets.forEach(ticket => {
+              const key = `${ticket.lottery.id}_${ticket.lottery.timeId}`;
+              if (!groupedTickets[key]) groupedTickets[key] = { lottery: ticket.lottery, tickets: [] };
+              groupedTickets[key].tickets.push(ticket);
+            });
+          %>
+
+          <% Object.values(groupedTickets).forEach(group => {
+               const drawDate = new Date(group.lottery.drawDate);
+               const formattedDate = drawDate.toLocaleDateString('en-GB');
+               const formattedTime = drawDate.toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase();
+          %>
+            <div class="lottery" aria-label="Lottery group">
+              <div class="lottery-head">
+                <div class="lottery-name"><%= group.lottery.name %></div>
+                <div class="lottery-sub"><span><%= formattedDate %> at <%= formattedTime %></span><span>Draw #<%= group.lottery.drawNumber %></span><span><%= group.tickets.length %> Ticket<%= group.tickets.length > 1 ? 's' : '' %></span></div>
+              </div>
+
+              <div class="ticket-list" role="list">
+                <% group.tickets.forEach(ticket => { %>
+                  <div class="ticket <%= ticket.isWon ? 'winning' : '' %>" role="listitem">
+                    <div class="ticket-number"><%= String(ticket.number) %></div>
+                    <div class="ticket-amount">Nu. <%= ticket.chargeAmount.toFixed(2) %></div>
+                    <% if (ticket.isWon) { %>
+                      <div style="position:absolute; top:-10px; right:-10px; background: linear-gradient(180deg,#ffd700 0%, #ffed4e 100%); color:#744210; padding:6px 12px; border-radius:14px; font-weight:900; font-size:12px; box-shadow:0 8px 22px rgba(0,0,0,0.06);">Winner</div>
+                    <% } %>
+                  </div>
+                <% }) %>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+
+        <!-- PAYMENT SUMMARY (keeps new look but larger & centered on desktop like old arrangement) -->
+        <div style="margin-bottom:10px;">
+          <div class="section-title">Payment Summary</div>
+          <div class="summary" role="region" aria-label="Payment summary">
+            <div class="summary-row"><div class="summary-label">Total Tickets</div><div class="summary-value"><%= booking.financial.quantity %></div></div>
+            <div class="summary-row"><div class="summary-label">Subtotal</div><div class="summary-value">Nu. <%= booking.financial.subtotal.toFixed(2) %></div></div>
+            <% if (booking.financial.tax && booking.financial.tax > 0) { %>
+              <div class="summary-row"><div class="summary-label">Tax</div><div class="summary-value">Nu. <%= booking.financial.tax.toFixed(2) %></div></div>
+            <% } %>
+            <div class="summary-total">
+              <div class="total-label">Total Amount</div>
+              <div class="total-value">Nu. <%= booking.financial.totalAmount.toFixed(2) %></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- QR CODE -->
+        <div style="margin-bottom:10px;">
+          <div class="section-title">Scan to Verify</div>
+          <div class="qrcode-wrap" aria-label="QR code">
+            <div id="qrcode"></div>
+            <div class="qrcode-note"><%= ticketNumber %></div>
+          </div>
+        </div>
+
+        <!-- ACTIONS -->
+        <div style="margin-bottom:10px;">
+          <div class="section-title">Actions</div>
+          <div class="actions" role="toolbar" aria-label="Receipt actions">
+            <button class="btn btn-primary" onclick="copyReceiptLink()" title="Copy receipt link" aria-label="Copy receipt link">
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                 <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"></path>
+              </svg>
+              Copy Link
+            </button>
+
+            <button class="btn btn-green" onclick="shareToWhatsapp('<%= booking.customer.name %>','<%= booking.customer.phone %>', window.location.href)" title="Share to WhatsApp" aria-label="Share to WhatsApp">
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                 <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"></path>
+              </svg>
+              Whatsapp
+            </button>
+
+            <button class="btn btn-outline" onclick="window.location.href='/results'" aria-label="Back to results">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                  <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                </svg>
+                Back to Results
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- FOOTER -->
+      <div class="card-footer">
+        <div class="footer-message">🎉 Keep this receipt link - it's your winning ticket to dreams!</div>
+        <div class="footer-note">
+            This is an official receipt from Bhutan State Lotteries. Please present this receipt link when claiming prizes to agent.
+For queries, contact our customer service or visit our official website.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- Toast -->
+  <div id="toast" class="toast" role="status" aria-live="polite"><span id="toastText">Link copied!</span></div>
+
+  <!-- QRCode.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <script>
+    (function(){
+      // --- QR CODE ---
+      try {
+        const el = document.getElementById('qrcode');
+        if(el) {
+          const qrData = String(window.location.href || '<%= ticketNumber %>');
+          new QRCode(el, {
+            text: qrData,
+            width: 180,
+            height: 180,
+            colorDark: "#07284a",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+          });
+        }
+      } catch(e){
+        console.warn('QR generation failed', e);
+      }
+
+      // --- TOAST UTILS ---
+      const toastEl = document.getElementById('toast');
+      const toastText = document.getElementById('toastText');
+      let toastTimer = null;
+      function showToast(msg, duration = 2500){
+        if(!toastEl) return;
+        toastText.textContent = msg;
+        toastEl.classList.add('show');
+        if(toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(()=> toastEl.classList.remove('show'), duration);
+      }
+
+      // Copy receipt link
+      window.copyReceiptLink = function(){
+        const receiptUrl = window.location.href;
+        if(navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(receiptUrl).then(()=> showToast('Link copied to clipboard!'))
+          .catch(()=> fallbackCopy(receiptUrl));
+        } else fallbackCopy(receiptUrl);
+      };
+
+      function fallbackCopy(text){
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        try {
+          document.execCommand('copy');
+          showToast('Link copied to clipboard!');
+        } catch(e){
+          showToast('Unable to copy link', 3000);
+        }
+        document.body.removeChild(ta);
+      }
+
+      // WhatsApp share (opens wa.me)
+      window.shareToWhatsapp = function(name, phone, url){
+        const safeName = name || '';
+        const safePhone = (phone || '').replace(/\D/g,''); // remove non-digits
+        const message = encodeURIComponent(`Hi ${safeName}, you booked a ticket from BSL. Here is the ticket URL: ${url}`);
+        if(!safePhone){
+          window.open(`https://wa.me/?text=${message}`, '_blank');
+        } else {
+          window.open(`https://wa.me/${safePhone}?text=${message}`, '_blank');
+        }
+      };
+
+      // Floating whatsapp button: open chat to support or share page
+      window.openWhatsApp = function(){
+        const supportNumber = '<%= booking.agent.phone || booking.customer.phone || "" %>'.replace(/\D/g,'') || '';
+        const url = encodeURIComponent(window.location.href);
+        const message = encodeURIComponent('Hello, I need help with my booking: ' + url);
+        if(supportNumber){
+          window.open(`https://wa.me/${supportNumber}?text=${message}`, '_blank');
+        } else {
+          window.open(`https://wa.me/?text=${message}`, '_blank');
+        }
+      };
+
+      // Keyboard support for floating button (accessibility)
+      const floatBtn = document.querySelector('.float-btn');
+      if(floatBtn){
+        floatBtn.setAttribute('tabindex', '0');
+        floatBtn.addEventListener('keypress', function(e){
+          if(e.key === 'Enter' || e.key === ' ') floatBtn.click();
+        });
+      }
+
+    })();
+  </script>
+</body>
+</html>

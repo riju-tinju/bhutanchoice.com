@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Receipt - <%= ticketNumber %></title>
+
+  <!-- Poppins font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* =========== MOBILE-FIRST BASE =========== */
+    :root{
+      --navy-1: #07284a;
+      --navy-2: #0d3b6a;
+      --accent-orange: #ff8c42;
+      --accent-orange-2: #ff6b35;
+      --accent-green: #25D366;
+      --muted: #6c757d;
+      --card-bg: #ffffff;
+      --surface: #f6f8fb;
+      --glass: rgba(255,255,255,0.85);
+      --radius-lg: 16px;
+      --radius-md: 10px;
+      --shadow-1: 0 8px 24px rgba(12,20,40,0.08);
+      --shadow-2: 0 6px 18px rgba(12,20,40,0.06);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(180deg, #eaf4ff 0%, #f7fbff 100%);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      color: #0b2740;
+      padding: 16px;
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+    }
+
+    /* container centered but mobile-first full width */
+    .page {
+      width:100%;
+      max-width:420px; /* mobile-first */
+      margin: 12px auto;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-1);
+      transform-origin: center;
+      transition: transform .25s ease;
+    }
+    .card:active { transform: translateY(1px); }
+
+    /* Header */
+    .card-header {
+      background: linear-gradient(135deg, var(--navy-1) 0%, var(--navy-2) 100%);
+      color: #fff;
+      padding: 20px;
+      position: relative;
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+
+    .brand {
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+
+    .logo {
+      width:48px;
+      height:48px;
+      border-radius:50%;
+      background:var(--glass);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow: var(--shadow-2);
+      flex-shrink:0;
+    }
+    .logo img{
+      width:38px;
+      height:38px;
+      border-radius:50%;
+      object-fit:cover;
+    }
+
+    .brand h1{
+      font-size:16px;
+      margin:0;
+      font-weight:700;
+      letter-spacing:0.2px;
+    }
+    .brand p{
+      margin:0;
+      font-size:12px;
+      opacity:0.95;
+      font-weight:500;
+    }
+
+    /* meta row inside header */
+    .meta-row{
+      margin-left:auto;
+      text-align:right;
+      font-size:12px;
+    }
+    .meta-row .label{ display:block; opacity:0.85; font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:0.6px;}
+    .meta-row .value{ font-weight:700; font-size:14px; margin-top:6px; }
+
+    /* Content area */
+    .card-body{
+      padding:18px;
+      background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+    }
+
+    .section-title{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-weight:700;
+      color: var(--navy-1);
+      font-size:14px;
+      margin-bottom:12px;
+    }
+    .section-title::before{
+      content:'';
+      display:inline-block;
+      width:4px;
+      height:20px;
+      background: linear-gradient(180deg, var(--accent-orange) 0%, var(--accent-orange-2) 100%);
+      border-radius:2px;
+    }
+
+    .info-card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding:12px;
+      border: 1px solid rgba(11,39,64,0.04);
+      margin-bottom:14px;
+    }
+    .row {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:8px;
+      padding:8px 0;
+      border-bottom:1px solid rgba(11,39,64,0.03);
+      font-size:13px;
+    }
+    .row:last-child{ border-bottom:none; padding-bottom:0; }
+    .label { color: var(--muted); font-weight:600; font-size:13px; }
+    .value { color: var(--navy-1); font-weight:700; text-align:right; }
+
+    /* Lottery card (compact) */
+    .lottery {
+      background: #fff;
+      border-radius:12px;
+      padding:12px;
+      border-left:6px solid var(--accent-orange);
+      box-shadow: var(--shadow-2);
+      margin-bottom:12px;
+    }
+    .lottery .lottery-head {
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+      align-items:flex-start;
+      margin-bottom:10px;
+    }
+    .lottery-name{ font-weight:800; color:var(--navy-1); font-size:15px; }
+    .lottery-sub { color:var(--muted); font-size:12px; display:flex; gap:10px; flex-wrap:wrap; }
+
+    .ticket-list { display:flex; flex-direction:column; gap:8px; margin-top:6px; }
+    .ticket {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:10px;
+      background: linear-gradient(180deg,#fbfdff 0%, #ffffff 100%);
+      border-radius:10px;
+      border:1px solid rgba(11,39,64,0.04);
+      font-weight:700;
+      font-size:14px;
+      position:relative;
+    }
+
+    /* winning ticket */
+    .ticket.winning {
+      background: linear-gradient(180deg,#fff8e1 0%, #fffbf0 100%);
+      border: 2px solid #ffd700;
+      box-shadow: 0 6px 18px rgba(255,215,0,0.14);
+    }
+    .ticket.winning::before{
+      content:'🏆';
+      position:absolute;
+      left:-8px;
+      top:50%;
+      transform:translateY(-50%);
+      font-size:20px;
+    }
+    .ticket-number { font-family: 'Courier New', monospace; letter-spacing:1.5px; color:var(--navy-1); }
+    .ticket-amount { color:#16a34a; font-weight:700; font-size:13px; }
+
+    /* summary */
+    .summary {
+      background: var(--surface);
+      border-radius:12px;
+      padding:12px;
+      border:1px solid rgba(11,39,64,0.04);
+      margin-bottom:14px;
+    }
+    .summary-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; font-size:13px; }
+    .summary-total { margin-top:8px; padding-top:8px; border-top:1px dashed rgba(11,39,64,0.04); display:flex; justify-content:space-between; align-items:center; }
+    .total-label{ font-weight:800; color:var(--navy-1); }
+    .total-value{ color:#16a34a; font-weight:900; font-size:18px; }
+
+    /* QR */
+    .qrcode-wrap{
+      margin-top:12px;
+      text-align:center;
+      padding:14px;
+      background: linear-gradient(180deg,#ffffff 0%, #fbfdff 100%);
+      border-radius:12px;
+      border:1px solid rgba(11,39,64,0.04);
+    }
+    #qrcode{ display:inline-block; width:150px; height:150px; }
+
+    .qrcode-note { font-size:12px; color:var(--muted); margin-top:8px; font-weight:600; letter-spacing:1px; }
+
+    /* footer */
+    .card-footer {
+      background:#fff;
+      padding:12px;
+      border-top: 3px solid var(--accent-orange);
+      text-align:center;
+    }
+    .footer-message{ font-weight:700; color:var(--navy-1); font-size:14px; margin-bottom:6px; }
+    .footer-note{ color:var(--muted); font-size:12px; line-height:1.35; }
+
+    /* action buttons - stacked on mobile */
+    .actions {
+      display:flex;
+      gap:10px;
+      margin-top:12px;
+      flex-direction:column;
+    }
+    .btn {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:12px;
+      border-radius:10px;
+      border:none;
+      cursor:pointer;
+      font-weight:700;
+      font-size:14px;
+      box-shadow: var(--shadow-2);
+      width:100%;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg,var(--accent-orange) 0%, var(--accent-orange-2) 100%);
+      color:white;
+      border: none;
+    }
+    .btn-green {
+      background: linear-gradient(135deg,#25D366 0%, #128C7E 100%);
+      color:white;
+    }
+    .btn-outline {
+      background: white;
+      color: var(--navy-1);
+      border: 2px solid rgba(11,39,64,0.06);
+      font-weight:700;
+    }
+
+    /* floating whatsapp/help button */
+    .float-btn {
+      position: fixed;
+      left: 16px;
+      bottom: 18px;
+      background: linear-gradient(135deg,#25D366 0%, #128C7E 100%);
+      color: white;
+      width:48px;
+      height:48px;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow: 0 8px 20px rgba(12,20,40,0.12);
+      z-index: 1100;
+      border:none;
+      cursor:pointer;
+    }
+    .float-btn:active{ transform: translateY(1px); }
+
+    /* toast */
+    .toast {
+      position: fixed;
+      right: 16px;
+      bottom: 18px;
+      background: linear-gradient(135deg,#28a745 0%, #20c997 100%);
+      color: white;
+      padding: 10px 16px;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(12,20,40,0.12);
+      z-index: 1200;
+      opacity:0;
+      transform: translateY(8px);
+      transition: all .28s ease;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-weight:700;
+      font-size:13px;
+    }
+    .toast.show { opacity:1; transform: translateY(0); }
+
+    /* PRINT */
+    @media print {
+      body { background: #fff; padding:0; }
+      .float-btn, .actions { display:none !important; }
+      .card { box-shadow:none; border-radius:0; max-width:100%; }
+    }
+
+    /* =========== TABLET / DESKTOP UPGRADES =========== */
+    @media (min-width: 768px) {
+      .page{ max-width:760px; padding:12px; }
+      .card { display:flex; flex-direction:column; }
+      .card-body { padding:22px; display:flex; gap:20px; flex-direction:row; flex-wrap:wrap; align-items:flex-start; }
+      .left-col { flex: 1 1 420px; min-width:280px; }
+      .right-col { width:320px; flex: 0 0 320px; }
+      .actions { flex-direction:row; }
+      .btn { width:auto; padding:12px 18px; }
+      .meta-row { text-align:right; }
+      #qrcode { width:180px; height:180px; }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="card" role="article" aria-labelledby="receiptTitle">
+
+      <!-- HEADER -->
+      <div class="card-header">
+        <div class="brand" aria-hidden="true">
+          <div class="logo">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfvxp4SnnjaYyFQDP8d5D660XMvy4nQfc08ScgqFq3IjufpC1OH-ykrQ6v-SkPsuVCt7w&usqp=CAU" alt="Logo" onerror="this.style.display='none'">
+          </div>
+          <div class="brand-text">
+            <h1 id="receiptTitle">BHUTAN STATE LOTTERIES</h1>
+            <p>Official Booking Receipt</p>
+          </div>
+        </div>
+
+        <div class="meta-row" aria-live="polite">
+          <span class="label">Receipt</span>
+          <span class="value"><%= ticketNumber %></span>
+          <div style="font-size:11px; margin-top:6px; color:rgba(255,255,255,0.9);">
+            <%= new Date(booking.booking.date).toLocaleDateString('en-GB') %> • <%= new Date(booking.booking.date).toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase() %>
+          </div>
+        </div>
+      </div>
+
+      <!-- BODY -->
+      <div class="card-body">
+
+        <!-- LEFT / MAIN COLUMN -->
+        <div class="left-col">
+
+          <!-- Customer -->
+          <div>
+            <div class="section-title">Customer Information</div>
+            <div class="info-card">
+              <div class="row">
+                <div class="label">Full name</div>
+                <div class="value"><%= booking.customer.name %></div>
+              </div>
+              <div class="row">
+                <div class="label">Contact</div>
+                <div class="value"><%= booking.customer.phone %></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Agent -->
+          <div>
+            <div class="section-title">Agent Information</div>
+            <div class="info-card">
+              <div class="row">
+                <div class="label">Agent name</div>
+                <div class="value"><%= booking.agent.name || 'N/A' %></div>
+              </div>
+              <div class="row">
+                <div class="label">Agent contact</div>
+                <div class="value"><%= booking.agent.phone || 'N/A' %></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tickets (grouped) -->
+          <div>
+            <div class="section-title">Your Lottery Tickets</div>
+
+            <% 
+            const groupedTickets = {};
+            booking.tickets.forEach(ticket => {
+              const key = `${ticket.lottery.id}_${ticket.lottery.timeId}`;
+              if (!groupedTickets[key]) groupedTickets[key] = { lottery: ticket.lottery, tickets: [] };
+              groupedTickets[key].tickets.push(ticket);
+            });
+            %>
+
+            <% Object.values(groupedTickets).forEach(group => { 
+              const drawDate = new Date(group.lottery.drawDate);
+              const formattedDate = drawDate.toLocaleDateString('en-GB');
+              const formattedTime = drawDate.toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase();
+            %>
+              <div class="lottery" aria-label="Lottery group">
+                <div class="lottery-head">
+                  <div>
+                    <div class="lottery-name"><%= group.lottery.name %></div>
+                    <div class="lottery-sub"><span><%= formattedDate %> at <%= formattedTime %></span><span>Draw #<%= group.lottery.drawNumber %></span><span><%= group.tickets.length %> Ticket<%= group.tickets.length > 1 ? 's' : '' %></span></div>
+                  </div>
+                </div>
+
+                <div class="ticket-list" role="list">
+                  <% group.tickets.forEach(ticket => { %>
+                    <div class="ticket <%= ticket.isWon ? 'winning' : '' %>" role="listitem">
+                      <div class="ticket-number"><%= String(ticket.number) %></div>
+                      <div class="ticket-amount">Nu. <%= ticket.chargeAmount.toFixed(2) %></div>
+                      <% if (ticket.isWon) { %>
+                        <div style="position:absolute; top:-10px; right:-10px; background: linear-gradient(180deg,#ffd700 0%, #ffed4e 100%); color:#744210; padding:4px 10px; border-radius:12px; font-weight:800; font-size:11px; box-shadow:0 6px 18px rgba(0,0,0,0.06);">Winner</div>
+                      <% } %>
+                    </div>
+                  <% }); %>
+                </div>
+              </div>
+            <% }); %>
+          </div>
+
+        </div>
+
+        <!-- RIGHT / SIDE COLUMN (summary + QR) -->
+        <aside class="right-col" aria-label="Summary and QR">
+          <div style="margin-bottom:12px;">
+            <div class="section-title">Payment Summary</div>
+            <div class="summary">
+              <div class="summary-row"><div class="label">Total Tickets</div><div class="value"><%= booking.financial.quantity %></div></div>
+              <div class="summary-row"><div class="label">Subtotal</div><div class="value">Nu. <%= booking.financial.subtotal.toFixed(2) %></div></div>
+              <% if (booking.financial.tax && booking.financial.tax > 0) { %>
+                <div class="summary-row"><div class="label">Tax</div><div class="value">Nu. <%= booking.financial.tax.toFixed(2) %></div></div>
+              <% } %>
+              <div class="summary-total">
+                <div class="total-label">Total Amount</div>
+                <div class="total-value">Nu. <%= booking.financial.totalAmount.toFixed(2) %></div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="section-title">Scan to Verify</div>
+            <div class="qrcode-wrap" role="img" aria-label="Receipt QR code">
+              <div id="qrcode"></div>
+              <div class="qrcode-note"><%= ticketNumber %></div>
+            </div>
+          </div>
+
+          <div style="margin-top:12px;">
+            <div class="section-title">Actions</div>
+            <div class="actions" role="toolbar" aria-label="Receipt actions">
+              <button class="btn btn-primary" onclick="copyReceiptLink()" title="Copy receipt link">
+                <!-- simple icon -->
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8h8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                Copy Link
+              </button>
+
+              <button class="btn btn-green" onclick="shareToWhatsapp('<%= booking.customer.name %>','<%= booking.customer.phone %>', window.location.href)" title="Share to WhatsApp">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 11.5a9.5 9.5 0 1 1-2.76-6.16L21 3l-2.5 3.5z" fill="currentColor"/></svg>
+                Whatsapp
+              </button>
+
+              <button class="btn btn-outline" onclick="window.location.href='/results'">
+                Back to Results
+              </button>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+
+      <!-- FOOTER -->
+      <div class="card-footer">
+        <div class="footer-message">🎉 Keep this receipt link — it's your proof of booking!</div>
+        <div class="footer-note">This is an official receipt from Bhutan State Lotteries. Present this receipt to claim prizes or contact customer support for assistance.</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Toast -->
+  <div id="toast" class="toast" role="status" aria-live="polite"><span id="toastText">Link copied!</span></div>
+
+  <!-- QRCode.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <script>
+    (function(){
+      // --- QR CODE ---
+      try {
+        const el = document.getElementById('qrcode');
+        if(el) {
+          const qrData = String(window.location.href || '<%= ticketNumber %>');
+          new QRCode(el, {
+            text: qrData,
+            width: 180,
+            height: 180,
+            colorDark: "#07284a",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+          });
+        }
+      } catch(e){
+        console.warn('QR generation failed', e);
+      }
+
+      // --- TOAST UTILS ---
+      const toastEl = document.getElementById('toast');
+      const toastText = document.getElementById('toastText');
+      let toastTimer = null;
+      function showToast(msg, duration = 2500){
+        if(!toastEl) return;
+        toastText.textContent = msg;
+        toastEl.classList.add('show');
+        if(toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(()=> toastEl.classList.remove('show'), duration);
+      }
+
+      // Expose copy function
+      window.copyReceiptLink = function(){
+        const receiptUrl = window.location.href;
+        if(navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(receiptUrl).then(()=> showToast('Link copied to clipboard!'))
+          .catch(()=> fallbackCopy(receiptUrl));
+        } else fallbackCopy(receiptUrl);
+      };
+
+      function fallbackCopy(text){
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        try {
+          document.execCommand('copy');
+          showToast('Link copied to clipboard!');
+        } catch(e){
+          showToast('Unable to copy link', 3000);
+        }
+        document.body.removeChild(ta);
+      }
+
+      // WhatsApp share (opens wa.me)
+      window.shareToWhatsapp = function(name, phone, url){
+        const safeName = name || '';
+        const safePhone = (phone || '').replace(/\D/g,''); // remove non-digits
+        const message = encodeURIComponent(`Hi ${safeName}, you booked a ticket from BSL. Here is the ticket URL: ${url}`);
+        if(!safePhone){
+          // fallback: open wa.me without phone to let user pick
+          window.open(`https://wa.me/?text=${message}`, '_blank');
+        } else {
+          window.open(`https://wa.me/${safePhone}?text=${message}`, '_blank');
+        }
+      };
+
+      // Floating whatsapp button: open chat to support or share page
+      window.openWhatsApp = function(){
+        const supportNumber = '<%= booking.agent.phone || booking.customer.phone || "" %>'.replace(/\D/g,'') || '';
+        const url = encodeURIComponent(window.location.href);
+        const message = encodeURIComponent('Hello, I need help with my booking: ' + url);
+        if(supportNumber){
+          window.open(`https://wa.me/${supportNumber}?text=${message}`, '_blank');
+        } else {
+          window.open(`https://wa.me/?text=${message}`, '_blank');
+        }
+      };
+
+      // Accessibility: keyboard support for floating button
+      document.querySelectorAll('.float-btn').forEach(btn => {
+        btn.setAttribute('tabindex', '0');
+        btn.addEventListener('keypress', function(e){
+          if(e.key === 'Enter' || e.key === ' ') btn.click();
+        });
+      });
+
+    })();
+  </script>
+</body>
+</html>
