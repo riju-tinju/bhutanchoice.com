@@ -88,8 +88,8 @@
     }
 
     .logo-circle img {
-      width: 45px;
-      height: 45px;
+      width: 60px;
+      height: 60px;
       border-radius: 50%;
       object-fit: cover;
     }
@@ -558,7 +558,7 @@
       }
 
       .brand-text h1 {
-        font-size: 22px; /* Increased from 20px */
+        font-size: 26px; /* Increased from 20px */
       }
 
       .receipt-content {
@@ -625,11 +625,7 @@
           <div class="date-item-container" style="">
             <div class="meta-item">
             <span class="meta-label">Date & Time</span>
-            <span class="meta-value"><%= new Date(booking.booking.date).toLocaleDateString('en-GB',{
-  day: 'numeric',
-  month: 'short',
-  year: 'numeric'
-}) %></span>
+            <span class="meta-value"><%= new Date(booking.booking.date).toLocaleDateString('en-GB',{day: 'numeric',month: 'short',year: 'numeric'}) %></span>
           </div>
 
           <div class="meta-item">
