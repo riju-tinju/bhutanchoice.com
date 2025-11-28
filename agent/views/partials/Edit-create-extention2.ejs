@@ -34,11 +34,11 @@
 
             <div class="form-group form-grid-full">
               <label class="form-label">Draw Date & Time</label>
-              <input type="text" id="drawDate" class="form-input" required placeholder="DD/MM/YYYY HH:MM">
+              <input type="datetime-local" id="drawDate" class="form-input" required>
             </div>
           </div>
         </div>
-
+        
 
         <!-- Prize Structure Section -->
         <div class="form-section">
@@ -92,9 +92,6 @@
 
 <!-- Toast Notification -->
 <div id="toast" class="toast"></div>
-
-<!-- Flatpickr CSS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
 <style>
   * {
@@ -562,27 +559,27 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
 
-  .toggle-switch input:checked+.toggle-slider {
+  .toggle-switch input:checked + .toggle-slider {
     background: linear-gradient(135deg, #10B981 0%, #059669 100%);
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 8px rgba(16, 185, 129, 0.3);
   }
 
-  .toggle-switch input:focus+.toggle-slider {
+  .toggle-switch input:focus + .toggle-slider {
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
   }
 
-  .toggle-switch input:checked+.toggle-slider:before {
+  .toggle-switch input:checked + .toggle-slider:before {
     transform: translateX(20px);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   }
 
   /* Toggle switch states */
-  .toggle-switch input:disabled+.toggle-slider {
+  .toggle-switch input:disabled + .toggle-slider {
     opacity: 0.6;
     cursor: not-allowed;
   }
 
-  .toggle-switch input:disabled+.toggle-slider:before {
+  .toggle-switch input:disabled + .toggle-slider:before {
     cursor: not-allowed;
   }
 
@@ -694,20 +691,6 @@
 
   .form-grid-full {
     grid-column: span 2;
-  }
-
-  /* Flatpickr custom styling */
-  .flatpickr-calendar {
-    font-family: 'Poppins', sans-serif !important;
-  }
-
-  .flatpickr-day.selected {
-    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%) !important;
-    border-color: #3B82F6 !important;
-  }
-
-  .flatpickr-time input:focus {
-    border-color: #3B82F6 !important;
   }
 
   /* Enhanced Mobile Responsive Design */
@@ -884,7 +867,7 @@
       width: 24px;
     }
 
-    .toggle-switch input:checked+.toggle-slider:before {
+    .toggle-switch input:checked + .toggle-slider:before {
       transform: translateX(22px);
     }
 
@@ -932,7 +915,7 @@
       right: 10px;
       left: 10px;
       max-width: none;
-      transform: translateY(-100%);
+      transform: translateY(-130%);
       border-radius: 12px;
     }
 
@@ -1007,9 +990,6 @@
   }
 </style>
 
-<!-- Flatpickr JS -->
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-
 <script>
   async function deleteLottery(id) {
     if (!confirm('Are you sure you want to delete this lottery? This action cannot be undone.')) {
@@ -1046,48 +1026,6 @@
   let currentEditId = null;
   let prizeCounter = 1;
   let winnerGroupCounter = 0;
-  let drawDatePicker = null;
-  let resultTimePickers = {};
-
-  // Initialize Flatpickr for draw date
-  function initDrawDatePicker() {
-    if (drawDatePicker) {
-      drawDatePicker.destroy();
-    }
-
-    drawDatePicker = flatpickr("#drawDate", {
-      enableTime: true,
-      dateFormat: "d/m/Y h:i K",
-      time_24hr: false,
-      minuteIncrement: 1,
-      allowInput: true,
-      disableMobile: true,
-      onChange: function(selectedDates, dateStr, instance) {
-        // Optionally handle change
-      }
-    });
-  }
-
-  // Initialize Flatpickr for result time inputs
-  function initResultTimePicker(inputElement, groupIndex) {
-    if (resultTimePickers[groupIndex]) {
-      resultTimePickers[groupIndex].destroy();
-    }
-
-    resultTimePickers[groupIndex] = flatpickr(inputElement, {
-      enableTime: true,
-      dateFormat: "d/m/Y h:i K",
-      time_24hr: false,
-      minuteIncrement: 1,
-      allowInput: true,
-      disableMobile: true,
-      onChange: function(selectedDates, dateStr, instance) {
-        // Optionally handle change
-      }
-    });
-
-    return resultTimePickers[groupIndex];
-  }
 
   // API Functions
   async function fetchAutoComplete() {
@@ -1143,8 +1081,6 @@
   }
 
   async function updateLottery(id, lotteryData) {
-    console.log('Updating lottery with ID:', id, 'Data:', lotteryData);
-    //return null
     try {
       const response = await fetch(`/api/lottery/${id}`, {
         method: 'PUT',
@@ -1223,9 +1159,6 @@
     const winnersContainer = document.getElementById('winnersContainer');
     winnersContainer.innerHTML = '';
 
-    // Initialize draw date picker
-    initDrawDatePicker();
-
     // Load auto-complete data
     const autoCompleteData = await fetchAutoComplete();
     if (autoCompleteData) {
@@ -1234,8 +1167,8 @@
       document.getElementById('drawNumber').value = autoCompleteData.nextDrawNumber || '';
 
       if (autoCompleteData.suggestedDate) {
-        const date = moment(autoCompleteData.suggestedDate).tz("Asia/Dubai");
-        drawDatePicker.setDate(date.toDate(), true);
+        const date = new Date(autoCompleteData.suggestedDate);
+        document.getElementById('drawDate').value = date.toISOString().slice(0, 16);
       }
     }
 
@@ -1255,14 +1188,13 @@
     document.getElementById('lotteryName2').value = lotteryData.name2 || '';
     document.getElementById('drawNumber').value = lotteryData.drawNumber || '';
 
-    // Initialize draw date picker first
-    initDrawDatePicker();
-
     if (lotteryData.drawDate) {
-      // const utcDate = new Date(lotteryData.drawDate);
-      // const dubaiOffset = 4 * 60 * 60 * 1000;
-      const dubaiDate = moment(lotteryData.drawDate).tz('Asia/Dubai').format('DD-MM-YYYY hh:mm A') //new Date(utcDate.getTime() + dubaiOffset);
-      drawDatePicker.setDate(dubaiDate, true);
+      const utcDate = new Date(lotteryData.drawDate);
+      // const istOffset = (5 * 60 * 60 * 1000) + (30 * 60 * 1000);
+       const dubaiOffset =4 * 60 * 60 * 1000;
+      const istDate = new Date(utcDate.getTime());
+      const formattedIST = istDate.toISOString().slice(0, 16);
+      document.getElementById('drawDate').value = formattedIST;
     }
 
     // Fill prizes
@@ -1299,14 +1231,13 @@
         const winnerGroupDiv = createWinnerGroupElement(winnerGroupCounter);
         winnersContainer.appendChild(winnerGroupDiv);
 
-        // Initialize result time picker for this group
-        const resultTimeInput = winnerGroupDiv.querySelector('.winner-group-time input');
-        const picker = initResultTimePicker(resultTimeInput, winnerGroupCounter);
-
         // Set result time
         if (winner.resultTime) {
-          const dubaiDate = moment(winner.resultTime).tz('Asia/Dubai').format('DD-MM-YYYY hh:mm A')
-          picker.setDate(dubaiDate, true);
+          const utcDate = new Date(winner.resultTime);
+          const istOffset = (5 * 60 * 60 * 1000) + (30 * 60 * 1000);
+          const istDate = new Date(utcDate.getTime() + istOffset);
+          const formattedIST = istDate.toISOString().slice(0, 16);
+          winnerGroupDiv.querySelector('.winner-group-time input').value = formattedIST;
         }
 
         // Add winning numbers
@@ -1341,19 +1272,6 @@
   function closeModal() {
     document.getElementById('lotteryModal').classList.remove('show');
     currentEditId = null;
-
-    // Destroy all Flatpickr instances
-    if (drawDatePicker) {
-      drawDatePicker.destroy();
-      drawDatePicker = null;
-    }
-
-    Object.keys(resultTimePickers).forEach(key => {
-      if (resultTimePickers[key]) {
-        resultTimePickers[key].destroy();
-      }
-    });
-    resultTimePickers = {};
   }
 
   // Prize Management
@@ -1398,17 +1316,15 @@
     winnerGroupCounter++;
     const winnersContainer = document.getElementById('winnersContainer');
     const winnerGroupDiv = createWinnerGroupElement(winnerGroupCounter);
-    winnersContainer.appendChild(winnerGroupDiv);
-
-    // Initialize result time picker for this group
-    const resultTimeInput = winnerGroupDiv.querySelector('.winner-group-time input');
-    const picker = initResultTimePicker(resultTimeInput, winnerGroupCounter);
+    // winnersContainer.appendChild(winnerGroupDiv);
+    winnersContainer.prepend(winnerGroupDiv);
 
     // Set default result time (2 hours after draw time)
-    if (drawDatePicker && drawDatePicker.selectedDates.length > 0) {
-      const drawDateTime = new Date(drawDatePicker.selectedDates[0]);
+    const drawDate = document.getElementById('drawDate').value;
+    if (drawDate) {
+      const drawDateTime = new Date(drawDate);
       drawDateTime.setHours(drawDateTime.getHours() + 2);
-      picker.setDate(drawDateTime, true);
+      winnerGroupDiv.querySelector('.winner-group-time input').value = drawDateTime.toISOString().slice(0, 16);
     }
 
     // Add first winning number
@@ -1423,7 +1339,7 @@
             <div class="winner-group-header">
                 <div class="winner-group-title">Group ${groupIndex}</div>
                 <div class="winner-group-time">
-                    <input type="text" placeholder="DD/MM/YYYY HH:MM" required>
+                    <input type="datetime-local" placeholder="Result Time" required>
                 </div>
                 <button type="button" class="remove-winner-group" onclick="removeWinnerGroup(${groupIndex})">
                     <i class="fas fa-trash"></i>
@@ -1441,11 +1357,6 @@
   function removeWinnerGroup(groupIndex) {
     const winnerGroup = document.querySelector(`[data-group-index="${groupIndex}"]`);
     if (winnerGroup) {
-      // Destroy the Flatpickr instance
-      if (resultTimePickers[groupIndex]) {
-        resultTimePickers[groupIndex].destroy();
-        delete resultTimePickers[groupIndex];
-      }
       winnerGroup.remove();
       updateWinnerGroupNumbers();
     }
@@ -1453,32 +1364,15 @@
 
   function updateWinnerGroupNumbers() {
     const winnerGroups = document.querySelectorAll('.winner-group');
-    const oldPickers = {...resultTimePickers};
-    resultTimePickers = {};
     winnerGroupCounter = 0;
-
     winnerGroups.forEach(group => {
       winnerGroupCounter++;
-      const oldGroupIndex = group.dataset.groupIndex;
       group.dataset.groupIndex = winnerGroupCounter;
       group.querySelector('.winner-group-title').textContent = `Group ${winnerGroupCounter}`;
 
       // Update button onclick handlers
       group.querySelector('.remove-winner-group').setAttribute('onclick', `removeWinnerGroup(${winnerGroupCounter})`);
       group.querySelector('.add-winner-number').setAttribute('onclick', `addWinnerNumber(${winnerGroupCounter})`);
-
-      // Re-initialize Flatpickr for this group with existing value
-      const resultTimeInput = group.querySelector('.winner-group-time input');
-      if (oldPickers[oldGroupIndex]) {
-        const currentDate = oldPickers[oldGroupIndex].selectedDates[0];
-        oldPickers[oldGroupIndex].destroy();
-        const newPicker = initResultTimePicker(resultTimeInput, winnerGroupCounter);
-        if (currentDate) {
-          newPicker.setDate(currentDate, true);
-        }
-      } else {
-        initResultTimePicker(resultTimeInput, winnerGroupCounter);
-      }
 
       // Update winning number remove buttons
       const winnerNumbers = group.querySelectorAll('.winner-number-item');
@@ -1598,14 +1492,15 @@
   document.getElementById('lotteryForm').addEventListener('submit', function(e) {
     e.preventDefault();
 
-    // Get draw date from Flatpickr
+    // Date conversion before sending to server
+    const selectedDateTimeLocalString = document.getElementById('drawDate').value;
     let drawDateUTC;
-    if (drawDatePicker && drawDatePicker.selectedDates.length > 0) {
-      const selectedDate = drawDatePicker.selectedDates[0];
-      const intendedBTTMoment = moment.tz(selectedDate, 'Asia/Dubai');
+
+    if (selectedDateTimeLocalString) {
+      const intendedBTTMoment = moment.tz(selectedDateTimeLocalString, 'YYYY-MM-DDTHH:mm', 'Asia/Dubai');
       drawDateUTC = intendedBTTMoment.utc().toISOString();
     } else {
-      showToast('Draw Date/Time is required', 'error');
+      console.error("Draw Date/Time is required.");
       return;
     }
 
@@ -1633,17 +1528,12 @@
     // Collect winner groups
     const winnerGroups = document.querySelectorAll('.winner-group');
     winnerGroups.forEach(group => {
-      const groupIndex = group.dataset.groupIndex;
-      
-      // Get result time from Flatpickr
+      const resultTimeInput = group.querySelector('.winner-group-time input').value;
+      if (!resultTimeInput) return;
+
       let resultTimeUTC;
-      if (resultTimePickers[groupIndex] && resultTimePickers[groupIndex].selectedDates.length > 0) {
-        const selectedDate = resultTimePickers[groupIndex].selectedDates[0];
-        const intendedBTTMoment = moment.tz(selectedDate, 'Asia/Dubai');
-        resultTimeUTC = intendedBTTMoment.utc().toISOString();
-      } else {
-        return;
-      }
+      const intendedBTTMoment = moment.tz(resultTimeInput, 'YYYY-MM-DDTHH:mm', 'Asia/Dubai');
+      resultTimeUTC = intendedBTTMoment.utc().toISOString();
 
       const winNumbers = [];
       const winnerNumbers = group.querySelectorAll('.winner-number-item');
