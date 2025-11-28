@@ -786,8 +786,8 @@ const bookingHelper = {
           agent: {
             name: req.session.agent.name || 'Agent Name',
             id: req.session.agent.id || null,
-            phone: 'NA',
-            role: ['admin']
+            phone: req.session.agent.phone || 'NA',
+            role: ['agent']
           },
           booking: {
             date: new Date(),

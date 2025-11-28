@@ -8,6 +8,10 @@ router.get('/theme', async function (req, res, next) {
   res.render('template', {})
 });
 
+router.get('/dd', async function (req, res, next) {
+  res.render('form', {})
+});
+
 /* GET home page. */
 router.get('/', async function (req, res, next) {
   await indexFun.getLotteries(req, res)
