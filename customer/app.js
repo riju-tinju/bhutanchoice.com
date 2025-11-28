@@ -3,6 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const moment = require('moment-timezone'); // custom
 
 
 var indexRouter = require('./routes/index');
@@ -36,7 +37,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', adminAuthRouter); // custom route for admin authentication
 let verifyAdmin = require("./helper/verifyAdmin");// custom
-app.use('/', indexRouter);//verifyAdmin,
+app.use('/',verifyAdmin, indexRouter);//verifyAdmin,
 app.use('/', settingsRouter);
 
 // catch 404 and forward to error handler
