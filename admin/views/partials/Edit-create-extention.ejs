@@ -1057,8 +1057,8 @@
 
     drawDatePicker = flatpickr("#drawDate", {
       enableTime: true,
-      dateFormat: "d/m/Y H:i",
-      time_24hr: true,
+      dateFormat: "d/m/Y h:i K",
+      time_24hr: false,
       minuteIncrement: 1,
       allowInput: true,
       disableMobile: true,
@@ -1076,8 +1076,8 @@
 
     resultTimePickers[groupIndex] = flatpickr(inputElement, {
       enableTime: true,
-      dateFormat: "d/m/Y H:i",
-      time_24hr: true,
+      dateFormat: "d/m/Y h:i K",
+      time_24hr: false,
       minuteIncrement: 1,
       allowInput: true,
       disableMobile: true,
