@@ -714,7 +714,7 @@
             <div class="lottery-header">
               <h3 class="lottery-name"><%= group.lottery.name %></h3>
               <div class="lottery-details">
-                <span><%= formattedDate %> at <%= formattedTime %></span>
+                <span><%= moment(group.lottery.drawDate).tz('Asia/Dubai').format('DD/MM/YYYY') %> at <%= moment(group.lottery.drawDate).tz('Asia/Dubai').format('hh:mm A') %></span>
                 <span>Draw #<%= group.lottery.drawNumber %></span>
                 <span><%= group.tickets.length %> Ticket<%= group.tickets.length > 1 ? 's' : '' %></span>
               </div>
