@@ -130,7 +130,7 @@ const bookingHelper = {
               {
                 $addFields: {
                   displayId: {
-                    $concat: ["TKT-", "$ticketNumber"]
+                    $concat: ["", "$ticketNumber"]
                   }
                 }
               }

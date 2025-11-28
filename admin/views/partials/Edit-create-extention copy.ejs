@@ -35,7 +35,7 @@
             <div class="form-group form-grid-full">
               <label class="form-label">Draw Date & Time</label>
               <input type="datetime-local" id="drawDate" class="form-input" required>
-
+              
             </div>
           </div>
         </div>
@@ -1193,10 +1193,12 @@
     document.getElementById('drawNumber').value = lotteryData.drawNumber || '';
 
     if (lotteryData.drawDate) {
-     // Use moment.js to handle Dubai timezone properly
-      const dubaiTime = moment.utc(lotteryData.drawDate).tz('Asia/Dubai');
-      const formattedDate = dubaiTime.format('YYYY-MM-DDTHH:mm');
-      document.getElementById('drawDate').value = formattedDate;
+      const utcDate = new Date(lotteryData.drawDate);
+      // const istOffset = (5 * 60 * 60 * 1000) + (30 * 60 * 1000);
+      const dubaiOffset =  4 * 60 * 60 * 1000;
+      const istDate = new Date(utcDate.getTime() + dubaiOffset);
+      const formattedIST = istDate.toISOString().slice(0, 16);
+      document.getElementById('drawDate').value = formattedIST
     }
 
     
@@ -1237,9 +1239,13 @@
 
         // Set result time
         if (winner.resultTime) {
-          const dubaiTime = moment.utc(winner.resultTime).tz('Asia/Dubai');
-          const formattedDate = dubaiTime.format('YYYY-MM-DDTHH:mm');
-          winnerGroupDiv.querySelector('.winner-group-time input').value = formattedDate;
+          const utcDate = new Date(winner.resultTime);
+          const istOffset = (4 * 60 * 60 * 1000);
+          const istDate = new Date(utcDate.getTime() + istOffset);
+          const formattedIST = istDate.toISOString().slice(0, 16);
+
+          
+          winnerGroupDiv.querySelector('.winner-group-time input').value = formattedIST;
         }
 
         // Add winning numbers
@@ -1321,14 +1327,13 @@
      winnersContainer.appendChild(winnerGroupDiv);
     // winnersContainer.prepend(winnerGroupDiv);
 
-    // Set default result time (2 hours after draw time) in Dubai timezone
-const drawDate = document.getElementById('drawDate').value;
-if (drawDate) {
-  const dubaiTime = moment.tz(drawDate, 'YYYY-MM-DDTHH:mm', 'Asia/Dubai');
-  dubaiTime.add(2, 'hours');
-  const formattedDate = dubaiTime.format('YYYY-MM-DDTHH:mm');
-  winnerGroupDiv.querySelector('.winner-group-time input').value = formattedDate;
-}
+    // Set default result time (2 hours after draw time)
+    const drawDate = document.getElementById('drawDate').value;
+    if (drawDate) {
+      const drawDateTime = new Date(drawDate);
+      drawDateTime.setHours(drawDateTime.getHours() + 2);
+      winnerGroupDiv.querySelector('.winner-group-time input').value = drawDateTime.toISOString().slice(0, 16);
+    }
 
     // Add first winning number
     addWinnerNumber(winnerGroupCounter);
