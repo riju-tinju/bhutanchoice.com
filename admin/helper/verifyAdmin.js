@@ -18,7 +18,7 @@ const verifyAdmin = async (req, res, next) => {
       //   return res.redirect("/not-found");
       // }
       // console.log(req.session.admin)
-      
+      res.locals.moment = moment;
       return next(); // Authenticated user
     }
 
