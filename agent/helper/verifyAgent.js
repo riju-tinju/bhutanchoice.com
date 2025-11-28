@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Agent = require("../model/agentSchema"); 
+const moment = require("moment-timezone");
 
 const verifyAgent = async (req, res, next) => {
   try {
@@ -22,6 +23,7 @@ const verifyAgent = async (req, res, next) => {
       req.session.agent.name = agent.name; 
       req.session.agent.email = agent.email;
       req.session.agent.phone = agent.phone;
+      res.locals.moment = moment; 
       console.log("Agent session found:", req.session.agent);
       return next(); // Authenticated user
     }
