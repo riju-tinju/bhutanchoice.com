@@ -116,7 +116,7 @@ const formattedDate = drawDate.toLocaleDateString('en-GB', {
                 else if(prize.rank === 3) rankStatus = 'rd';
                 else rankStatus = 'th';
                %>
-              <%= prize.rank %><%= rankStatus %> Prize: Nu. <%= prize.amount.toLocaleString('en-IN') %>
+              <%= prize.rank %><%= rankStatus %> Prize: Nu. <%= prize.amount.toLocaleString('en-US') %>
             </span><br>
           </div>
           <% }); %>
