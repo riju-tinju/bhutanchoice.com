@@ -1062,6 +1062,7 @@
       minuteIncrement: 1,
       allowInput: true,
       disableMobile: true,
+       timezone: "Asia/Dubai",
       onChange: function(selectedDates, dateStr, instance) {
         // Optionally handle change
       }
@@ -1081,6 +1082,7 @@
       minuteIncrement: 1,
       allowInput: true,
       disableMobile: true,
+      timezone: "Asia/Dubai",
       onChange: function(selectedDates, dateStr, instance) {
         // Optionally handle change
       }
@@ -1143,8 +1145,6 @@
   }
 
   async function updateLottery(id, lotteryData) {
-    console.log('Updating lottery with ID:', id, 'Data:', lotteryData);
-    //return null
     try {
       const response = await fetch(`/api/lottery/${id}`, {
         method: 'PUT',
@@ -1234,8 +1234,9 @@
       document.getElementById('drawNumber').value = autoCompleteData.nextDrawNumber || '';
 
       if (autoCompleteData.suggestedDate) {
-        const date = moment(autoCompleteData.suggestedDate).tz("Asia/Dubai");
-        drawDatePicker.setDate(date.toDate(), true);
+        // Convert UTC from database to Dubai time for display
+        const dubaiTime = moment.utc(autoCompleteData.suggestedDate).tz('Asia/Dubai').format('DD/MM/YYYY hh:mm A');
+        drawDatePicker.setDate(dubaiTime, true);
       }
     }
 
@@ -1259,10 +1260,9 @@
     initDrawDatePicker();
 
     if (lotteryData.drawDate) {
-      // const utcDate = new Date(lotteryData.drawDate);
-      // const dubaiOffset = 4 * 60 * 60 * 1000;
-      const dubaiDate = moment(lotteryData.drawDate).tz('Asia/Dubai').format('DD-MM-YYYY hh:mm A') //new Date(utcDate.getTime() + dubaiOffset);
-      drawDatePicker.setDate(dubaiDate, true);
+      // Convert UTC from database to Dubai time for display
+      const dubaiTime = moment.utc(lotteryData.drawDate).tz('Asia/Dubai').format('DD/MM/YYYY hh:mm A');
+      drawDatePicker.setDate(dubaiTime, true);
     }
 
     // Fill prizes
@@ -1303,10 +1303,10 @@
         const resultTimeInput = winnerGroupDiv.querySelector('.winner-group-time input');
         const picker = initResultTimePicker(resultTimeInput, winnerGroupCounter);
 
-        // Set result time
+        // Set result time - convert UTC from database to Dubai time for display
         if (winner.resultTime) {
-          const dubaiDate = moment(winner.resultTime).tz('Asia/Dubai').format('DD-MM-YYYY hh:mm A')
-          picker.setDate(dubaiDate, true);
+          const dubaiTime = moment.utc(winner.resultTime).tz('Asia/Dubai').format('DD/MM/YYYY hh:mm A');
+          picker.setDate(dubaiTime, true);
         }
 
         // Add winning numbers
@@ -1322,7 +1322,7 @@
             const ticketInput = winNumberDiv.querySelector('.winner-ticket-input');
             const resultStatusToggle = winNumberDiv.querySelector('.result-status-switch');
 
-            // FIXED: First populate options, then set value
+            // First populate options, then set value
             updatePrizeRankOptions(winnerGroupCounter);
             prizeSelect.value = winNumber.prizeRank || '';
             ticketInput.value = winNumber.ticketNumber || '';
@@ -1330,7 +1330,7 @@
           });
         }
 
-        // FIXED: Update options after all winning numbers are added
+        // Update options after all winning numbers are added
         updatePrizeRankOptions(winnerGroupCounter);
       });
     }
@@ -1595,94 +1595,134 @@
   }
 
   // Form Submission
-  document.getElementById('lotteryForm').addEventListener('submit', function(e) {
-    e.preventDefault();
+document.getElementById('lotteryForm').addEventListener('submit', function(e) {
+  e.preventDefault();
 
-    // Get draw date from Flatpickr
-    let drawDateUTC;
-    if (drawDatePicker && drawDatePicker.selectedDates.length > 0) {
-      const selectedDate = drawDatePicker.selectedDates[0];
-      const intendedBTTMoment = moment.tz(selectedDate, 'Asia/Dubai');
-      drawDateUTC = intendedBTTMoment.utc().toISOString();
-    } else {
-      showToast('Draw Date/Time is required', 'error');
-      return;
+  // Get draw date from Flatpickr and convert to UTC
+  let drawDateUTC;
+  if (drawDatePicker && drawDatePicker.input.value) {
+    const dateString = drawDatePicker.input.value; // "29/11/2025 09:00 AM"
+    
+    // Parse the date string manually and treat it as Dubai time
+    const [datePart, timePart, period] = dateString.split(' ');
+    const [day, month, year] = datePart.split('/');
+    const [hours, minutes] = timePart.split(':');
+    
+    // Convert to 24-hour format
+    let hours24 = parseInt(hours);
+    if (period === 'PM' && hours24 !== 12) {
+      hours24 += 12;
+    } else if (period === 'AM' && hours24 === 12) {
+      hours24 = 0;
     }
-
-    const formData = {
-      name: document.getElementById('lotteryName').value,
-      name2: document.getElementById('lotteryName2').value || '',
-      drawNumber: parseInt(document.getElementById('drawNumber').value),
-      drawDate: drawDateUTC,
-      prizes: [],
-      winners: []
-    };
-
-    // Collect prizes
-    const prizeItems = document.querySelectorAll('.prize-item');
-    prizeItems.forEach((item, index) => {
-      const amount = parseInt(item.querySelector('.prize-amount-input').value);
-      if (amount) {
-        formData.prizes.push({
-          rank: index + 1,
-          amount: amount
-        });
-      }
+    
+    // Create a date string that Moment can parse as Dubai time
+    const dubaiTimeString = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${hours24.toString().padStart(2, '0')}:${minutes}:00`;
+    
+    // Parse as Dubai time and convert to UTC
+    const dubaiMoment = moment.tz(dubaiTimeString, 'Asia/Dubai');
+    drawDateUTC = dubaiMoment.utc().toISOString();
+    
+    console.log('Date conversion debug:', {
+      input: dateString,
+      dubaiTime: dubaiMoment.format(),
+      utcTime: drawDateUTC
     });
+    
+  } else {
+    showToast('Draw Date/Time is required', 'error');
+    return;
+  }
 
-    // Collect winner groups
-    const winnerGroups = document.querySelectorAll('.winner-group');
-    winnerGroups.forEach(group => {
-      const groupIndex = group.dataset.groupIndex;
-      
-      // Get result time from Flatpickr
-      let resultTimeUTC;
-      if (resultTimePickers[groupIndex] && resultTimePickers[groupIndex].selectedDates.length > 0) {
-        const selectedDate = resultTimePickers[groupIndex].selectedDates[0];
-        const intendedBTTMoment = moment.tz(selectedDate, 'Asia/Dubai');
-        resultTimeUTC = intendedBTTMoment.utc().toISOString();
-      } else {
-        return;
-      }
+  const formData = {
+    name: document.getElementById('lotteryName').value,
+    name2: document.getElementById('lotteryName2').value || '',
+    drawNumber: parseInt(document.getElementById('drawNumber').value),
+    drawDate: drawDateUTC,
+    prizes: [],
+    winners: []
+  };
 
-      const winNumbers = [];
-      const winnerNumbers = group.querySelectorAll('.winner-number-item');
-
-      winnerNumbers.forEach(numberItem => {
-        const prizeRank = parseInt(numberItem.querySelector('.winner-prize-select').value);
-        const ticketNumber = numberItem.querySelector('.winner-ticket-input').value.trim();
-        const resultStatus = numberItem.querySelector('.result-status-switch').checked;
-
-        if (prizeRank && ticketNumber) {
-          winNumbers.push({
-            prizeRank: prizeRank,
-            ticketNumber: ticketNumber,
-            resultStatus: resultStatus
-          });
-        }
+  // Collect prizes
+  const prizeItems = document.querySelectorAll('.prize-item');
+  prizeItems.forEach((item, index) => {
+    const amount = parseInt(item.querySelector('.prize-amount-input').value);
+    if (amount) {
+      formData.prizes.push({
+        rank: index + 1,
+        amount: amount
       });
-
-      if (winNumbers.length > 0) {
-        formData.winners.push({
-          resultTime: resultTimeUTC,
-          winNumbers: winNumbers
-        });
-      }
-    });
-
-    // Validate
-    if (formData.prizes.length === 0) {
-      showToast('Please add at least one prize', 'error');
-      return;
-    }
-
-    // Submit
-    if (currentEditId) {
-      updateLottery(currentEditId, formData);
-    } else {
-      createLottery(formData);
     }
   });
+
+  // Collect winner groups
+  const winnerGroups = document.querySelectorAll('.winner-group');
+  winnerGroups.forEach(group => {
+    const groupIndex = group.dataset.groupIndex;
+    
+    // Get result time from Flatpickr and convert to UTC
+    let resultTimeUTC;
+    if (resultTimePickers[groupIndex] && resultTimePickers[groupIndex].input.value) {
+      const dateString = resultTimePickers[groupIndex].input.value;
+      
+      // Parse the date string manually and treat it as Dubai time
+      const [datePart, timePart, period] = dateString.split(' ');
+      const [day, month, year] = datePart.split('/');
+      const [hours, minutes] = timePart.split(':');
+      
+      let hours24 = parseInt(hours);
+      if (period === 'PM' && hours24 !== 12) {
+        hours24 += 12;
+      } else if (period === 'AM' && hours24 === 12) {
+        hours24 = 0;
+      }
+      
+      const dubaiTimeString = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${hours24.toString().padStart(2, '0')}:${minutes}:00`;
+      const dubaiMoment = moment.tz(dubaiTimeString, 'Asia/Dubai');
+      resultTimeUTC = dubaiMoment.utc().toISOString();
+      
+    } else {
+      return;
+    }
+
+    const winNumbers = [];
+    const winnerNumbers = group.querySelectorAll('.winner-number-item');
+
+    winnerNumbers.forEach(numberItem => {
+      const prizeRank = parseInt(numberItem.querySelector('.winner-prize-select').value);
+      const ticketNumber = numberItem.querySelector('.winner-ticket-input').value.trim();
+      const resultStatus = numberItem.querySelector('.result-status-switch').checked;
+
+      if (prizeRank && ticketNumber) {
+        winNumbers.push({
+          prizeRank: prizeRank,
+          ticketNumber: ticketNumber,
+          resultStatus: resultStatus
+        });
+      }
+    });
+
+    if (winNumbers.length > 0) {
+      formData.winners.push({
+        resultTime: resultTimeUTC,
+        winNumbers: winNumbers
+      });
+    }
+  });
+
+  // Validate
+  if (formData.prizes.length === 0) {
+    showToast('Please add at least one prize', 'error');
+    return;
+  }
+
+  // Submit
+  if (currentEditId) {
+    updateLottery(currentEditId, formData);
+  } else {
+    createLottery(formData);
+  }
+});
 
   // Toast Function
   function showToast(message, type) {

@@ -1113,11 +1113,6 @@
 
   async function createLottery(lotteryData) {
     try {
-
-      console.log('Creating lottery with Data:', lotteryData);
-      alert(lotteryData.drawDate)
-      return new Error( 'Failed to create lottery');
-
       const response = await fetch('/api/lottery', {
         method: 'POST',
         headers: {
@@ -1266,10 +1261,8 @@
     if (lotteryData.drawDate) {
       // const utcDate = new Date(lotteryData.drawDate);
       // const dubaiOffset = 4 * 60 * 60 * 1000;
-      // const dubaiDate = moment(lotteryData.drawDate).tz('Asia/Dubai').format('DD-MM-YYYY hh:mm A') //new Date(utcDate.getTime() + dubaiOffset);
-      // drawDatePicker.setDate(dubaiDate, true);
-      drawDatePicker.setDate(lotteryData.drawDate, true);
-      
+      const dubaiDate = moment(lotteryData.drawDate).tz('Asia/Dubai').format('DD-MM-YYYY hh:mm A') //new Date(utcDate.getTime() + dubaiOffset);
+      drawDatePicker.setDate(dubaiDate, true);
     }
 
     // Fill prizes
