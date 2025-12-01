@@ -709,14 +709,34 @@
             minute: '2-digit', 
             hour12: true 
           }).toLowerCase();
+
+           // Check if ALL winning tickets in this group have status = "PAID"
+  const hasWinningTickets = group.tickets.some(ticket => ticket.isWon);
+  const allWinningTicketsPaid = hasWinningTickets && 
+    group.tickets.every(ticket => {
+      // If ticket is won, check if status is "PAID"
+      if (ticket.isWon) {
+        return ticket.status === "PAID";
+      }
+      // If ticket is not won, it doesn't affect the condition
+      return true;
+    });
+
         %>
           <div class="lottery-card" style="position: relative;">
-            <div class="redeemedSticker" style="background: url('/images/redeemConfirm.svg');height: 200px;width: 200px;border-radius: 50%;position: absolute;right: 27%;
-  top: 30%;z-index:99;overflow: hidden;">
+            <% if (allWinningTicketsPaid) { %>
+            <!-- Here is the redeemSticker (hi deepseek add ejs condition here)-->
+            <div class="redeemedSticker" style="background: url('/images/redeemConfirm.svg');height: 200px;width: 200px;border-radius: 50%;position: absolute;top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 99;
+  overflow: hidden;">
               <img class="redeemStickerImg" src="/images/redeemConfirm.svg" style="height: 100%;width: 100%;">
 
               </img>
             </div>
+            <!--  -->
+            <% } %>
             <div class="lottery-header">
               <h3 class="lottery-name"><%= group.lottery.name %></h3>
               <div class="lottery-details">
