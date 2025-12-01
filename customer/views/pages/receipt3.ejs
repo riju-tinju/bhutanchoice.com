@@ -710,7 +710,12 @@
             hour12: true 
           }).toLowerCase();
         %>
-          <div class="lottery-card">
+          <div class="lottery-card" style="position: relative;">
+            <div class="redeemedSticker" style="background: url('/images/redeemConfirm.svg');height: 132px;width: 132px;border-radius: 50%;position: absolute;right: 12px;top: -26px;overflow: hidden;">
+              <img class="redeemStickerImg" src="/images/redeemConfirm.svg" style="height: 100%;width: 100%;">
+
+              </img>
+            </div>
             <div class="lottery-header">
               <h3 class="lottery-name"><%= group.lottery.name %></h3>
               <div class="lottery-details">
