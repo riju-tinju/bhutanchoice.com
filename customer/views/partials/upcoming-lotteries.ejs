@@ -201,13 +201,25 @@
                 <% }); %>
               </div>
 
-              <div class="winning-numbers-container">
+              
+
+              <% 
+                let allResultPublished= false;
+                allResultPublished = winner.winNumbers.every(winNumber => winNumber.resultStatus === true);
+              %>
+              <% if(allResultPublished){ %>
+                <div class="winning-numbers-container">
                 <div class="winning-number-item">
                   <div class="winning-number" data-ticket-number="<%= firstTicketNumber %>">
                     <%= firstTicketNumber %>
                   </div>
                 </div>
               </div>
+              <% }else{ %>
+                  <div class="winning-numbers-container1" style="margin-top: 14px;">
+                    <img src="/images/dummy-counter-box.png" style="height: 78px; width: 235px ">
+                  </div>
+              <% } %>
             
 
               <div class="otherPrizeContainer">
