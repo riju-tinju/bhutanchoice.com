@@ -213,6 +213,11 @@
     const winningNumberElements = container.querySelectorAll('.winning-number');
     const otherPrizeContainers = container.querySelectorAll('.otherPrizeContainer');
 
+    if( winningNumberElements.length === 0){
+      console.log('No winning numbers found for card:', cardId);
+      return null;
+    }
+
     // Hide all other prizes initially
     otherPrizeContainers.forEach(otherPrizeContainer => {
       otherPrizeContainer.classList.remove('show');
