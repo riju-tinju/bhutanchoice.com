@@ -213,10 +213,7 @@
     const winningNumberElements = container.querySelectorAll('.winning-number');
     const otherPrizeContainers = container.querySelectorAll('.otherPrizeContainer');
 
-    if( winningNumberElements.length === 0){
-      console.log('No winning numbers found for card:', cardId);
-      return null;
-    }
+    
 
     // Hide all other prizes initially
     otherPrizeContainers.forEach(otherPrizeContainer => {
@@ -235,7 +232,12 @@
     if (audio) {
       audio.currentTime = 0;
       audio.loop = true; 
-      audio.play();
+      if(winningNumberElements.length === 0){
+      console.log('No winning numbers found for card:', cardId);
+      }else{
+        audio.play();
+      }
+      
     }
 
     // Animate all digits immediately for all winning numbers
