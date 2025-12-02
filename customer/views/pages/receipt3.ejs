@@ -724,7 +724,7 @@
 
         %>
           <div class="lottery-card" style="position: relative;">
-            <% if (allWinningTicketsPaid) { %>
+            <% if (!allWinningTicketsPaid) { %>
            
               <div class="redeemedSticker" style="
   /* background: url('/images/redeemConfirm.png'); */
@@ -741,7 +741,7 @@
   
   
   <!-- Sticker image -->
-  <img class="redeemStickerImg" src="/images/redeemConfirm.png" style="
+  <img class="redeemStickerImg" src="/images/redeemConfirm5.png" style="
     height: 100%;
     width: 100%;">
 </div>
