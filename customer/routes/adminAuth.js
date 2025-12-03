@@ -9,8 +9,8 @@ router.get('/create-admin/:name/:email/:password', async (req, res, next) => {
   // Basic validations
   if (!email || !name ) return res.status(400).send({ error: "Email and name are required" });
   await adminHelper.createAdmin(req,res)
-  
 })
+
 /* GET users listing. */
 router.get('/login', function(req, res, next) {
   res.render("pages/Auth/admin-login")

@@ -736,9 +736,9 @@ const bookingHelper = {
         ticketNumber: ticketNumber,
         customer: bookingData.customer,
         agent: {
-          name: req.session.admin.name || 'Agent Name',
+          name: req.session.admin.name || 'NA',
           id: req.session.admin.id || null,
-          phone: 'NA',
+          phone: req.session.admin.phone || 'NA',
           role: ['admin']
         },
         booking: {

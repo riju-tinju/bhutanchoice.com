@@ -588,12 +588,13 @@ const indexHelper = {
       const { ticketNumber } = req.params;
       const booking = await Booking.findOne({ ticketNumber });
       if (!booking) {
-        return res.status(404).json({ success: false, message: "Booking not found" });
+        return res.status(404).render('error');
+        // return res.status(404).json({ success: false, message: "Booking not found" });
       }
-      res.render('pages/receipt3', { ticketNumber: req.params.ticketNumber, booking, });
+     return res.status(200).render('pages/receipt', { ticketNumber: req.params.ticketNumber, booking, });
     
   }catch(err){
-   res.status(404)
+     return res.status(404).render('error');
   }
 }
 };

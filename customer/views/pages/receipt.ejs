@@ -4,6 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Receipt - <%= ticketNumber %></title>
+    <title>Official Receipt & Status for Ticket [<%= ticketNumber %>] | Bhutan Lottery Results</title>
+
+    <meta name="description" content="View the full transaction details, draw information, and official winning status for your Bhutan Lottery receipt number [<%= ticketNumber %>].">
+
+    <meta property="og:title" content="Official Receipt & Status for Ticket [<%= ticketNumber %>] | Bhutan Lottery Results" />
+    <meta property="og:description" content="View the full transaction details, draw information, and official winning status for your Bhutan Lottery receipt number [<%= ticketNumber %>]." />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://bhutanlotteryresults.com/receipt/<%= ticketNumber %>" /> 
+
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     * {
@@ -14,7 +23,8 @@
     }
 
     body {
-      background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+      /* background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); */
+       background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
       min-height: 100vh;
       padding: 20px;
       display: flex;
@@ -45,7 +55,7 @@
 
     /* Header Section */
     .receipt-header {
-      background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+      background: linear-gradient(135deg, #07284a 0%, #0d3b6a 100%);
       color: white;
       padding: 40px 30px;
       position: relative;
@@ -87,23 +97,23 @@
     }
 
     .logo-circle img {
-      width: 45px;
-      height: 45px;
+      width: 60px;
+      height: 60px;
       border-radius: 50%;
       object-fit: cover;
     }
 
     .brand-text h1 {
-      font-size: 24px;
-      font-weight: 700;
+      font-size: 26px; /* Increased from 24px */
+      font-weight: 800; /* Increased from 700 */
       margin-bottom: 4px;
       letter-spacing: 0.5px;
     }
 
     .brand-text p {
-      font-size: 13px;
+      font-size: 14px; /* Increased from 13px */
       opacity: 0.9;
-      font-weight: 400;
+      font-weight: 500; /* Increased from 400 */
     }
 
     .receipt-meta {
@@ -122,15 +132,16 @@
     }
 
     .meta-label {
-      font-size: 11px;
+      font-size: 12px; /* Increased from 11px */
       opacity: 0.8;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      font-weight: 600; /* Added boldness */
     }
 
     .meta-value {
-      font-size: 15px;
-      font-weight: 600;
+      font-size: 16px; /* Increased from 15px */
+      font-weight: 700; /* Increased from 600 */
     }
 
     /* Content Section */
@@ -144,8 +155,8 @@
 
     .section-title {
       color: #1e3a5f;
-      font-size: 16px;
-      font-weight: 700;
+      font-size: 18px; /* Increased from 16px */
+      font-weight: 800; /* Increased from 700 */
       margin-bottom: 16px;
       display: flex;
       align-items: center;
@@ -162,7 +173,8 @@
 
     /* Info Cards */
     .info-card {
-      background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+      /* background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); */
+      background: linear-gradient(135deg, #e5edf4 0%, #fff 100%);
       border: 2px solid #e9ecef;
       border-radius: 16px;
       padding: 24px;
@@ -184,14 +196,14 @@
 
     .info-label {
       color: #6c757d;
-      font-size: 14px;
-      font-weight: 500;
+      font-size: 18px; /* Increased from 14px */
+      font-weight: 600; /* Increased from 500 */
     }
 
     .info-value {
       color: #1e3a5f;
-      font-size: 14px;
-      font-weight: 600;
+      font-size: 18px; /* Increased from 14px */
+      font-weight: 700; /* Increased from 600 */
       text-align: right;
     }
 
@@ -219,17 +231,18 @@
 
     .lottery-name {
       color: #1e3a5f;
-      font-size: 18px;
-      font-weight: 700;
+      font-size: 20px; /* Increased from 18px */
+      font-weight: 800; /* Increased from 700 */
       margin-bottom: 8px;
     }
 
     .lottery-details {
       color: #6c757d;
-      font-size: 13px;
+      font-size: 14px; /* Increased from 13px */
       display: flex;
       gap: 16px;
       align-items: center;
+      font-weight: 500; /* Added medium weight */
     }
 
     .lottery-details span {
@@ -283,10 +296,10 @@
     .ticket-item.winning::before {
       content: '🏆';
       position: absolute;
-      left: -8px;
+      left: -12px;
       top: 50%;
-      transform: translateY(-50%);
-      font-size: 24px;
+      transform: translateY(-50%); 
+      font-size: 28px;
       animation: trophyBounce 1s infinite;
     }
 
@@ -301,7 +314,8 @@
 
     .ticket-item.winning .ticket-number {
       color: #d4a017;
-      font-weight: 800;
+      font-weight: 850;
+      
     }
 
     .ticket-item.winning .ticket-amount {
@@ -317,25 +331,26 @@
       color: #744210;
       padding: 4px 12px;
       border-radius: 12px;
-      font-size: 11px;
-      font-weight: 700;
+      font-size: 12px; /* Increased from 11px */
+      font-weight: 800; /* Increased from 700 */
       box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
 
+    /* Golden color for all ticket numbers */
     .ticket-number {
-      color: #1e3a5f;
-      font-size: 18px;
-      font-weight: 700;
-      font-family: 'Courier New', monospace;
+      color: #d4a017; /* Changed to golden color */
+      font-size: 28px;
+      font-weight: 900;
+      /* font-family: 'Courier New', monospace; */
       letter-spacing: 2px;
     }
 
     .ticket-amount {
       color: #28a745;
-      font-size: 15px;
-      font-weight: 600;
+      font-size: 16px; /* Increased from 15px */
+      font-weight: 700; /* Increased from 600 */
     }
 
     /* Summary Section */
@@ -355,14 +370,14 @@
 
     .summary-label {
       color: #6c757d;
-      font-size: 14px;
-      font-weight: 500;
+      font-size: 18px; /* Increased from 14px */
+      font-weight: 600; /* Increased from 500 */
     }
 
     .summary-value {
       color: #1e3a5f;
-      font-size: 14px;
-      font-weight: 600;
+      font-size: 18px; /* Increased from 14px */
+      font-weight: 700; /* Increased from 600 */
     }
 
     .summary-total {
@@ -376,14 +391,14 @@
 
     .total-label {
       color: #1e3a5f;
-      font-size: 18px;
-      font-weight: 700;
+      font-size: 20px; /* Increased from 18px */
+      font-weight: 800; /* Increased from 700 */
     }
 
     .total-value {
       color: #28a745;
-      font-size: 24px;
-      font-weight: 800;
+      font-size: 26px; /* Increased from 24px */
+      font-weight: 800; /* Increased from 800 */
     }
 
     /* QR Code Section */
@@ -410,15 +425,15 @@
 
     .qrcode-label {
       color: #1e3a5f;
-      font-size: 14px;
-      font-weight: 600;
+      font-size: 16px; /* Increased from 14px */
+      font-weight: 700; /* Increased from 600 */
       margin-bottom: 8px;
     }
 
     .qrcode-number {
       color: #6c757d;
-      font-size: 13px;
-      font-weight: 600;
+      font-size: 14px; /* Increased from 13px */
+      font-weight: 700; /* Increased from 600 */
       letter-spacing: 2px;
       font-family: 'Courier New', monospace;
     }
@@ -433,15 +448,16 @@
 
     .footer-message {
       color: #1e3a5f;
-      font-size: 15px;
-      font-weight: 600;
+      font-size: 16px; /* Increased from 15px */
+      font-weight: 700; /* Increased from 600 */
       margin-bottom: 12px;
     }
 
     .footer-note {
       color: #6c757d;
-      font-size: 12px;
+      font-size: 13px; /* Increased from 12px */
       line-height: 1.6;
+      font-weight: 500; /* Added medium weight */
     }
 
     /* Action Buttons */
@@ -455,8 +471,8 @@
     .btn {
       padding: 12px 28px;
       border-radius: 10px;
-      font-size: 14px;
-      font-weight: 600;
+      font-size: 15px; /* Increased from 14px */
+      font-weight: 700; /* Increased from 600 */
       cursor: pointer;
       border: none;
       transition: all 0.3s ease;
@@ -501,7 +517,7 @@
       opacity: 0;
       transform: translateX(100%);
       transition: all 0.3s ease;
-      font-weight: 600;
+      font-weight: 700; /* Increased from 600 */
       display: flex;
       align-items: center;
       gap: 10px;
@@ -522,6 +538,10 @@
       .receipt-container {
         box-shadow: none;
         max-width: 100%;
+      }
+      .date-item-container{
+        justify-content: space-evenly;
+        width: 100%;
       }
 
       .action-buttons {
@@ -548,7 +568,7 @@
       }
 
       .brand-text h1 {
-        font-size: 20px;
+        font-size: 26px; /* Increased from 20px */
       }
 
       .receipt-content {
@@ -558,7 +578,15 @@
       .receipt-meta {
         flex-direction: column;
         gap: 16px;
-        align-items: flex-start;
+        align-items: center;
+        background: #c05656;
+        padding: 14px 22px;
+        border-radius: 24px;
+      }
+      .date-item-container {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
       }
 
       .action-buttons {
@@ -578,7 +606,7 @@
 
       .ticket-item.winning::before {
         font-size: 20px;
-        left: -6px;
+        /* left: -6px; */
       }
     }
   </style>
@@ -599,14 +627,24 @@
         </div>
 
         <div class="receipt-meta">
-          <div class="meta-item">
+
+          <div class="date-item-container" style="">
+            <div class="meta-item">
+              <span class="meta-label">Date</span>
+              <span class="meta-value"><%= new Date(booking.booking.date).toLocaleDateString('en-GB',{day: 'numeric',month: 'short',year: 'numeric'}) %></span>
+            </div>
+
+             <div class="meta-item">
+               <span class="meta-label">Time</span>
+               <span class="meta-value"> <%= moment(booking.booking.date).tz('Asia/Dubai').format('hh:mm A') %> </span>
+             </div>
+
+           </div>
+           <div class="meta-item">
             <span class="meta-label">Receipt Number</span>
             <span class="meta-value"><%= ticketNumber %></span>
           </div>
-          <div class="meta-item">
-            <span class="meta-label">Date & Time</span>
-            <span class="meta-value"><%= new Date(booking.booking.date).toLocaleDateString('en-GB') %> • <%= new Date(booking.booking.date).toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase() %></span>
-          </div>
+
         </div>
       </div>
     </div>
@@ -671,12 +709,49 @@
             minute: '2-digit', 
             hour12: true 
           }).toLowerCase();
+
+           // Check if ALL winning tickets in this group have status = "PAID"
+  const hasWinningTickets = group.tickets.some(ticket => ticket.isWon);
+  const allWinningTicketsPaid = hasWinningTickets && 
+    group.tickets.every(ticket => {
+      // If ticket is won, check if status is "PAID"
+      if (ticket.isWon) {
+        return ticket.status === "PAID";
+      }
+      // If ticket is not won, it doesn't affect the condition
+      return true;
+    });
+
         %>
-          <div class="lottery-card">
+          <div class="lottery-card" style="position: relative;">
+            <% if (allWinningTicketsPaid) { %>
+           
+              <div class="redeemedSticker" style="
+  /* background: url('/images/redeemConfirm.png'); */
+  height: 120px;
+  width: 260px;
+  border-radius: 10px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-34deg); /* Rotate entire container */
+  transform-origin: center center;
+  z-index: 99;
+  overflow: hidden;">
+  
+  
+  <!-- Sticker image -->
+  <img class="redeemStickerImg" src="/images/redeemConfirm5.png" style="
+    height: 100%;
+    width: 100%;">
+</div>
+
+            <!--  -->
+            <% } %>
             <div class="lottery-header">
               <h3 class="lottery-name"><%= group.lottery.name %></h3>
               <div class="lottery-details">
-                <span><%= formattedDate %> at <%= formattedTime %></span>
+                <span><%= moment(group.lottery.drawDate).tz('Asia/Dubai').format('DD/MM/YYYY') %> at <%= moment(group.lottery.drawDate).tz('Asia/Dubai').format('hh:mm A') %></span>
                 <span>Draw #<%= group.lottery.drawNumber %></span>
                 <span><%= group.tickets.length %> Ticket<%= group.tickets.length > 1 ? 's' : '' %></span>
               </div>
@@ -764,8 +839,6 @@
           </svg>
           Back to Result Page
         </button>
-
-
       </div>
     </div>
   </div>
@@ -791,7 +864,7 @@
         text: qrData,
         width: 180,
         height: 180,
-        colorDark: "#1e3a5f",
+        colorDark: "#000000",
         colorLight: "#ffffff",
         correctLevel: QRCode.CorrectLevel.H
       });

@@ -20,7 +20,7 @@ var app = express();
 //custom
 const session = require('express-session');
 app.use(session({
-  secret: 'your-secret-key',
+  secret: 'your-secret-key3',
   resave: false,
   saveUninitialized: true,
   cookie: { secure: false } // set to true only with HTTPS
