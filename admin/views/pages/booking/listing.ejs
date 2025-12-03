@@ -341,6 +341,7 @@
             if (result.success) {
                 showToast('Booking removed successfully', 'success');
                 document.querySelector('[data-booking-id="' + bookingId + '"]').remove()
+                document.querySelector('[detailed-tableRow-id="' + bookingId + '"]').remove()
             } else {
                 throw new Error(result.message || 'Failed to remove booking');
             }
@@ -1868,7 +1869,7 @@ body {
             // Child tickets row
             if (isExpanded) {
                 html += `
-                    <tr class="child-tickets-row show">
+                    <tr class="child-tickets-row show" detailed-tableRow-id="${booking._id}">
                         <td colspan="9" class="child-tickets-cell">
                             <div class="child-tickets-container">
                                 <div class="child-tickets-title">
