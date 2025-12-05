@@ -77,7 +77,11 @@ router.get('/booking', async function (req, res, next) {
 })
 
 router.get('/api/lotteries', async function (req, res, next) {
-  await indexFun.getLotteriesForApi(req, res)
+  await indexFun.getActiveLotteries(req, res)
+})
+
+router.get('/api/active-lotteries', async function (req, res, next) {
+  await indexFun.getActiveLotteries(req, res)
 })
 
 router.get('/api/booking/ticket-charges', async function (req, res, next) {

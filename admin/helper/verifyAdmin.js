@@ -5,13 +5,13 @@ const moment = require("moment-timezone");
 const verifyAdmin = async (req, res, next) => {
   try {
     console.log(req.session.admin);
-    // req.session.admin = {
-    //   id: '68f73081f178cb613258b21e',
+     req.session.admin = {
+        id: '69311b0220bbe0753e43c865',
     //   name: 'Riju',
     //   email: 'riju@gmail.com',
     //   phone: '+975111112345',
     //   roll: 'admin'
-    // }// For testing purposes, remove this line in production
+     }// For testing purposes, remove this line in production
     if (req.session.admin && req.session.admin.id) {
       let admin = await Admin.findById(req.session.admin.id);
       if (!admin) {

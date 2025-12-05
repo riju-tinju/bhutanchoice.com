@@ -1,6 +1,8 @@
 const Lottery = require("../model/lotterySchema"); // Your model
 const Charge = require("../model/ticketChargeSchema"); // Your model
 const Booking = require("../model/bookingsSchema"); // Your model
+const ticketCharge = require("../model/ticketChargeSchema");
+
 mongoose = require("mongoose");
 const PDFDocument = require("pdfkit");
 const moment = require("moment-timezone");
@@ -1198,7 +1200,7 @@ if (lottery.winners && lottery.winners.length > 0) {
       });
     }
   },
-  getLotteriesForApi: async (req, res) => {
+  getLotteriesForApiOrg: async (req, res) => {
     try {
       // Extract query parameters for filtering
       const {
@@ -1247,7 +1249,7 @@ if (lottery.winners && lottery.winners.length > 0) {
           name: lottery.name,
           name2: lottery.name2,
           drawNumber: lottery.drawNumber,
-          drawDate: lottery.drawDate,
+          drawDate: moment(lottery.drawDate).tz('Asia/Dubai').format('DD/MM/YYYY HH:mm'),
           prizes: lottery.prizes.map((prize) => ({
             rank: prize.rank,
             amount: prize.amount,
@@ -1289,6 +1291,196 @@ if (lottery.winners && lottery.winners.length > 0) {
       });
     }
   },
+  getActiveLotteries: async (req, res) => {
+  try {
+    // Get current Dubai time
+    const moment = require('moment-timezone');
+    const now = moment().tz('Asia/Dubai');
+    const todayStart = now.clone().startOf('day').toDate();
+    const todayEnd = now.clone().endOf('day').toDate();
+
+    // 1. Find parent lotteries where drawDate is today (Dubai date)
+    const parentLotteries = await Lottery.find({
+      drawDate: {
+        $gte: todayStart,
+        $lte: todayEnd
+      }
+    })
+    .sort({ drawDate: 1 }) // Sort by drawDate ascending
+    .lean();
+
+    if (parentLotteries.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No active lotteries found for today",
+        activeLotteries: [],
+        currentLottery: null
+      });
+    }
+
+    // 2. Process each parent lottery to find next child lottery
+    const activeLotteries = [];
+
+    parentLotteries.forEach(parentLottery => {
+      if (!parentLottery.winners || parentLottery.winners.length === 0) {
+        // If no child lotteries (draw times), use parent as default
+        activeLotteries.push({
+          _id: `${parentLottery._id}_main`,
+          parentId: parentLottery._id,
+          name: parentLottery.name,
+          name2: parentLottery.name2,
+          drawNumber: parentLottery.drawNumber,
+          drawDate: parentLottery.drawDate,
+          drawTime: 'Main Draw',
+          drawTimeId: 'main',
+          drawTimeDisplay: 'Main Draw',
+          drawTimeData: null,
+          nextDrawTime: parentLottery.drawDate,
+          isNext: true,
+          parentLottery: parentLottery
+        });
+        return;
+      }
+
+      // 3. Find the next child lottery based on resultTime
+      let nextChild = null;
+      let minTimeDiff = Infinity;
+
+      parentLottery.winners.forEach((winner, index) => {
+        if (!winner.resultTime) return;
+
+        const resultTime = moment(winner.resultTime).tz('Asia/Dubai');
+        const timeDiff = resultTime.diff(now); // milliseconds until draw
+
+        // Find the next upcoming draw (timeDiff > 0 means future)
+        if (timeDiff > 0 && timeDiff < minTimeDiff) {
+          minTimeDiff = timeDiff;
+          nextChild = {
+            winner,
+            index,
+            resultTime,
+            timeDiff
+          };
+        }
+      });
+
+      if (nextChild) {
+        // Found a future draw time
+        const drawTimeName = `Draw Time ${nextChild.index + 1}`;
+        const drawTimeDisplay = nextChild.resultTime.format('hh:mm A');
+        
+        activeLotteries.push({
+          _id: `${parentLottery._id}_${nextChild.winner._id}`,
+          parentId: parentLottery._id,
+          name: parentLottery.name,
+          name2: parentLottery.name2,
+          drawNumber: parentLottery.drawNumber,
+          drawDate: parentLottery.drawDate,
+          drawTime: drawTimeName,
+          drawTimeId: nextChild.winner._id,
+          drawTimeDisplay: drawTimeDisplay,
+          drawTimeData: nextChild.winner,
+          nextDrawTime: nextChild.resultTime.toDate(),
+          timeUntilDraw: nextChild.timeDiff, // milliseconds until draw
+          isNext: true,
+          parentLottery: parentLottery
+        });
+      } else {
+        // No future draws found, get the most recent past draw
+        const lastChild = parentLottery.winners.reduce((latest, winner, index) => {
+          if (!winner.resultTime) return latest;
+          const resultTime = moment(winner.resultTime).tz('Asia/Dubai');
+          return (resultTime > latest.resultTime) ? { winner, index, resultTime } : latest;
+        }, { winner: null, index: 0, resultTime: moment(0) });
+
+        if (lastChild.winner) {
+          const drawTimeName = `Draw Time ${lastChild.index + 1}`;
+          const drawTimeDisplay = lastChild.resultTime.format('hh:mm A');
+          
+          activeLotteries.push({
+            _id: `${parentLottery._id}_${lastChild.winner._id}`,
+            parentId: parentLottery._id,
+            name: parentLottery.name,
+            name2: parentLottery.name2,
+            drawNumber: parentLottery.drawNumber,
+            drawDate: parentLottery.drawDate,
+            drawTime: drawTimeName,
+            drawTimeId: lastChild.winner._id,
+            drawTimeDisplay: drawTimeDisplay,
+            drawTimeData: lastChild.winner,
+            nextDrawTime: lastChild.resultTime.toDate(),
+            timeUntilDraw: lastChild.resultTime.diff(now), // negative for past
+            isNext: false, // This is a past draw
+            parentLottery: parentLottery
+          });
+        }
+      }
+    });
+
+    // 4. Sort active lotteries by nextDrawTime (closest first)
+    activeLotteries.sort((a, b) => {
+      return new Date(a.nextDrawTime) - new Date(b.nextDrawTime);
+    });
+
+    // 5. Mark the first one as current/primary
+    if (activeLotteries.length > 0) {
+      activeLotteries[0].isCurrent = true;
+    }
+
+    // 6. Also get ticket charges for pricing
+    const ticketCharges = await ticketCharge.find()
+      .sort({ ticketType: -1 }) // Type 5 first, then 4, etc.
+      .lean();
+
+    // Format ticket charges as a map for easy lookup
+    const ticketChargesMap = {};
+    ticketCharges.forEach(charge => {
+      ticketChargesMap[charge.ticketType] = charge.chargeAmount;
+    });
+
+    // 7. Prepare response
+    const response = {
+      success: true,
+      activeLotteries: activeLotteries.map(lottery => ({
+        _id: lottery._id,
+        parentId: lottery.parentId,
+        name: lottery.name,
+        name2: lottery.name2,
+        drawNumber: lottery.drawNumber,
+        drawDate: moment(lottery.drawDate).tz('Asia/Dubai').format('DD/MM/YYYY'),
+        drawTime: lottery.drawTime,
+        drawTimeId: lottery.drawTimeId,
+        drawTimeDisplay: lottery.drawTimeDisplay,
+        nextDrawTime: moment(lottery.nextDrawTime).tz('Asia/Dubai').format('DD/MM/YYYY hh:mm A'),
+        timeUntilDraw: lottery.timeUntilDraw,
+        isCurrent: lottery.isCurrent || false,
+        isNext: lottery.isNext,
+        prizes: lottery.parentLottery.prizes || [],
+        // Include original winner data if needed
+        winner: lottery.drawTimeData ? {
+          _id: lottery.drawTimeData._id,
+          resultTime: moment(lottery.drawTimeData.resultTime).tz('Asia/Dubai').format('DD/MM/YYYY hh:mm A'),
+          winNumbers: lottery.drawTimeData.winNumbers || []
+        } : null
+      })),
+      currentLottery: activeLotteries.length > 0 ? activeLotteries[0] : null,
+      ticketCharges: ticketChargesMap,
+      serverTime: now.format('DD/MM/YYYY hh:mm A'),
+      serverTimezone: 'Asia/Dubai'
+    };
+
+    res.status(200).json(response);
+
+  } catch (err) {
+    console.error("Error fetching active lotteries:", err);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to retrieve active lotteries",
+      error: process.env.NODE_ENV === "development" ? err.message : "Internal server error"
+    });
+  }
+},
   getAllTicketCharges: async (req, res) => {
     try {
       let charges = await Charge.find({}).sort({ ticketType: 1 })

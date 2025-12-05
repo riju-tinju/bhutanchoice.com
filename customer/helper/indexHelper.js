@@ -120,7 +120,7 @@ const indexHelper = {
       let filteredUpcoming = [];
       if (upcoming.length > 0) filteredUpcoming.push(upcoming[0]);
 
-      return res.render("index", {
+      return res.status(200).render("index", {
         todays,
         upcoming: filteredUpcoming,
         past: limitedPast,

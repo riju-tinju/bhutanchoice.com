@@ -1,5 +1,6 @@
 const Lottery = require("../model/lotterySchema");
 const Charge = require("../model/ticketChargeSchema");
+const ticketCharge = require("../model/ticketChargeSchema");
 const Booking = require("../model/bookingsSchema");
 const Agent = require("../model/agentSchema");
 const mongoose = require("mongoose");
@@ -598,7 +599,7 @@ const bookingHelper = {
       ];
 
       const childLotteries = await Lottery.aggregate(pipeline);
-
+      console.log('Child Lotteries:\n', childLotteries);
       return {
         success: true,
         childLotteries: childLotteries
@@ -671,7 +672,7 @@ const bookingHelper = {
   },
 
   // Create new booking
-  createBooking: async (bookingData, req, res) => {
+  createBookingOrg: async (bookingData, req, res) => {
     try {
       // Generate unique ticket number
       const ticketNumber = await bookingHelper.generateUniqueTicketNumber();
@@ -779,6 +780,658 @@ const bookingHelper = {
     }
   },
 
+  // Create new booking
+  createBookingjj: async (bookingData, req, res) => {
+    try {
+      // Validate required fields
+      if (!bookingData.customer || !bookingData.customer.name || !bookingData.customer.phone) {
+        return res.status(400).json({
+          success: false,
+          message: "Customer name and phone are required",
+          data: null
+        });
+      }
+
+      if (!bookingData.tickets || !Array.isArray(bookingData.tickets) || bookingData.tickets.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: "At least one ticket is required",
+          data: null
+        });
+      }
+
+      // Generate unique ticket number
+      const ticketNumber = await bookingHelper.generateUniqueTicketNumber();
+
+      // Process tickets with validation
+      const processedTickets = [];
+      let subtotal = 0;
+      let validationErrors = [];
+
+      for (const [index, ticket] of bookingData.tickets.entries()) {
+        try {
+          // Validate required ticket fields
+          if (!ticket.number || !ticket.type || !ticket.lottery || !ticket.lottery.id) {
+            validationErrors.push(`Ticket ${index + 1}: Number, type, and lottery ID are required`);
+            continue;
+          }
+
+          // Validate ticket type
+          if (ticket.type < 1 || ticket.type > 5) {
+            validationErrors.push(`Ticket ${index + 1}: Invalid ticket type ${ticket.type}. Must be 1-5`);
+            continue;
+          }
+
+          // Get lottery
+          const lottery = await Lottery.findById(ticket.lottery.id);
+          if (!lottery) {
+            validationErrors.push(`Ticket ${index + 1}: Lottery not found: ${ticket.lottery.id}`);
+            continue;
+          }
+
+          // Get ticket charge for this type
+          const chargeRecord = await ticketCharge.findOne({ ticketType: ticket.type });
+          if (!chargeRecord) {
+            validationErrors.push(`Ticket ${index + 1}: No price found for type ${ticket.type}`);
+            continue;
+          }
+
+          // Validate timeId (draw time)
+          let timeId = ticket.lottery.timeId || 'main';
+          let drawDate = lottery.drawDate; // Default to parent lottery draw date
+
+          if (timeId !== 'main') {
+            const childLottery = lottery.winners.find(w => w._id.toString() === timeId.toString());
+            if (!childLottery) {
+              validationErrors.push(`Ticket ${index + 1}: Draw time not found: ${timeId}`);
+              continue;
+            }
+            drawDate = childLottery.resultTime || drawDate;
+          }
+
+          // // Check for duplicate ticket in database
+          // const existingTicket = await Booking.findOne({
+          //   'tickets.lottery.id': lottery._id,
+          //   'tickets.lottery.timeId': timeId,
+          //   'tickets.number': ticket.number,
+          //   'tickets.type': ticket.type
+          // });
+
+          // if (existingTicket) {
+          //   validationErrors.push(`Ticket "${ticket.number}" (Type ${ticket.type}) already exists for this lottery`);
+          //   continue;
+          // }
+
+          // Create ticket entries based on quantity
+          const quantity = ticket.quantity || 1;
+          if (quantity < 1 || quantity > 99) {
+            validationErrors.push(`Ticket ${index + 1}: Quantity must be 1-99`);
+            continue;
+          }
+
+          for (let i = 0; i < quantity; i++) {
+            const uniqueNumberId = `${ticket.number}-${Date.now()}-${Math.random().toString(36).substr(2, 4)}-${i}`;
+
+            processedTickets.push({
+              lottery: {
+                id: lottery._id,
+                name: lottery.name,
+                drawNumber: lottery.drawNumber,
+                drawDate: drawDate,
+                timeId: timeId
+              },
+              numberId: uniqueNumberId,
+              isWon: false,
+              number: ticket.number,
+              type: ticket.type,
+              quantity: 1, // Each entry is quantity 1
+              chargeAmount: chargeRecord.chargeAmount,
+              status: "NOT_WINNER"
+            });
+
+            subtotal += chargeRecord.chargeAmount;
+          }
+        } catch (error) {
+          validationErrors.push(`Ticket ${index + 1}: ${error.message}`);
+        }
+      }
+
+      // Check for validation errors
+      if (validationErrors.length > 0) {
+        return res.status(400).json({
+          success: false,
+          message: "Ticket validation failed",
+          errors: validationErrors,
+          data: null
+        });
+      }
+
+      if (processedTickets.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: "No valid tickets to book",
+          data: null
+        });
+      }
+
+      // Get agent info from session
+      const agent = {
+        name: req.session?.admin?.name || 'NA',
+        id: req.session?.admin?.id || null,
+        phone: req.session?.admin?.phone || 'N/A',
+        role: req.session?.admin?.role || ['admin']
+      };
+
+      // Create booking object
+      const newBooking = new Booking({
+        ticketNumber: ticketNumber,
+        customer: {
+          name: bookingData.customer.name.trim(),
+          phone: bookingData.customer.phone.trim()
+        },
+        agent: agent,
+        booking: {
+          date: new Date(),
+          status: 'active'
+        },
+        tickets: processedTickets,
+        financial: {
+          quantity: processedTickets.reduce((accumulator, ticketItem) => {
+            return accumulator + ticketItem.quantity;
+          }, 0),
+          subtotal: subtotal,
+          tax: 0,
+          totalAmount: subtotal,
+          currency: "NU"
+        },
+        payment: bookingData.payment || {
+          method: 'cash',
+          status: 'paid',
+          reference: `PAY-${Date.now()}`
+        }
+      });
+
+      // Save booking
+      const savedBooking = await newBooking.save();
+
+      // Add displayId virtual field
+      const bookingObj = savedBooking.toObject();
+      bookingObj.displayId = `TKT-${savedBooking.ticketNumber}`;
+
+      return res.status(201).json({
+        success: true,
+        message: "Booking created successfully",
+        data: {
+          ticketNumber: savedBooking.ticketNumber,
+          displayId: bookingObj.displayId,
+          customer: savedBooking.customer,
+          totalAmount: savedBooking.financial.totalAmount,
+          totalTickets: processedTickets.length,
+          bookingDate: savedBooking.booking.date
+        }
+      });
+
+    } catch (error) {
+      console.error('Error in createBooking:', error);
+
+      // Handle specific error types
+      if (error.name === 'ValidationError') {
+        const errors = Object.values(error.errors).map(err => err.message);
+        return res.status(400).json({
+          success: false,
+          message: "Validation failed",
+          errors: errors,
+          data: null
+        });
+      }
+
+      if (error.code === 11000) {
+        return res.status(400).json({
+          success: false,
+          message: "Duplicate ticket number detected",
+          data: null
+        });
+      }
+
+      return res.status(500).json({
+        success: false,
+        message: "An error occurred while creating booking",
+        data: null,
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  },
+  createBookingLast: async (bookingData, req, res) => {
+  try {
+    // Validate required fields
+    if (!bookingData.customer || !bookingData.customer.name || !bookingData.customer.phone) {
+      return res.status(400).json({
+        success: false,
+        message: "Customer name and phone are required",
+        data: null
+      });
+    }
+
+    if (!bookingData.tickets || !Array.isArray(bookingData.tickets) || bookingData.tickets.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "At least one ticket is required",
+        data: null
+      });
+    }
+
+    // Generate unique ticket number
+    const ticketNumber = await bookingHelper.generateUniqueTicketNumber();
+
+    // Process tickets with validation
+    const processedTickets = [];
+    let subtotal = 0;
+    let totalQuantity = 0;
+    let validationErrors = [];
+
+    for (const [index, ticket] of bookingData.tickets.entries()) {
+      try {
+        // Validate required ticket fields
+        if (!ticket.number || !ticket.type || !ticket.lottery || !ticket.lottery.id) {
+          validationErrors.push(`Ticket ${index + 1}: Number, type, and lottery ID are required`);
+          continue;
+        }
+
+        // Validate ticket type
+        if (ticket.type < 1 || ticket.type > 5) {
+          validationErrors.push(`Ticket ${index + 1}: Invalid ticket type ${ticket.type}. Must be 1-5`);
+          continue;
+        }
+
+        // Get lottery
+        const lottery = await Lottery.findById(ticket.lottery.id);
+        if (!lottery) {
+          validationErrors.push(`Ticket ${index + 1}: Lottery not found: ${ticket.lottery.id}`);
+          continue;
+        }
+
+        // Get ticket charge for this type
+        const chargeRecord = await ticketCharge.findOne({ ticketType: ticket.type });
+        if (!chargeRecord) {
+          validationErrors.push(`Ticket ${index + 1}: No price found for type ${ticket.type}`);
+          continue;
+        }
+
+        // Validate timeId (draw time)
+        let timeId = ticket.lottery.timeId || 'main';
+        let drawDate = lottery.drawDate; // Default to parent lottery draw date
+
+        if (timeId !== 'main') {
+          const childLottery = lottery.winners.find(w => w._id.toString() === timeId.toString());
+          if (!childLottery) {
+            validationErrors.push(`Ticket ${index + 1}: Draw time not found: ${timeId}`);
+            continue;
+          }
+          drawDate = childLottery.resultTime || drawDate;
+        }
+
+        // Validate quantity
+        const quantity = ticket.quantity || 1;
+        if (quantity < 1 || quantity > 99) {
+          validationErrors.push(`Ticket ${index + 1}: Quantity must be 1-99`);
+          continue;
+        }
+
+        // Generate unique numberId for this ticket entry
+        const uniqueNumberId = `${ticket.number}-${Date.now()}-${Math.random().toString(36).substr(2, 8)}`;
+
+        // Create single ticket entry with quantity
+        processedTickets.push({
+          lottery: {
+            id: lottery._id,
+            name: lottery.name,
+            drawNumber: lottery.drawNumber,
+            drawDate: drawDate,
+            timeId: timeId
+          },
+          numberId: uniqueNumberId,
+          isWon: false,
+          number: ticket.number,
+          type: ticket.type,
+          quantity: quantity, // Single entry with quantity field
+          chargeAmount: chargeRecord.chargeAmount * quantity,
+          status: "NOT_WINNER"
+        });
+
+        // Calculate total price for this ticket (price × quantity)
+        const ticketTotal = chargeRecord.chargeAmount * quantity;
+        subtotal += ticketTotal;
+        totalQuantity += quantity;
+
+      } catch (error) {
+        validationErrors.push(`Ticket ${index + 1}: ${error.message}`);
+      }
+    }
+
+    // Check for validation errors
+    if (validationErrors.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Ticket validation failed",
+        errors: validationErrors,
+        data: null
+      });
+    }
+
+    if (processedTickets.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No valid tickets to book",
+        data: null
+      });
+    }
+
+    // Get agent info from session
+    const agent = {
+      name: req.session?.admin?.name || 'NA',
+      id: req.session?.admin?.id || null,
+      phone: req.session?.admin?.phone || 'N/A',
+      role: req.session?.admin?.role || ['admin']
+    };
+
+    // Create booking object
+    const newBooking = new Booking({
+      ticketNumber: ticketNumber,
+      customer: {
+        name: bookingData.customer.name.trim(),
+        phone: bookingData.customer.phone.trim()
+      },
+      agent: agent,
+      booking: {
+        date: new Date(),
+        status: 'active'
+      },
+      tickets: processedTickets,
+      financial: {
+        quantity: processedTickets.reduce((acc, ticket) => acc + ticket.quantity, 0), // Total quantity across all tickets
+        subtotal: subtotal,
+        tax: 0,
+        totalAmount: subtotal,
+        currency: "NU"
+      },
+      payment: bookingData.payment || {
+        method: 'cash',
+        status: 'paid',
+        reference: `PAY-${Date.now()}`
+      }
+    });
+
+    // Save booking
+    const savedBooking = await newBooking.save();
+
+    // Add displayId virtual field
+    const bookingObj = savedBooking.toObject();
+    bookingObj.displayId = `TKT-${savedBooking.ticketNumber}`;
+
+    return res.status(201).json({
+      success: true,
+      message: "Booking created successfully",
+      data: {
+        ticketNumber: savedBooking.ticketNumber,
+        displayId: bookingObj.displayId,
+        customer: savedBooking.customer,
+        totalAmount: savedBooking.financial.totalAmount,
+        totalTickets: processedTickets.length, // Number of unique ticket entries
+        totalQuantity: savedBooking.financial.quantity, // Total quantity across all tickets
+        bookingDate: savedBooking.booking.date
+      }
+    });
+
+  } catch (error) {
+    console.error('Error in createBooking:', error);
+
+    // Handle specific error types
+    if (error.name === 'ValidationError') {
+      const errors = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({
+        success: false,
+        message: "Validation failed",
+        errors: errors,
+        data: null
+      });
+    }
+
+    if (error.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: "Duplicate ticket number detected",
+        data: null
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while creating booking",
+      data: null,
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+},
+createBooking: async (bookingData, req, res) => {
+  try {
+    
+    // Validate required fields
+    if (!bookingData.customer || !bookingData.customer.name || !bookingData.customer.phone) {
+      return res.status(400).json({
+        success: false,
+        message: "Customer name and phone are required",
+        data: null
+      });
+    }
+
+    if (!bookingData.tickets || !Array.isArray(bookingData.tickets) || bookingData.tickets.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "At least one ticket is required",
+        data: null
+      });
+    }
+
+    // Generate unique ticket number
+    const ticketNumber = await bookingHelper.generateUniqueTicketNumber();
+
+    // Process tickets with validation
+    const processedTickets = [];
+    let subtotal = 0;
+    let totalQuantity = 0;
+    let validationErrors = [];
+
+    for (const [index, ticket] of bookingData.tickets.entries()) {
+      try {
+        // Validate required ticket fields
+        if (!ticket.number || !ticket.type || !ticket.lottery || !ticket.lottery.id) {
+          validationErrors.push(`Ticket ${index + 1}: Number, type, and lottery ID are required`);
+          continue;
+        }
+
+        // Validate ticket type
+        if (ticket.type < 1 || ticket.type > 5) {
+          validationErrors.push(`Ticket ${index + 1}: Invalid ticket type ${ticket.type}. Must be 1-5`);
+          continue;
+        }
+
+        // Get lottery
+        const lottery = await Lottery.findById(ticket.lottery.id);
+        if (!lottery) {
+          validationErrors.push(`Ticket ${index + 1}: Lottery not found: ${ticket.lottery.id}`);
+          continue;
+        }
+
+        // Get ticket charge for this type
+        const chargeRecord = await ticketCharge.findOne({ ticketType: ticket.type });
+        if (!chargeRecord) {
+          validationErrors.push(`Ticket ${index + 1}: No price found for type ${ticket.type}`);
+          continue;
+        }
+
+        // Validate timeId (draw time)
+        let timeId = ticket.lottery.timeId || 'main';
+        let drawDate = lottery.drawDate; // Default to parent lottery draw date
+
+        if (timeId !== 'main') {
+          const childLottery = lottery.winners.find(w => w._id.toString() === timeId.toString());
+          if (!childLottery) {
+            validationErrors.push(`Ticket ${index + 1}: Draw time not found: ${timeId}`);
+            continue;
+          }
+          drawDate = childLottery.resultTime || drawDate;
+        }
+
+        // Validate quantity
+        const quantity = ticket.quantity || 1;
+        if (quantity < 1 || quantity > 99) {
+          validationErrors.push(`Ticket ${index + 1}: Quantity must be 1-99`);
+          continue;
+        }
+
+        // Generate unique numberId for this ticket entry
+        const uniqueNumberId = `${ticket.number}-${Date.now()}-${Math.random().toString(36).substr(2, 8)}`;
+
+        // Calculate total charge for this ticket entry (per-ticket price × quantity)
+        const singleTicketCharge = chargeRecord.chargeAmount;
+        const totalTicketCharge = singleTicketCharge * quantity;
+
+        // Create single ticket entry with quantity
+        processedTickets.push({
+          lottery: {
+            id: lottery._id,
+            name: lottery.name,
+            drawNumber: lottery.drawNumber,
+            drawDate: drawDate,
+            timeId: timeId
+          },
+          numberId: uniqueNumberId,
+          isWon: false,
+          number: ticket.number,
+          type: ticket.type,
+          quantity: quantity, // Quantity for this ticket entry
+          chargeAmount: totalTicketCharge, // TOTAL charge for this ticket entry (quantity × per-ticket price)
+          status: "NOT_WINNER"
+        });
+
+        // Add to totals
+        subtotal += totalTicketCharge;
+        totalQuantity += quantity;
+
+      } catch (error) {
+        validationErrors.push(`Ticket ${index + 1}: ${error.message}`);
+      }
+    }
+
+    // Check for validation errors
+    if (validationErrors.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Ticket validation failed",
+        errors: validationErrors,
+        data: null
+      });
+    }
+
+    if (processedTickets.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No valid tickets to book",
+        data: null
+      });
+    }
+
+    // Get agent info from session
+    const agent = {
+      name: req.session?.admin?.name || 'NA',
+      id: req.session?.admin?.id || null,
+      phone: req.session?.admin?.phone || 'N/A',
+      role: req.session?.admin?.role || ['admin']
+    };
+
+    // Create booking object
+    const newBooking = new Booking({
+      ticketNumber: ticketNumber,
+      customer: {
+        name: bookingData.customer.name.trim(),
+        phone: bookingData.customer.phone.trim()
+      },
+      agent: agent,
+      booking: {
+        date: new Date(),
+        status: 'active'
+      },
+      tickets: processedTickets,
+      financial: {
+        quantity: totalQuantity, // Total quantity (sum of all ticket quantities)
+        subtotal: subtotal,
+        tax: 0,
+        totalAmount: subtotal,
+        currency: "NU"
+      },
+      payment: bookingData.payment || {
+        method: 'cash',
+        status: 'paid',
+        reference: `PAY-${Date.now()}`
+      }
+    });
+
+    console.log('Booking data:\n', bookingData);
+    console.log('Tickets data:\n', bookingData.tickets);
+    console.log('processedTickets Before saving the book :\n',processedTickets)
+    // Save booking
+    const savedBooking = await newBooking.save();
+    console.log('Saved Booking:\n', savedBooking);
+
+    // Add displayId virtual field
+    const bookingObj = savedBooking.toObject();
+    bookingObj.displayId = `TKT-${savedBooking.ticketNumber}`;
+
+    return res.status(201).json({
+      success: true,
+      message: "Booking created successfully",
+      data: {
+        ticketNumber: savedBooking.ticketNumber,
+        displayId: bookingObj.displayId,
+        customer: savedBooking.customer,
+        totalAmount: savedBooking.financial.totalAmount,
+        totalTickets: processedTickets.length, // Number of unique ticket entries
+        totalQuantity: savedBooking.financial.quantity, // Total quantity across all tickets
+        bookingDate: savedBooking.booking.date
+      }
+    });
+
+  } catch (error) {
+    console.error('Error in createBooking:', error);
+
+    // Handle specific error types
+    if (error.name === 'ValidationError') {
+      const errors = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({
+        success: false,
+        message: "Validation failed",
+        errors: errors,
+        data: null
+      });
+    }
+
+    if (error.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: "Duplicate ticket number detected",
+        data: null
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while creating booking",
+      data: null,
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+},
+
   // Generate unique ticket number
   generateUniqueTicketNumber: async () => {
     try {
@@ -860,7 +1513,7 @@ const bookingHelper = {
     }
   },
 
-  deleteBooking: async (bookingId,req,res) => {
+  deleteBooking: async (bookingId, req, res) => {
     try {
       if (!mongoose.Types.ObjectId.isValid(bookingId)) {
         throw new Error('Invalid booking ID format');
@@ -885,9 +1538,9 @@ const bookingHelper = {
     } catch (error) {
       console.log(error)
       return res.status(502).json({
-          success: false,
-          message: 'An Err Occured'
-        })
+        success: false,
+        message: 'An Err Occured'
+      })
     }
   },
 

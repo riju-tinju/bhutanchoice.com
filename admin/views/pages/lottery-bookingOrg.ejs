@@ -3,6 +3,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex">
   <title>Admin - Bhutan State Lotteries</title>
+   
 </head>
 <!-- Flexible Ticket Booking Page -->
 <div class="booking-container">
@@ -1162,8 +1163,7 @@
       bottom: auto;
       right: 20px;
       left: auto;
-      transform: translateX(130%);
-      /* transform: translateX(100%); */
+      transform: translateX(100%);
       max-width: 400px;
     }
 
@@ -1431,6 +1431,8 @@
       }
 
       const html = lotteriesData.map(lottery => `
+
+            
             <div class="lottery-option" onclick="selectParentLottery('${lottery._id}')">
                 <div class="lottery-option-header">
                     <div>
@@ -1744,14 +1746,67 @@
       }
     }
 
+    async function checkTicketNumberExists(ticketData) {
+      console.log('Checking ticket existence:', ticketData);
+      // return false;
+
+      try {
+        const response = await fetch('bookings/api/booking/check-ticket-existence', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(ticketData)
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to check ticket existence');
+        }
+
+        const data = await response.json();
+        return data; // Return true if ticket does NOT exist
+
+      } catch (error) {
+        showToast('Error checking ticket existence', 'error');
+        console.error('Error checking ticket existence:', error);
+        
+        return {"exists": false,
+        "success": false,
+        "message": "Error checking ticket existence"};
+      }
+
+    }
+
     // Add single ticket
-    function addSingleTicket() {
+    async function addSingleTicket() {
       const ticketNumber = document.getElementById('ticketNumberInput').value.trim().toUpperCase();
 
       if (!ticketNumber || !selectedParentLottery || !selectedChildLottery || !selectedTicketType) {
         showToast('Please complete all selections before adding ticket', 'error');
         return;
       }
+
+      let ticketData = {
+        number: ticketNumber,
+        lotteryId: selectedParentLottery._id,
+        timeId: selectedChildLottery._id,
+        type: selectedTicketType.type
+      };
+
+      // let isNumberExistData=await checkTicketNumberExists(ticketData);
+
+      // if(!isNumberExistData){
+      //   showToast('An error occured', 'error');
+      //   return;
+      // }
+      // if(isNumberExistData.success==false){
+      //   showToast('An error occured.. Try another number', 'error');
+      //   return;
+      // }
+      // if (isNumberExistData.exists) {
+      //   showToast('Ticket number already exists in the system. Please choose a different number.', 'error');
+      //   return;
+      // }
 
       const ticket = {
         id: generateTicketId(),
@@ -2163,7 +2218,7 @@
           resetAllData();
         }, 2000);
 
-        await downloadBookingReceipt(bookRes.data.ticketNumber);
+        await gotoReceipt(bookRes.data.ticketNumber);
 
       } catch (error) {
         console.error('Error confirming booking:', error);
@@ -2205,8 +2260,9 @@
             uniqueDrawTimes: new Set(addedTickets.map(t => `${t.lottery.id}_${t.lottery.timeId}`)).size
           }
         };
-
-        const response = await fetch('bookings/api/bookings', {
+        console.log('Booking Data:\n', bookingData);
+        return null
+        const response = await fetch('/bookings/api/bookings', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -2218,7 +2274,7 @@
           const errorData = await response.json();
           throw new Error(errorData.message || 'Failed to create booking');
         }
-
+        
         const result = await response.json();
         return result;
 
@@ -2228,46 +2284,15 @@
       }
     }
 
-    async function downloadBookingReceipt(ticketNumber) {
-      try {
-        const response = await fetch(`/api/receipt/${ticketNumber}`, {
-          method: 'GET'
-        });
-
-        if (!response.ok) {
-          throw new Error(`Failed to download receipt: ${response.statusText}`);
-        }
-
-        // Convert response to Blob (PDF)
-        const blob = await response.blob();
-
-        // Create a download link
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-
-        // Try to get filename from response header
-        const disposition = response.headers.get("Content-Disposition");
-        let fileName = `receipt-${ticketNumber}.pdf`;
-        if (disposition && disposition.includes("filename=")) {
-          fileName = disposition
-            .split("filename=")[1]
-            .replace(/['"]/g, "")
-            .trim();
-        }
-        a.download = fileName;
-
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        window.URL.revokeObjectURL(url);
-
-        showToast('Receipt downloaded successfully!', 'success');
-      } catch (error) {
-        console.error('Error downloading receipt:', error);
-        showToast('Error: ' + error.message, 'error');
-      }
-    }
+    
+    function gotoReceipt(ticketNumber) {
+  // Simulate a delay before navigation
+  setTimeout(() => {
+    console.log(`Navigating to receipt for ticket: ${ticketNumber}`);
+    location.href = `<%= url %>/receipt/${ticketNumber}`;
+    // No resolve/reject needed, as the script stops here
+  }, 1000);
+}
     // Reset all data
     function resetAllData() {
       // Reset customer info

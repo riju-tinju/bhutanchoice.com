@@ -109,6 +109,11 @@ const ticketSchema = new Schema({
         min: 1,
         max: 5
       },
+      quantity:{
+        type: Number,
+        required: true,
+        min: 1
+      },
       chargeAmount: {
         type: Number,
         required: true,
@@ -146,8 +151,8 @@ const ticketSchema = new Schema({
     },
     currency: {
       type: String,
-      default: "USD",
-      enum: ["USD", "EUR", "GBP", "INR", "LKR"],
+      default: "NU",
+      enum: ["NU", "EUR", "GBP", "INR", "LKR"],
       uppercase: true,
       trim: true
     }
@@ -185,7 +190,8 @@ ticketSchema.virtual("displayId").get(function () {
 // Pre-save hook: auto-calculate quantity, subtotal, and totalAmount
 ticketSchema.pre("save", function (next) {
   if (this.tickets && this.tickets.length > 0) {
-    this.financial.quantity = this.tickets.length;
+    // Sum of all ticket quantities, not just count of ticket entries
+    this.financial.quantity = this.tickets.reduce((sum, t) => sum + (t.quantity || 0), 0);
     this.financial.subtotal = this.tickets.reduce((sum, t) => sum + (t.chargeAmount || 0), 0);
     this.financial.totalAmount = this.financial.subtotal + (this.financial.tax || 0);
   }
