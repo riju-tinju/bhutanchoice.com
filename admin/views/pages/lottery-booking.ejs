@@ -960,7 +960,7 @@
     <!-- Summary Section -->
     <section class="form-section" id="summarySection" style="display: none;">
       <div class="summary-grid">
-        <div class="summary-item">
+        <div class="summary-item" style="display: none;">
           <span class="summary-label">Total Tickets</span>
           <span class="summary-value" id="totalTickets">0</span>
         </div>
@@ -1426,13 +1426,30 @@
         
         elements.lotteryName.textContent = lottery.name;
         elements.drawNumber.textContent = `#${lottery.drawNumber}`;
-        elements.drawDate.textContent = lottery.drawDate.toLocaleString('en-IN', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-        timeZone: 'Asia/Dubai'
-      });
-        elements.nextDrawTime.textContent = lottery.nextDrawTime;
+        // elements.drawDate.textContent = lottery.drawDate
+        // 1. Convert the ISO string into a Date object
+const drawDateObject = new Date(lottery.drawDate);
+
+// 2. Use the Date object's toLocaleString method for formatting
+elements.drawDate.textContent = drawDateObject.toLocaleDateString('en-IN', {
+  day: '2-digit',
+  month: 'long',
+  year: 'numeric',
+  timeZone: 'Asia/Dubai'
+});
+// .toLocaleString('en-IN', {
+//     hour: 'numeric',
+//     minute: '2-digit',
+//     hour12: true,
+//     timeZone: 'Asia/Dubai'
+// });
+        const drawTimeObject = new Date(lottery.nextDrawTime);
+        elements.nextDrawTime.textContent = drawTimeObject.toLocaleString('en-IN', {
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true,
+          timeZone: 'Asia/Dubai'
+        });
 
         // Update banner color based on draw status
         if (lottery.isNext && lottery.timeUntilDraw > 0) {
