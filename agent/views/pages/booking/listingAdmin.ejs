@@ -283,7 +283,7 @@
           <label class="form-label">Booking Status</label>
           <select id="newBookingStatus" class="form-select">
             <option value="PAID" selected >Paid</option>
-            <option value="IN_AGENT">IN_AGENT</option>
+            <option value="UNPAID">UNPAID</option>
           </select>
         </div>
       </form>
@@ -1841,8 +1841,8 @@ body {
                                 <div class="child-ticket-value">${formatDateTime(ticket.lottery.drawDate)}</div>
                             </div>
                             <div class="child-ticket-detail">
-                                <div class="child-ticket-label">Type</div>
-                                <div class="child-ticket-value">Type ${ticket.type}</div>
+                                <div class="child-ticket-label">Qty</div>
+                                <div class="child-ticket-value">${ticket.quantity}</div>
                             </div>
 
                             <div class="child-ticket-detail">
@@ -1854,7 +1854,7 @@ body {
                                 <div class="child-ticket-label">Amount</div>
                                 <div class="child-ticket-value">Nu. ${ticket.chargeAmount.toLocaleString()}</div>
                             </div>
-                            ${ticket.isWon && (ticket.status === 'PAID' || ticket.status === 'IN_AGENT') ?
+                            ${ticket.isWon && (ticket.status === 'PAID' || ticket.status === 'UNPAID') ?
                             `<button type="button" class="btn btn-warning btn-sm btn-icon" onclick="openDirectStatusModal('${booking._id}','${ticket.lottery.timeId}','${ticket.number}','${ticket.numberId}')" title="Update Status" style="max-width:120px;">
                                 <i class="fas fa-edit" ></i>
                                 Edit status

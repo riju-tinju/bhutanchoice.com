@@ -1,431 +1,432 @@
 const Lottery = require("../model/lotterySchema");
 const Charge = require("../model/ticketChargeSchema");
+const ticketCharge = require("../model/ticketChargeSchema");
 const Booking = require("../model/bookingsSchema");
 const Agent = require("../model/agentSchema");
 const mongoose = require("mongoose");
 const moment = require("moment-timezone");
 
 const bookingHelper = {
-  
-  getBookingsWithFilters: async (queryParams,req) => {
-      try {
-        const {
-          page = 1,
-          limit = 25,
-          customerSearch,
-          fromDateTime,
-          toDateTime,
-          childLotteryId,
-          agentId,
-          status,
-          sort = 'booking.date_desc',
-          win
-        } = queryParams;
-  
-        // Build match conditions
-        const matchConditions = {};
 
-        matchConditions["agent.id"]= new mongoose.Types.ObjectId(req.session.agent.id);
-  
-        // Customer search (name or phone)
-        if (customerSearch && customerSearch.trim()) {
-          matchConditions.$or = [
-            { "customer.name": { $regex: customerSearch.trim(), $options: 'i' } },
-            { "customer.phone": { $regex: customerSearch.trim(), $options: 'i' } }
-          ];
+  getBookingsWithFilters: async (queryParams, req) => {
+    try {
+      const {
+        page = 1,
+        limit = 25,
+        customerSearch,
+        fromDateTime,
+        toDateTime,
+        childLotteryId,
+        agentId,
+        status,
+        sort = 'booking.date_desc',
+        win
+      } = queryParams;
+
+      // Build match conditions
+      const matchConditions = {};
+
+      matchConditions["agent.id"] = new mongoose.Types.ObjectId(req.session.agent.id);
+
+      // Customer search (name or phone)
+      if (customerSearch && customerSearch.trim()) {
+        matchConditions.$or = [
+          { "customer.name": { $regex: customerSearch.trim(), $options: 'i' } },
+          { "customer.phone": { $regex: customerSearch.trim(), $options: 'i' } }
+        ];
+      }
+
+
+
+      // Date range filter
+      if (fromDateTime || toDateTime) {
+        matchConditions["booking.date"] = {};
+        if (fromDateTime) {
+          matchConditions["booking.date"].$gte = new Date(fromDateTime);
         }
-  
-  
-  
-        // Date range filter
-        if (fromDateTime || toDateTime) {
-          matchConditions["booking.date"] = {};
-          if (fromDateTime) {
-            matchConditions["booking.date"].$gte = new Date(fromDateTime);
-          }
-          if (toDateTime) {
-            matchConditions["booking.date"].$lte = new Date(toDateTime);
-          }
+        if (toDateTime) {
+          matchConditions["booking.date"].$lte = new Date(toDateTime);
         }
-  
-        // Child lottery filter
-        if (childLotteryId && childLotteryId.trim()) {
-          matchConditions["tickets.lottery.timeId"] = childLotteryId
+      }
+
+      // Child lottery filter
+      if (childLotteryId && childLotteryId.trim()) {
+        matchConditions["tickets.lottery.timeId"] = childLotteryId
+      }
+
+      // Status filter
+      if (status && status.trim()) {
+        if (status === "ALL") {
+          // If status is ALL, we don't need to filter by status
         }
-  
-        // Status filter
-        if (status && status.trim()) {
-          if(status ==="ALL"){
-            // If status is ALL, we don't need to filter by status
-          }
-          else if (status === "PAID" || status === "UNPAID")
-            matchConditions["tickets.status"] = status;
-          else if (status === "NOT_WINNER") {
-            // Get documents where ALL tickets have status "NOT_WINNER"
-            // AND exclude documents that have at least one ticket with "PAID" or "UNPAID"
-            matchConditions["tickets.status"] = "NOT_WINNER";
-            matchConditions["tickets"] = {
-              $not: {
-                $elemMatch: {
-                  status: { $in: ["PAID", "UNPAID"] }
+        else if (status === "PAID" || status === "UNPAID")
+          matchConditions["tickets.status"] = status;
+        else if (status === "NOT_WINNER") {
+          // Get documents where ALL tickets have status "NOT_WINNER"
+          // AND exclude documents that have at least one ticket with "PAID" or "UNPAID"
+          matchConditions["tickets.status"] = "NOT_WINNER";
+          matchConditions["tickets"] = {
+            $not: {
+              $elemMatch: {
+                status: { $in: ["PAID", "UNPAID"] }
+              }
+            }
+          };
+        }
+
+      }
+
+      // 🟢 WIN filter (newly added)
+      if (win && win.trim()) {
+        if (win === "WON") {
+          // Get documents having at least one ticket with isWon = true
+          matchConditions["tickets"] = { $elemMatch: { isWon: true } };
+        } else if (win === "NOT_WON") {
+          // Get documents having NO ticket with isWon = true
+          matchConditions["tickets.isWon"] = { $ne: true };
+        }
+      }
+
+      // Build sort conditions
+      const [sortField, sortDirection] = sort.split('_');
+      const sortConditions = {};
+
+      switch (sortField) {
+        case 'booking.date':
+          sortConditions["booking.date"] = sortDirection === 'desc' ? -1 : 1;
+          break;
+        case 'agent.name':
+          sortConditions["agent.name"] = sortDirection === 'desc' ? -1 : 1;
+          break;
+        case 'financial.totalAmount':
+          sortConditions["financial.totalAmount"] = sortDirection === 'desc' ? -1 : 1;
+          break;
+        case 'financial.quantity':
+          sortConditions["financial.quantity"] = sortDirection === 'desc' ? -1 : 1;
+          break;
+        default:
+          sortConditions["booking.date"] = -1; // Default sort
+      }
+
+      // Calculate pagination
+      const pageNumber = parseInt(page);
+      const limitNumber = parseInt(limit);
+      const skip = (pageNumber - 1) * limitNumber;
+
+      // Execute query with aggregation for better performance + KPIs
+      const pipeline = [
+        { $match: matchConditions },
+        { $sort: sortConditions },
+        {
+          $facet: {
+            // Paginated bookings data
+            bookings: [
+              { $skip: skip },
+              { $limit: limitNumber },
+              {
+                $addFields: {
+                  displayId: {
+                    $concat: ["", "$ticketNumber"]
+                  }
                 }
               }
-            };
-          }
-  
-        }
-  
-        // 🟢 WIN filter (newly added)
-        if (win && win.trim()) {
-          if (win === "WON") {
-            // Get documents having at least one ticket with isWon = true
-            matchConditions["tickets"] = { $elemMatch: { isWon: true } };
-          } else if (win === "NOT_WON") {
-            // Get documents having NO ticket with isWon = true
-            matchConditions["tickets.isWon"] = { $ne: true };
-          }
-        }
-  
-        // Build sort conditions
-        const [sortField, sortDirection] = sort.split('_');
-        const sortConditions = {};
-  
-        switch (sortField) {
-          case 'booking.date':
-            sortConditions["booking.date"] = sortDirection === 'desc' ? -1 : 1;
-            break;
-          case 'agent.name':
-            sortConditions["agent.name"] = sortDirection === 'desc' ? -1 : 1;
-            break;
-          case 'financial.totalAmount':
-            sortConditions["financial.totalAmount"] = sortDirection === 'desc' ? -1 : 1;
-            break;
-          case 'financial.quantity':
-            sortConditions["financial.quantity"] = sortDirection === 'desc' ? -1 : 1;
-            break;
-          default:
-            sortConditions["booking.date"] = -1; // Default sort
-        }
-  
-        // Calculate pagination
-        const pageNumber = parseInt(page);
-        const limitNumber = parseInt(limit);
-        const skip = (pageNumber - 1) * limitNumber;
-  
-        // Execute query with aggregation for better performance + KPIs
-        const pipeline = [
-          { $match: matchConditions },
-          { $sort: sortConditions },
-          {
-            $facet: {
-              // Paginated bookings data
-              bookings: [
-                { $skip: skip },
-                { $limit: limitNumber },
-                {
-                  $addFields: {
-                    displayId: {
-                      $concat: ["", "$ticketNumber"]
-                    }
-                  }
-                }
-              ],
-  
-              // Total count for pagination
-              totalCount: [
-                { $count: "count" }
-              ],
-  
-              // KPI calculations based on filtered data
-              kpiData: [
-                {
-                  $group: {
-                    _id: null,
-                    // Total number of bookings (totalTickets)
-                    totalTickets: { $sum: 1 },
-  
-                    // Total number of individual ticket numbers across all bookings
-                    totalTicketNumbers: { $sum: { $size: "$tickets" } },
-  
-                    // Total revenue from all bookings
-                    totalRevenue: { $sum: "$financial.totalAmount" },
-  
-                    // Total won ticket numbers (sum of tickets where isWon = true)
-                    totalWonTicketNumbers: {
-                      $sum: {
-                        $size: {
-                          $filter: {
-                            input: "$tickets",
-                            cond: { $eq: ["$$this.isWon", true] }
-                          }
+            ],
+
+            // Total count for pagination
+            totalCount: [
+              { $count: "count" }
+            ],
+
+            // KPI calculations based on filtered data
+            kpiData: [
+              {
+                $group: {
+                  _id: null,
+                  // Total number of bookings (totalTickets)
+                  totalTickets: { $sum: 1 },
+
+                  // Total number of individual ticket numbers across all bookings
+                  totalTicketNumbers: { $sum: { $size: "$tickets" } },
+
+                  // Total revenue from all bookings
+                  totalRevenue: { $sum: "$financial.totalAmount" },
+
+                  // Total won ticket numbers (sum of tickets where isWon = true)
+                  totalWonTicketNumbers: {
+                    $sum: {
+                      $size: {
+                        $filter: {
+                          input: "$tickets",
+                          cond: { $eq: ["$$this.isWon", true] }
                         }
                       }
-                    },
-  
-                    // Additional useful KPIs
-                    totalActiveBookings: {
-                      $sum: {
-                        $cond: [{ $eq: ["$booking.status", "active"] }, 1, 0]
-                      }
-                    },
-                    totalCancelledBookings: {
-                      $sum: {
-                        $cond: [{ $eq: ["$booking.status", "cancelled"] }, 1, 0]
-                      }
-                    },
-                    averageBookingValue: { $avg: "$financial.totalAmount" },
-                    totalSubtotal: { $sum: "$financial.subtotal" },
-                    totalTax: { $sum: "$financial.tax" }
-                  }
+                    }
+                  },
+
+                  // Additional useful KPIs
+                  totalActiveBookings: {
+                    $sum: {
+                      $cond: [{ $eq: ["$booking.status", "active"] }, 1, 0]
+                    }
+                  },
+                  totalCancelledBookings: {
+                    $sum: {
+                      $cond: [{ $eq: ["$booking.status", "cancelled"] }, 1, 0]
+                    }
+                  },
+                  averageBookingValue: { $avg: "$financial.totalAmount" },
+                  totalSubtotal: { $sum: "$financial.subtotal" },
+                  totalTax: { $sum: "$financial.tax" }
                 }
-              ]
-            }
+              }
+            ]
           }
-        ];
-  
-        const result = await Booking.aggregate(pipeline);
-        const bookings = result[0].bookings;
-        const totalItems = result[0].totalCount[0]?.count || 0;
-        const totalPages = Math.ceil(totalItems / limitNumber);
-        const kpiData = result[0].kpiData[0] || {};
-  
-        // Prepare KPI object with proper formatting
-        const kpi = {
-          totalTickets: kpiData.totalTickets || 0,
-          totalTicketNumbers: kpiData.totalTicketNumbers || 0,
-          totalRevenue: parseFloat((kpiData.totalRevenue || 0).toFixed(2)),
-          totalWonTicketNumbers: kpiData.totalWonTicketNumbers || 0,
-  
-          // Additional KPIs for better insights
-          totalActiveBookings: kpiData.totalActiveBookings || 0,
-          totalCancelledBookings: kpiData.totalCancelledBookings || 0,
-          averageBookingValue: parseFloat((kpiData.averageBookingValue || 0).toFixed(2)),
-          totalSubtotal: parseFloat((kpiData.totalSubtotal || 0).toFixed(2)),
-          totalTax: parseFloat((kpiData.totalTax || 0).toFixed(2)),
-  
-          // Calculated metrics
-          winRate: kpiData.totalTicketNumbers > 0
-            ? parseFloat(((kpiData.totalWonTicketNumbers / kpiData.totalTicketNumbers) * 100).toFixed(2))
-            : 0,
-          cancelRate: kpiData.totalTickets > 0
-            ? parseFloat(((kpiData.totalCancelledBookings / kpiData.totalTickets) * 100).toFixed(2))
-            : 0
-        };
-  
-        return {
-          success: true,
-          bookings: bookings,
-          pagination: {
-            currentPage: pageNumber,
-            totalPages: totalPages,
-            totalItems: totalItems,
-            itemsPerPage: limitNumber
-          },
-          kpi: kpi
-        };
-  
-      } catch (error) {
-        console.error('Error in getBookingsWithFilters:', error);
-        throw error;
-      }
-    },
+        }
+      ];
 
- // Get bookings with filters, sorting, and pagination + KPIs
-// getBookingsWithFilters: async (queryParams) => {
-//   try {
-//     const {
-//       page = 1,
-//       limit = 25,
-//       customerSearch,
-//       fromDateTime,
-//       toDateTime,
-//       childLotteryId,
-//       agentId,
-//       status,
-//       win,//this may be 'WON' or 'NOT_WON'
-//       sort = 'booking.date_desc'
-//     } = queryParams;
+      const result = await Booking.aggregate(pipeline);
+      const bookings = result[0].bookings;
+      const totalItems = result[0].totalCount[0]?.count || 0;
+      const totalPages = Math.ceil(totalItems / limitNumber);
+      const kpiData = result[0].kpiData[0] || {};
 
-//     // Build match conditions
-//     const matchConditions = {};
+      // Prepare KPI object with proper formatting
+      const kpi = {
+        totalTickets: kpiData.totalTickets || 0,
+        totalTicketNumbers: kpiData.totalTicketNumbers || 0,
+        totalRevenue: parseFloat((kpiData.totalRevenue || 0).toFixed(2)),
+        totalWonTicketNumbers: kpiData.totalWonTicketNumbers || 0,
 
-//     // Customer search (name or phone)
-//     if (customerSearch && customerSearch.trim()) {
-//       matchConditions.$or = [
-//         { "customer.name": { $regex: customerSearch.trim(), $options: 'i' } },
-//         { "customer.phone": { $regex: customerSearch.trim(), $options: 'i' } }
-//       ];
-//     }
+        // Additional KPIs for better insights
+        totalActiveBookings: kpiData.totalActiveBookings || 0,
+        totalCancelledBookings: kpiData.totalCancelledBookings || 0,
+        averageBookingValue: parseFloat((kpiData.averageBookingValue || 0).toFixed(2)),
+        totalSubtotal: parseFloat((kpiData.totalSubtotal || 0).toFixed(2)),
+        totalTax: parseFloat((kpiData.totalTax || 0).toFixed(2)),
 
-//     // Date range filter
-//     if (fromDateTime || toDateTime) {
-//       matchConditions["booking.date"] = {};
-//       if (fromDateTime) {
-//         matchConditions["booking.date"].$gte = new Date(fromDateTime);
-//       }
-//       if (toDateTime) {
-//         matchConditions["booking.date"].$lte = new Date(toDateTime);
-//       }
-//     }
+        // Calculated metrics
+        winRate: kpiData.totalTicketNumbers > 0
+          ? parseFloat(((kpiData.totalWonTicketNumbers / kpiData.totalTicketNumbers) * 100).toFixed(2))
+          : 0,
+        cancelRate: kpiData.totalTickets > 0
+          ? parseFloat(((kpiData.totalCancelledBookings / kpiData.totalTickets) * 100).toFixed(2))
+          : 0
+      };
 
-//     // Child lottery filter
-//     if (childLotteryId && childLotteryId.trim()) {
-//       matchConditions["tickets.lottery.timeId"] = childLotteryId
-//     }
+      return {
+        success: true,
+        bookings: bookings,
+        pagination: {
+          currentPage: pageNumber,
+          totalPages: totalPages,
+          totalItems: totalItems,
+          itemsPerPage: limitNumber
+        },
+        kpi: kpi
+      };
 
-//     // Agent filter
-//     if (agentId && agentId.trim()) {
-//       matchConditions["agent.id"] = new mongoose.Types.ObjectId(agentId);
-//     }
+    } catch (error) {
+      console.error('Error in getBookingsWithFilters:', error);
+      throw error;
+    }
+  },
 
-//     // Status filter
-//     if (status && status.trim()) {
-//       matchConditions["booking.status"] = status;
-//     }
+  // Get bookings with filters, sorting, and pagination + KPIs
+  // getBookingsWithFilters: async (queryParams) => {
+  //   try {
+  //     const {
+  //       page = 1,
+  //       limit = 25,
+  //       customerSearch,
+  //       fromDateTime,
+  //       toDateTime,
+  //       childLotteryId,
+  //       agentId,
+  //       status,
+  //       win,//this may be 'WON' or 'NOT_WON'
+  //       sort = 'booking.date_desc'
+  //     } = queryParams;
 
-//     // Build sort conditions
-//     const [sortField, sortDirection] = sort.split('_');
-//     const sortConditions = {};
-    
-//     switch (sortField) {
-//       case 'booking.date':
-//         sortConditions["booking.date"] = sortDirection === 'desc' ? -1 : 1;
-//         break;
-//       case 'agent.name':
-//         sortConditions["agent.name"] = sortDirection === 'desc' ? -1 : 1;
-//         break;
-//       case 'financial.totalAmount':
-//         sortConditions["financial.totalAmount"] = sortDirection === 'desc' ? -1 : 1;
-//         break;
-//       case 'financial.quantity':
-//         sortConditions["financial.quantity"] = sortDirection === 'desc' ? -1 : 1;
-//         break;
-//       default:
-//         sortConditions["booking.date"] = -1; // Default sort
-//     }
+  //     // Build match conditions
+  //     const matchConditions = {};
 
-//     // Calculate pagination
-//     const pageNumber = parseInt(page);
-//     const limitNumber = parseInt(limit);
-//     const skip = (pageNumber - 1) * limitNumber;
+  //     // Customer search (name or phone)
+  //     if (customerSearch && customerSearch.trim()) {
+  //       matchConditions.$or = [
+  //         { "customer.name": { $regex: customerSearch.trim(), $options: 'i' } },
+  //         { "customer.phone": { $regex: customerSearch.trim(), $options: 'i' } }
+  //       ];
+  //     }
 
-//     // Execute query with aggregation for better performance + KPIs
-//     const pipeline = [
-//       { $match: matchConditions },
-//       { $sort: sortConditions },
-//       {
-//         $facet: {
-//           // Paginated bookings data
-//           bookings: [
-//             { $skip: skip },
-//             { $limit: limitNumber },
-//             {
-//               $addFields: {
-//                 displayId: {
-//                   $concat: ["TKT-", "$ticketNumber"]
-//                 }
-//               }
-//             }
-//           ],
-          
-//           // Total count for pagination
-//           totalCount: [
-//             { $count: "count" }
-//           ],
-          
-//           // KPI calculations based on filtered data
-//           kpiData: [
-//             {
-//               $group: {
-//                 _id: null,
-//                 // Total number of bookings (totalTickets)
-//                 totalTickets: { $sum: 1 },
-                
-//                 // Total number of individual ticket numbers across all bookings
-//                 totalTicketNumbers: { $sum: { $size: "$tickets" } },
-                
-//                 // Total revenue from all bookings
-//                 totalRevenue: { $sum: "$financial.totalAmount" },
-                
-//                 // Total won ticket numbers (sum of tickets where isWon = true)
-//                 totalWonTicketNumbers: {
-//                   $sum: {
-//                     $size: {
-//                       $filter: {
-//                         input: "$tickets",
-//                         cond: { $eq: ["$$this.isWon", true] }
-//                       }
-//                     }
-//                   }
-//                 },
-                
-//                 // Additional useful KPIs
-//                 totalActiveBookings: {
-//                   $sum: {
-//                     $cond: [{ $eq: ["$booking.status", "active"] }, 1, 0]
-//                   }
-//                 },
-//                 totalCancelledBookings: {
-//                   $sum: {
-//                     $cond: [{ $eq: ["$booking.status", "cancelled"] }, 1, 0]
-//                   }
-//                 },
-//                 averageBookingValue: { $avg: "$financial.totalAmount" },
-//                 totalSubtotal: { $sum: "$financial.subtotal" },
-//                 totalTax: { $sum: "$financial.tax" }
-//               }
-//             }
-//           ]
-//         }
-//       }
-//     ];
+  //     // Date range filter
+  //     if (fromDateTime || toDateTime) {
+  //       matchConditions["booking.date"] = {};
+  //       if (fromDateTime) {
+  //         matchConditions["booking.date"].$gte = new Date(fromDateTime);
+  //       }
+  //       if (toDateTime) {
+  //         matchConditions["booking.date"].$lte = new Date(toDateTime);
+  //       }
+  //     }
 
-//     const result = await Booking.aggregate(pipeline);
-//     const bookings = result[0].bookings;
-//     const totalItems = result[0].totalCount[0]?.count || 0;
-//     const totalPages = Math.ceil(totalItems / limitNumber);
-//     const kpiData = result[0].kpiData[0] || {};
+  //     // Child lottery filter
+  //     if (childLotteryId && childLotteryId.trim()) {
+  //       matchConditions["tickets.lottery.timeId"] = childLotteryId
+  //     }
 
-//     // Prepare KPI object with proper formatting
-//     const kpi = {
-//       totalTickets: kpiData.totalTickets || 0,
-//       totalTicketNumbers: kpiData.totalTicketNumbers || 0,
-//       totalRevenue: parseFloat((kpiData.totalRevenue || 0).toFixed(2)),
-//       totalWonTicketNumbers: kpiData.totalWonTicketNumbers || 0,
-      
-//       // Additional KPIs for better insights
-//       totalActiveBookings: kpiData.totalActiveBookings || 0,
-//       totalCancelledBookings: kpiData.totalCancelledBookings || 0,
-//       averageBookingValue: parseFloat((kpiData.averageBookingValue || 0).toFixed(2)),
-//       totalSubtotal: parseFloat((kpiData.totalSubtotal || 0).toFixed(2)),
-//       totalTax: parseFloat((kpiData.totalTax || 0).toFixed(2)),
-      
-//       // Calculated metrics
-//       winRate: kpiData.totalTicketNumbers > 0 
-//         ? parseFloat(((kpiData.totalWonTicketNumbers / kpiData.totalTicketNumbers) * 100).toFixed(2))
-//         : 0,
-//       cancelRate: kpiData.totalTickets > 0 
-//         ? parseFloat(((kpiData.totalCancelledBookings / kpiData.totalTickets) * 100).toFixed(2))
-//         : 0
-//     };
+  //     // Agent filter
+  //     if (agentId && agentId.trim()) {
+  //       matchConditions["agent.id"] = new mongoose.Types.ObjectId(agentId);
+  //     }
 
-//     return {
-//       success: true,
-//       bookings: bookings,
-//       pagination: {
-//         currentPage: pageNumber,
-//         totalPages: totalPages,
-//         totalItems: totalItems,
-//         itemsPerPage: limitNumber
-//       },
-//       kpi: kpi
-//     };
+  //     // Status filter
+  //     if (status && status.trim()) {
+  //       matchConditions["booking.status"] = status;
+  //     }
 
-//   } catch (error) {
-//     console.error('Error in getBookingsWithFilters:', error);
-//     throw error;
-//   }
-// },
+  //     // Build sort conditions
+  //     const [sortField, sortDirection] = sort.split('_');
+  //     const sortConditions = {};
+
+  //     switch (sortField) {
+  //       case 'booking.date':
+  //         sortConditions["booking.date"] = sortDirection === 'desc' ? -1 : 1;
+  //         break;
+  //       case 'agent.name':
+  //         sortConditions["agent.name"] = sortDirection === 'desc' ? -1 : 1;
+  //         break;
+  //       case 'financial.totalAmount':
+  //         sortConditions["financial.totalAmount"] = sortDirection === 'desc' ? -1 : 1;
+  //         break;
+  //       case 'financial.quantity':
+  //         sortConditions["financial.quantity"] = sortDirection === 'desc' ? -1 : 1;
+  //         break;
+  //       default:
+  //         sortConditions["booking.date"] = -1; // Default sort
+  //     }
+
+  //     // Calculate pagination
+  //     const pageNumber = parseInt(page);
+  //     const limitNumber = parseInt(limit);
+  //     const skip = (pageNumber - 1) * limitNumber;
+
+  //     // Execute query with aggregation for better performance + KPIs
+  //     const pipeline = [
+  //       { $match: matchConditions },
+  //       { $sort: sortConditions },
+  //       {
+  //         $facet: {
+  //           // Paginated bookings data
+  //           bookings: [
+  //             { $skip: skip },
+  //             { $limit: limitNumber },
+  //             {
+  //               $addFields: {
+  //                 displayId: {
+  //                   $concat: ["TKT-", "$ticketNumber"]
+  //                 }
+  //               }
+  //             }
+  //           ],
+
+  //           // Total count for pagination
+  //           totalCount: [
+  //             { $count: "count" }
+  //           ],
+
+  //           // KPI calculations based on filtered data
+  //           kpiData: [
+  //             {
+  //               $group: {
+  //                 _id: null,
+  //                 // Total number of bookings (totalTickets)
+  //                 totalTickets: { $sum: 1 },
+
+  //                 // Total number of individual ticket numbers across all bookings
+  //                 totalTicketNumbers: { $sum: { $size: "$tickets" } },
+
+  //                 // Total revenue from all bookings
+  //                 totalRevenue: { $sum: "$financial.totalAmount" },
+
+  //                 // Total won ticket numbers (sum of tickets where isWon = true)
+  //                 totalWonTicketNumbers: {
+  //                   $sum: {
+  //                     $size: {
+  //                       $filter: {
+  //                         input: "$tickets",
+  //                         cond: { $eq: ["$$this.isWon", true] }
+  //                       }
+  //                     }
+  //                   }
+  //                 },
+
+  //                 // Additional useful KPIs
+  //                 totalActiveBookings: {
+  //                   $sum: {
+  //                     $cond: [{ $eq: ["$booking.status", "active"] }, 1, 0]
+  //                   }
+  //                 },
+  //                 totalCancelledBookings: {
+  //                   $sum: {
+  //                     $cond: [{ $eq: ["$booking.status", "cancelled"] }, 1, 0]
+  //                   }
+  //                 },
+  //                 averageBookingValue: { $avg: "$financial.totalAmount" },
+  //                 totalSubtotal: { $sum: "$financial.subtotal" },
+  //                 totalTax: { $sum: "$financial.tax" }
+  //               }
+  //             }
+  //           ]
+  //         }
+  //       }
+  //     ];
+
+  //     const result = await Booking.aggregate(pipeline);
+  //     const bookings = result[0].bookings;
+  //     const totalItems = result[0].totalCount[0]?.count || 0;
+  //     const totalPages = Math.ceil(totalItems / limitNumber);
+  //     const kpiData = result[0].kpiData[0] || {};
+
+  //     // Prepare KPI object with proper formatting
+  //     const kpi = {
+  //       totalTickets: kpiData.totalTickets || 0,
+  //       totalTicketNumbers: kpiData.totalTicketNumbers || 0,
+  //       totalRevenue: parseFloat((kpiData.totalRevenue || 0).toFixed(2)),
+  //       totalWonTicketNumbers: kpiData.totalWonTicketNumbers || 0,
+
+  //       // Additional KPIs for better insights
+  //       totalActiveBookings: kpiData.totalActiveBookings || 0,
+  //       totalCancelledBookings: kpiData.totalCancelledBookings || 0,
+  //       averageBookingValue: parseFloat((kpiData.averageBookingValue || 0).toFixed(2)),
+  //       totalSubtotal: parseFloat((kpiData.totalSubtotal || 0).toFixed(2)),
+  //       totalTax: parseFloat((kpiData.totalTax || 0).toFixed(2)),
+
+  //       // Calculated metrics
+  //       winRate: kpiData.totalTicketNumbers > 0 
+  //         ? parseFloat(((kpiData.totalWonTicketNumbers / kpiData.totalTicketNumbers) * 100).toFixed(2))
+  //         : 0,
+  //       cancelRate: kpiData.totalTickets > 0 
+  //         ? parseFloat(((kpiData.totalCancelledBookings / kpiData.totalTickets) * 100).toFixed(2))
+  //         : 0
+  //     };
+
+  //     return {
+  //       success: true,
+  //       bookings: bookings,
+  //       pagination: {
+  //         currentPage: pageNumber,
+  //         totalPages: totalPages,
+  //         totalItems: totalItems,
+  //         itemsPerPage: limitNumber
+  //       },
+  //       kpi: kpi
+  //     };
+
+  //   } catch (error) {
+  //     console.error('Error in getBookingsWithFilters:', error);
+  //     throw error;
+  //   }
+  // },
 
 
   // Get specific booking by ID
@@ -436,7 +437,7 @@ const bookingHelper = {
       }
 
       const booking = await Booking.findById(bookingId);
-      
+
       if (!booking) {
         throw new Error('Booking not found');
       }
@@ -458,88 +459,88 @@ const bookingHelper = {
 
   // Update booking status
   updateBookingStatus: async (req, res) => {
-      try {
-        let {
-          bookingId,
-          status,
-          timeId,
-          ticketNumber,
-          numberId
-        } = req.body;
-  
-        let newStatus = status;
-        console.log('req.body:\n', req.body);
-  
-        // Validate required fields
-        if (!bookingId || !newStatus || !timeId || !ticketNumber || !numberId) {
-          return res.status(400).json({
-            message: 'Missing required fields: bookingId, newStatus, timeId, ticketNumber, numberId'
-          });
-        }
-  
-        // 1. Define the Query Filter
-        const filter = {
-          _id: bookingId,
-          'tickets.lottery.timeId': timeId,
-          'tickets.number': ticketNumber,
-          'tickets.numberId': numberId
-        };
-  
-        // 2. Define the Update Operation
-        const update = {
-          $set: {
-            'tickets.$.status': newStatus
-          }
-        };
-  
-        // 3. Execute the Update
-        const updatedBooking = await Booking.findOneAndUpdate(
-          filter,
-          update,
-          {
-            new: true,
-            runValidators: true
-          }
-        );
-  
-        // 4. Check the Result
-        if (!updatedBooking) {
-          return res.status(404).json({
-            message: 'Booking not found or no ticket matched the specified criteria.'
-          });
-        }
-  
-        // Find the updated ticket to verify the change
-        const updatedTicket = updatedBooking.tickets.find(ticket =>
-          ticket.lottery?.timeId === timeId &&
-          ticket.number === ticketNumber &&
-          ticket.numberId === numberId
-        );
-  
-        if (!updatedTicket) {
-          return res.status(404).json({
-            message: 'Ticket found but criteria not met after update.'
-          });
-        }
-  
-        console.log('✅ Booking updated successfully. Updated ticket:', updatedTicket);
-  
-        // 5. Send a Success Response
-        return res.status(200).json({
-          success: true,
-          message: 'Ticket status updated successfully.',
-          booking: updatedBooking,
-          updatedTicket: updatedTicket
-        });
-  
-      } catch (error) {
-        console.error('Error in updateBookingStatus:', error);
-        return res.status(500).json({
-          message: 'Internal server error',
-          error: error.message
+    try {
+      let {
+        bookingId,
+        status,
+        timeId,
+        ticketNumber,
+        numberId
+      } = req.body;
+
+      let newStatus = status;
+      console.log('req.body:\n', req.body);
+
+      // Validate required fields
+      if (!bookingId || !newStatus || !timeId || !ticketNumber || !numberId) {
+        return res.status(400).json({
+          message: 'Missing required fields: bookingId, newStatus, timeId, ticketNumber, numberId'
         });
       }
-    },
+
+      // 1. Define the Query Filter
+      const filter = {
+        _id: bookingId,
+        'tickets.lottery.timeId': timeId,
+        'tickets.number': ticketNumber,
+        'tickets.numberId': numberId
+      };
+
+      // 2. Define the Update Operation
+      const update = {
+        $set: {
+          'tickets.$.status': newStatus
+        }
+      };
+
+      // 3. Execute the Update
+      const updatedBooking = await Booking.findOneAndUpdate(
+        filter,
+        update,
+        {
+          new: true,
+          runValidators: true
+        }
+      );
+
+      // 4. Check the Result
+      if (!updatedBooking) {
+        return res.status(404).json({
+          message: 'Booking not found or no ticket matched the specified criteria.'
+        });
+      }
+
+      // Find the updated ticket to verify the change
+      const updatedTicket = updatedBooking.tickets.find(ticket =>
+        ticket.lottery?.timeId === timeId &&
+        ticket.number === ticketNumber &&
+        ticket.numberId === numberId
+      );
+
+      if (!updatedTicket) {
+        return res.status(404).json({
+          message: 'Ticket found but criteria not met after update.'
+        });
+      }
+
+      console.log('✅ Booking updated successfully. Updated ticket:', updatedTicket);
+
+      // 5. Send a Success Response
+      return res.status(200).json({
+        success: true,
+        message: 'Ticket status updated successfully.',
+        booking: updatedBooking,
+        updatedTicket: updatedTicket
+      });
+
+    } catch (error) {
+      console.error('Error in updateBookingStatus:', error);
+      return res.status(500).json({
+        message: 'Internal server error',
+        error: error.message
+      });
+    }
+  },
 
   // Get child lotteries for dropdown (winners array items from lottery schema)
   getChildLotteries: async () => {
@@ -563,54 +564,54 @@ const bookingHelper = {
                 { $cond: [{ $ne: ["$name2", null] }, { $concat: [" - ", "$name2"] }, ""] },
                 " - ",
                 {
-          $let: {
-            vars: {
-              hour24: {
-                $toInt: {
-                  $dateToString: {
-                    format: "%H",
-                    date: "$winners.resultTime",
-                    timezone: "Asia/Dubai"
+                  $let: {
+                    vars: {
+                      hour24: {
+                        $toInt: {
+                          $dateToString: {
+                            format: "%H",
+                            date: "$winners.resultTime",
+                            timezone: "Asia/Dubai"
+                          }
+                        }
+                      },
+                      minute: {
+                        $dateToString: {
+                          format: "%M",
+                          date: "$winners.resultTime",
+                          timezone: "Asia/Dubai"
+                        }
+                      }
+                    },
+                    in: {
+                      $concat: [
+                        // 12-hour hour (0-11, then convert 0 to 12)
+                        {
+                          $toString: {
+                            $cond: [
+                              // If hour is 0 (midnight), set to 12
+                              { $eq: ["$$hour24", 0] },
+                              12,
+                              // If hour is > 12, subtract 12. Otherwise, keep original hour.
+                              { $cond: [{ $gt: ["$$hour24", 12] }, { $subtract: ["$$hour24", 12] }, "$$hour24"] }
+                            ]
+                          }
+                        },
+                        ":",
+                        "$$minute",
+                        " ",
+                        // AM/PM designator
+                        {
+                          $cond: [
+                            { $lt: ["$$hour24", 12] },
+                            "AM",
+                            "PM"
+                          ]
+                        }
+                      ]
+                    }
                   }
                 }
-              },
-              minute: {
-                $dateToString: {
-                  format: "%M",
-                  date: "$winners.resultTime",
-                  timezone: "Asia/Dubai"
-                }
-              }
-            },
-            in: {
-              $concat: [
-                // 12-hour hour (0-11, then convert 0 to 12)
-                {
-                  $toString: {
-                    $cond: [
-                      // If hour is 0 (midnight), set to 12
-                      { $eq: ["$$hour24", 0] },
-                      12,
-                      // If hour is > 12, subtract 12. Otherwise, keep original hour.
-                      { $cond: [{ $gt: ["$$hour24", 12] }, { $subtract: ["$$hour24", 12] }, "$$hour24"] }
-                    ]
-                  }
-                },
-                ":",
-                "$$minute",
-                " ",
-                // AM/PM designator
-                {
-                  $cond: [
-                    { $lt: ["$$hour24", 12] },
-                    "AM",
-                    "PM"
-                  ]
-                }
-              ]
-            }
-          }
-        }
               ]
             },
             drawDate: "$drawDate"
@@ -719,113 +720,333 @@ const bookingHelper = {
   //     throw error;
   //   }
   // },
+  createBookingorg: async (bookingData, req, res) => {
+    try {
+      // Generate unique ticket number
+      const ticketNumber = await bookingHelper.generateUniqueTicketNumber();
+
+      // Process tickets with validation
+      const processedTickets = [];
+
+      for (const ticket of bookingData.tickets) {
+        const lottery = await Lottery.findById(ticket.lottery.id);
+        if (!lottery) {
+          throw new Error(`Lottery not found for ticket ${ticket.number}`);
+        }
+
+        // 🚨 VALIDATE: Check if the provided timeId exists in lottery winners
+        if (!ticket.lottery.timeId) {
+          throw new Error(`TimeId is required for ticket ${ticket.number}`);
+        }
+
+        const childLottery = lottery.winners.find(w =>
+          w._id.toString() === ticket.lottery.timeId.toString()
+        );
+
+        if (!childLottery) {
+          throw new Error(`Child lottery not found with timeId: ${ticket.lottery.timeId} for ticket ${ticket.number}`);
+        }
+
+        // 🚨 Check for duplicate in database
+        const existingTicket = await Booking.findOne({
+          'tickets.lottery.id': lottery._id,
+          'tickets.lottery.timeId': childLottery._id,
+          'tickets.number': ticket.number
+        });
+
+        // if (existingTicket) {
+        //   console.log(`\nTicket number "${ticket.number}" already exists for this lottery and draw time. Please choose a different number.\n`)
+        //   return res.status(400).json({
+        //     success: false,
+        //     message: `Ticket number "${ticket.number}" already exists for this lottery and draw time. Please choose a different number.`,
+        //     data: null
+        //   });
+        // }
+
+        // Use the validated timeId and child lottery data
+        processedTickets.push({
+          lottery: {
+            id: lottery._id,
+            name: lottery.name,
+            drawNumber: lottery.drawNumber,
+            drawDate: childLottery.resultTime, // Use child lottery's resultTime
+            timeId: childLottery._id // Use the validated child lottery _id
+          },
+          numberId: 'NumberId_' + Math.floor(Math.random() * 1000000).toString().padStart(6, '0'),
+          number: ticket.number,
+          type: ticket.type,
+          chargeAmount: ticket.chargeAmount,
+          isWon: false
+        });
+      }
+
+      // Create booking object
+      const newBooking = new Booking({
+        ticketNumber: ticketNumber,
+        customer: bookingData.customer,
+        agent: {
+          name: req.session.agent.name || 'Agent Name',
+          id: req.session.agent.id || null,
+          phone: req.session.agent.phone || 'NA',
+          role: ['agent']
+        },
+        booking: {
+          date: new Date(),
+          status: 'active'
+        },
+        tickets: processedTickets,
+        financial: bookingData.financial,
+        payment: bookingData.payment || {
+          method: 'cash',
+          status: 'pending',
+          reference: ''
+        }
+      });
+
+      // Save booking
+      const savedBooking = await newBooking.save();
+
+      // Add displayId virtual field
+      const bookingObj = savedBooking.toObject();
+      bookingObj.displayId = `TKT-${savedBooking.ticketNumber}`;
+
+
+      return res.status(200).json({
+        success: true,
+        message: "Booking saved successfully",
+        data: bookingObj,
+      });
+
+    } catch (error) {
+      console.error('Error in createBooking:', error);
+      // throw error;
+      return res.status(502).json({
+        success: false,
+        message: "An Error Occured..",
+        data: null,
+      });
+    }
+  },
+
   createBooking: async (bookingData, req, res) => {
-      try {
-        // Generate unique ticket number
-        const ticketNumber = await bookingHelper.generateUniqueTicketNumber();
-  
-        // Process tickets with validation
-        const processedTickets = [];
-  
-        for (const ticket of bookingData.tickets) {
+    try {
+
+      // Validate required fields
+      if (!bookingData.customer || !bookingData.customer.name || !bookingData.customer.phone) {
+        return res.status(400).json({
+          success: false,
+          message: "Customer name and phone are required",
+          data: null
+        });
+      }
+
+      if (!bookingData.tickets || !Array.isArray(bookingData.tickets) || bookingData.tickets.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: "At least one ticket is required",
+          data: null
+        });
+      }
+
+      // Generate unique ticket number
+      const ticketNumber = await bookingHelper.generateUniqueTicketNumber();
+
+      // Process tickets with validation
+      const processedTickets = [];
+      let subtotal = 0;
+      let totalQuantity = 0;
+      let validationErrors = [];
+
+      for (const [index, ticket] of bookingData.tickets.entries()) {
+        try {
+          // Validate required ticket fields
+          if (!ticket.number || !ticket.type || !ticket.lottery || !ticket.lottery.id) {
+            validationErrors.push(`Ticket ${index + 1}: Number, type, and lottery ID are required`);
+            continue;
+          }
+
+          // Validate ticket type
+          if (ticket.type < 1 || ticket.type > 5) {
+            validationErrors.push(`Ticket ${index + 1}: Invalid ticket type ${ticket.type}. Must be 1-5`);
+            continue;
+          }
+
+          // Get lottery
           const lottery = await Lottery.findById(ticket.lottery.id);
           if (!lottery) {
-            throw new Error(`Lottery not found for ticket ${ticket.number}`);
+            validationErrors.push(`Ticket ${index + 1}: Lottery not found: ${ticket.lottery.id}`);
+            continue;
           }
-  
-          // 🚨 VALIDATE: Check if the provided timeId exists in lottery winners
-          if (!ticket.lottery.timeId) {
-            throw new Error(`TimeId is required for ticket ${ticket.number}`);
+
+          // Get ticket charge for this type
+          const chargeRecord = await ticketCharge.findOne({ ticketType: ticket.type });
+          if (!chargeRecord) {
+            validationErrors.push(`Ticket ${index + 1}: No price found for type ${ticket.type}`);
+            continue;
           }
-  
-          const childLottery = lottery.winners.find(w =>
-            w._id.toString() === ticket.lottery.timeId.toString()
-          );
-  
-          if (!childLottery) {
-            throw new Error(`Child lottery not found with timeId: ${ticket.lottery.timeId} for ticket ${ticket.number}`);
+
+          // Validate timeId (draw time)
+          let timeId = ticket.lottery.timeId || 'main';
+          let drawDate = lottery.drawDate; // Default to parent lottery draw date
+
+          if (timeId !== 'main') {
+            const childLottery = lottery.winners.find(w => w._id.toString() === timeId.toString());
+            if (!childLottery) {
+              validationErrors.push(`Ticket ${index + 1}: Draw time not found: ${timeId}`);
+              continue;
+            }
+            drawDate = childLottery.resultTime || drawDate;
           }
-  
-          // 🚨 Check for duplicate in database
-          const existingTicket = await Booking.findOne({
-            'tickets.lottery.id': lottery._id,
-            'tickets.lottery.timeId': childLottery._id,
-            'tickets.number': ticket.number
-          });
-  
-          // if (existingTicket) {
-          //   console.log(`\nTicket number "${ticket.number}" already exists for this lottery and draw time. Please choose a different number.\n`)
-          //   return res.status(400).json({
-          //     success: false,
-          //     message: `Ticket number "${ticket.number}" already exists for this lottery and draw time. Please choose a different number.`,
-          //     data: null
-          //   });
-          // }
-  
-          // Use the validated timeId and child lottery data
+
+          // Validate quantity
+          const quantity = ticket.quantity || 1;
+          if (quantity < 1 || quantity > 99) {
+            validationErrors.push(`Ticket ${index + 1}: Quantity must be 1-99`);
+            continue;
+          }
+
+          // Generate unique numberId for this ticket entry
+          const uniqueNumberId = `${ticket.number}-${Date.now()}-${Math.random().toString(36).substr(2, 8)}`;
+
+          // Calculate total charge for this ticket entry (per-ticket price × quantity)
+          const singleTicketCharge = chargeRecord.chargeAmount;
+          const totalTicketCharge = singleTicketCharge * quantity;
+
+          // Create single ticket entry with quantity
           processedTickets.push({
             lottery: {
               id: lottery._id,
               name: lottery.name,
               drawNumber: lottery.drawNumber,
-              drawDate: childLottery.resultTime, // Use child lottery's resultTime
-              timeId: childLottery._id // Use the validated child lottery _id
+              drawDate: drawDate,
+              timeId: timeId
             },
-            numberId: 'NumberId_' + Math.floor(Math.random() * 1000000).toString().padStart(6, '0'),
+            numberId: uniqueNumberId,
+            isWon: false,
             number: ticket.number,
             type: ticket.type,
-            chargeAmount: ticket.chargeAmount,
-            isWon: false
+            quantity: quantity, // Quantity for this ticket entry
+            chargeAmount: totalTicketCharge, // TOTAL charge for this ticket entry (quantity × per-ticket price)
+            status: "NOT_WINNER"
           });
+
+          // Add to totals
+          subtotal += totalTicketCharge;
+          totalQuantity += quantity;
+
+        } catch (error) {
+          validationErrors.push(`Ticket ${index + 1}: ${error.message}`);
         }
-  
-        // Create booking object
-        const newBooking = new Booking({
-          ticketNumber: ticketNumber,
-          customer: bookingData.customer,
-          agent: {
-            name: req.session.agent.name || 'Agent Name',
-            id: req.session.agent.id || null,
-            phone: req.session.agent.phone || 'NA',
-            role: ['agent']
-          },
-          booking: {
-            date: new Date(),
-            status: 'active'
-          },
-          tickets: processedTickets,
-          financial: bookingData.financial,
-          payment: bookingData.payment || {
-            method: 'cash',
-            status: 'pending',
-            reference: ''
-          }
-        });
-  
-        // Save booking
-        const savedBooking = await newBooking.save();
-  
-        // Add displayId virtual field
-        const bookingObj = savedBooking.toObject();
-        bookingObj.displayId = `TKT-${savedBooking.ticketNumber}`;
-  
-  
-        return res.status(200).json({
-          success: true,
-          message: "Booking saved successfully",
-          data: bookingObj,
-        });
-  
-      } catch (error) {
-        console.error('Error in createBooking:', error);
-        // throw error;
-        return res.status(502).json({
+      }
+
+      // Check for validation errors
+      if (validationErrors.length > 0) {
+        return res.status(400).json({
           success: false,
-          message: "An Error Occured..",
-          data: null,
+          message: "Ticket validation failed",
+          errors: validationErrors,
+          data: null
         });
       }
-    },
+
+      if (processedTickets.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: "No valid tickets to book",
+          data: null
+        });
+      }
+
+      // Get agent info from session
+      const agent = {
+        name: req.session?.agent?.name || 'NA',
+        id: req.session?.agent?.id || null,
+        phone: req.session?.agent?.phone || 'N/A',
+        role:  ['agent']
+      };
+
+      // Create booking object
+      const newBooking = new Booking({
+        ticketNumber: ticketNumber,
+        customer: {
+          name: bookingData.customer.name.trim(),
+          phone: bookingData.customer.phone.trim()
+        },
+        agent: agent,
+        booking: {
+          date: new Date(),
+          status: 'active'
+        },
+        tickets: processedTickets,
+        financial: {
+          quantity: totalQuantity, // Total quantity (sum of all ticket quantities)
+          subtotal: subtotal,
+          tax: 0,
+          totalAmount: subtotal,
+          currency: "NU"
+        },
+        payment: bookingData.payment || {
+          method: 'cash',
+          status: 'paid',
+          reference: `PAY-${Date.now()}`
+        }
+      });
+
+      console.log('Booking data:\n', bookingData);
+      console.log('Tickets data:\n', bookingData.tickets);
+      console.log('processedTickets Before saving the book :\n', processedTickets)
+      // Save booking
+      const savedBooking = await newBooking.save();
+      console.log('Saved Booking:\n', savedBooking);
+
+      // Add displayId virtual field
+      const bookingObj = savedBooking.toObject();
+      bookingObj.displayId = `TKT-${savedBooking.ticketNumber}`;
+
+      return res.status(201).json({
+        success: true,
+        message: "Booking created successfully",
+        data: {
+          ticketNumber: savedBooking.ticketNumber,
+          displayId: bookingObj.displayId,
+          customer: savedBooking.customer,
+          totalAmount: savedBooking.financial.totalAmount,
+          totalTickets: processedTickets.length, // Number of unique ticket entries
+          totalQuantity: savedBooking.financial.quantity, // Total quantity across all tickets
+          bookingDate: savedBooking.booking.date
+        }
+      });
+
+    } catch (error) {
+      console.error('Error in createBooking:', error);
+
+      // Handle specific error types
+      if (error.name === 'ValidationError') {
+        const errors = Object.values(error.errors).map(err => err.message);
+        return res.status(400).json({
+          success: false,
+          message: "Validation failed",
+          errors: errors,
+          data: null
+        });
+      }
+
+      if (error.code === 11000) {
+        return res.status(400).json({
+          success: false,
+          message: "Duplicate ticket number detected",
+          data: null
+        });
+      }
+
+      return res.status(500).json({
+        success: false,
+        message: "An error occurred while creating booking",
+        data: null,
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  },
 
   // Generate unique ticket number
   generateUniqueTicketNumber: async () => {
@@ -862,7 +1083,7 @@ const bookingHelper = {
 
       const booking = await Booking.findByIdAndUpdate(
         bookingId,
-        { 
+        {
           "booking.status": "cancelled",
           updatedAt: new Date()
         },
@@ -915,7 +1136,7 @@ const bookingHelper = {
       // Build sort conditions
       const [sortField, sortDirection] = sort.split('_');
       const sortConditions = {};
-      
+
       switch (sortField) {
         case 'name':
           sortConditions.name = sortDirection === 'desc' ? -1 : 1;
