@@ -3,7 +3,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex">
   <title>Admin - Bhutan State Lotteries</title>
-   
+
 </head>
 <!-- Flexible Ticket Booking Page -->
 <div class="booking-container">
@@ -1283,7 +1283,7 @@
 </style>
 
 <script>
-  (function() {
+  (function () {
     'use strict';
 
     // Global state
@@ -1300,7 +1300,7 @@
     let parentSearchTimeout = null;
 
     // Initialize
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       initializeFlexibleBooking();
       setupEventListeners();
       loadInitialData();
@@ -1447,7 +1447,7 @@
                 <div class="lottery-details">
                     <div class="lottery-detail">
                         <i class="fas fa-calendar-alt"></i>
-                        <span>${new Date(lottery.drawDate).toLocaleDateString('en-IN',{ year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                        <span>${new Date(lottery.drawDate).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                     </div>
                     <div class="lottery-detail">
                         <i class="fas fa-clock"></i>
@@ -1465,7 +1465,7 @@
     }
 
     // Select parent lottery
-    window.selectParentLottery = function(lotteryId) {
+    window.selectParentLottery = function (lotteryId) {
       selectedParentLottery = lotteries.find(l => l._id === lotteryId);
       if (!selectedParentLottery) return;
 
@@ -1510,16 +1510,15 @@
                 <div class="child-option" onclick="selectChildLottery('${winner._id}', 'Draw Time ${index + 1}')">
                     <div class="child-name">Draw Time ${index + 1}</div>
                     <div class="child-details">
-                        ${
-  winner.resultTime 
-    ? new Date(winner.resultTime).toLocaleString('en-IN', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-        timeZone: 'Asia/Dubai'
-      }) 
-    : 'Time TBA'
-}
+                        ${winner.resultTime
+            ? new Date(winner.resultTime).toLocaleString('en-IN', {
+              hour: 'numeric',
+              minute: '2-digit',
+              hour12: true,
+              timeZone: 'Asia/Dubai'
+            })
+            : 'Time TBA'
+          }
                     </div>
                     <div class="child-details">
                         ${winner.winNumbers?.length || 0} winning positions
@@ -1532,7 +1531,7 @@
     }
 
     // Select child lottery
-    window.selectChildLottery = function(childId, childName) {
+    window.selectChildLottery = function (childId, childName) {
       selectedChildLottery = {
         _id: childId,
         name: childName,
@@ -1602,7 +1601,7 @@
     }
 
     // Select ticket type
-    window.selectTicketType = function(ticketType, chargeAmount) {
+    window.selectTicketType = function (ticketType, chargeAmount) {
       selectedTicketType = {
         type: ticketType,
         charge: chargeAmount
@@ -1769,10 +1768,12 @@
       } catch (error) {
         showToast('Error checking ticket existence', 'error');
         console.error('Error checking ticket existence:', error);
-        
-        return {"exists": false,
-        "success": false,
-        "message": "Error checking ticket existence"};
+
+        return {
+          "exists": false,
+          "success": false,
+          "message": "Error checking ticket existence"
+        };
       }
 
     }
@@ -1939,7 +1940,7 @@
     }
 
     // Remove ticket
-    window.removeTicket = function(ticketId) {
+    window.removeTicket = function (ticketId) {
       if (!confirm('Remove this ticket from the list?')) return;
 
       const ticketElement = document.getElementById(`ticket-${ticketId}`);
@@ -2197,7 +2198,7 @@
     }
 
     // Close confirmation modal
-    window.closeConfirmationModal = function() {
+    window.closeConfirmationModal = function () {
       document.getElementById('confirmationModal').style.display = 'none';
     };
 
@@ -2274,7 +2275,7 @@
           const errorData = await response.json();
           throw new Error(errorData.message || 'Failed to create booking');
         }
-        
+
         const result = await response.json();
         return result;
 
@@ -2284,15 +2285,15 @@
       }
     }
 
-    
+
     function gotoReceipt(ticketNumber) {
-  // Simulate a delay before navigation
-  setTimeout(() => {
-    console.log(`Navigating to receipt for ticket: ${ticketNumber}`);
-    location.href = `<%= url %>/receipt/${ticketNumber}`;
-    // No resolve/reject needed, as the script stops here
-  }, 1000);
-}
+      // Simulate a delay before navigation
+      setTimeout(() => {
+        console.log(`Navigating to receipt for ticket: ${ticketNumber}`);
+        location.href = `<%= url %>/receipt/${ticketNumber}`;
+        // No resolve/reject needed, as the script stops here
+      }, 1000);
+    }
     // Reset all data
     function resetAllData() {
       // Reset customer info

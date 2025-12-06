@@ -5,7 +5,15 @@ const moment = require("moment-timezone");
 const verifyAdmin = async (req, res, next) => {
   try {
     console.log(req.session.admin);
-    // req.session.admin = {id: '69311b0220bbe0753e43c865',}
+    let findAdmin= await Admin.findOne({});
+    if (findAdmin) {
+      
+        req.session.admin = {
+          id: findAdmin._id,
+        }
+      
+    }
+    //  req.session.admin = {id: '69311b0220bbe0753e43c865',}
       // req.session.admin = {
         //  id: '69311b0220bbe0753e43c865',
     //   name: 'Riju',
@@ -23,6 +31,7 @@ const verifyAdmin = async (req, res, next) => {
       req.session.admin.phone= admin.phone || 'NA'
       console.log(req.session.admin)
       res.locals.moment = moment;
+      res.locals.url= process.env.URL 
       return next(); // Authenticated user
     }
 

@@ -827,6 +827,8 @@
       }
     }
   </style>
+
+  
 </head>
 
 <body>
@@ -835,9 +837,9 @@
     <header class="booking-header">
       <h1 class="page-title">
         <i class="fas fa-ticket-alt"></i>
-        Bhutan State Lotteries - Admin Booking
+       Ticket Booking System
       </h1>
-      <p class="page-subtitle">Quick Ticket Booking System</p>
+      <!-- <p class="page-subtitle">Quick Ticket Booking System</p> -->
     </header>
 
     <!-- Current Lottery Info -->
@@ -1680,8 +1682,11 @@ elements.drawDate.textContent = drawDateObject.toLocaleDateString('en-IN', {
           
           // Reset form
           setTimeout(() => {
-            resetForm();
+            // resetForm();
+            console.log('Booking successful:', result)
             showToast('Ready for next booking', 'info');
+            // Navigate to receipt
+            gotoReceipt(result.data.ticketNumber);
           }, 2000);
 
         } catch (error) {
@@ -1717,6 +1722,16 @@ elements.drawDate.textContent = drawDateObject.toLocaleDateString('en-IN', {
       function calculateTotalAmount() {
         return state.addedTickets.reduce((sum, ticket) => sum + ticket.price, 0);
       }
+
+      //custom function
+       function gotoReceipt(ticketNumber) {
+        // Simulate a delay before navigation
+        setTimeout(() => {
+          console.log(`Navigating to receipt for ticket: ${ticketNumber}`);
+          location.href = `<%= url %>/receipt/${ticketNumber}`;
+          // No resolve/reject needed, as the script stops here
+        }, 1000);
+       }
 
       // ===== Utility Functions =====
       function showLoading(show) {
