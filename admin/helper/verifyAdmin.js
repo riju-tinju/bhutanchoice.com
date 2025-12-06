@@ -5,6 +5,7 @@ const moment = require("moment-timezone");
 const verifyAdmin = async (req, res, next) => {
   try {
     console.log(req.session.admin);
+    // req.session.admin = {id: '69311b0220bbe0753e43c865',}
       // req.session.admin = {
         //  id: '69311b0220bbe0753e43c865',
     //   name: 'Riju',
