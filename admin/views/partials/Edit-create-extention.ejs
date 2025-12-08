@@ -1295,44 +1295,44 @@
 
     if (lotteryData.winners && lotteryData.winners.length > 0) {
       lotteryData.winners.forEach(winner => {
-        winnerGroupCounter++;
-        const winnerGroupDiv = createWinnerGroupElement(winnerGroupCounter);
-        winnersContainer.appendChild(winnerGroupDiv);
+  winnerGroupCounter++;
+  const winnerGroupDiv = createWinnerGroupElement(winnerGroupCounter, winner); // ✅ Pass the entire winner object
+  winnersContainer.appendChild(winnerGroupDiv);
+  
+  // Initialize result time picker for this group
+  const resultTimeInput = winnerGroupDiv.querySelector('.winner-group-time input');
+  const picker = initResultTimePicker(resultTimeInput, winnerGroupCounter);
 
-        // Initialize result time picker for this group
-        const resultTimeInput = winnerGroupDiv.querySelector('.winner-group-time input');
-        const picker = initResultTimePicker(resultTimeInput, winnerGroupCounter);
+  // Set result time - convert UTC from database to Dubai time for display
+  if (winner.resultTime) {
+    const dubaiTime = moment.utc(winner.resultTime).tz('Asia/Dubai').format('DD/MM/YYYY hh:mm A');
+    picker.setDate(dubaiTime, true);
+  }
 
-        // Set result time - convert UTC from database to Dubai time for display
-        if (winner.resultTime) {
-          const dubaiTime = moment.utc(winner.resultTime).tz('Asia/Dubai').format('DD/MM/YYYY hh:mm A');
-          picker.setDate(dubaiTime, true);
-        }
+  // Add winning numbers
+  if (winner.winNumbers && winner.winNumbers.length > 0) {
+    const winNumbersContainer = winnerGroupDiv.querySelector('.win-numbers-container');
+    winNumbersContainer.innerHTML = '';
 
-        // Add winning numbers
-        if (winner.winNumbers && winner.winNumbers.length > 0) {
-          const winNumbersContainer = winnerGroupDiv.querySelector('.win-numbers-container');
-          winNumbersContainer.innerHTML = '';
+    winner.winNumbers.forEach(winNumber => {
+      const winNumberDiv = createWinnerNumberElement(winnerGroupCounter);
+      winNumbersContainer.appendChild(winNumberDiv);
 
-          winner.winNumbers.forEach(winNumber => {
-            const winNumberDiv = createWinnerNumberElement(winnerGroupCounter);
-            winNumbersContainer.appendChild(winNumberDiv);
+      const prizeSelect = winNumberDiv.querySelector('.winner-prize-select');
+      const ticketInput = winNumberDiv.querySelector('.winner-ticket-input');
+      const resultStatusToggle = winNumberDiv.querySelector('.result-status-switch');
 
-            const prizeSelect = winNumberDiv.querySelector('.winner-prize-select');
-            const ticketInput = winNumberDiv.querySelector('.winner-ticket-input');
-            const resultStatusToggle = winNumberDiv.querySelector('.result-status-switch');
+      // First populate options, then set value
+      updatePrizeRankOptions(winnerGroupCounter);
+      prizeSelect.value = winNumber.prizeRank || '';
+      ticketInput.value = winNumber.ticketNumber || '';
+      resultStatusToggle.checked = winNumber.resultStatus || false;
+    });
+  }
 
-            // First populate options, then set value
-            updatePrizeRankOptions(winnerGroupCounter);
-            prizeSelect.value = winNumber.prizeRank || '';
-            ticketInput.value = winNumber.ticketNumber || '';
-            resultStatusToggle.checked = winNumber.resultStatus || false;
-          });
-        }
-
-        // Update options after all winning numbers are added
-        updatePrizeRankOptions(winnerGroupCounter);
-      });
+  // Update options after all winning numbers are added
+  updatePrizeRankOptions(winnerGroupCounter);
+});
     }
 
     document.getElementById('lotteryModal').classList.add('show');
@@ -1395,48 +1395,50 @@
 
   // Winner Group Management
   function addWinnerGroup() {
-    winnerGroupCounter++;
-    const winnersContainer = document.getElementById('winnersContainer');
-    const winnerGroupDiv = createWinnerGroupElement(winnerGroupCounter);
-    winnersContainer.appendChild(winnerGroupDiv);
+  winnerGroupCounter++;
+  const winnersContainer = document.getElementById('winnersContainer');
+  const winnerGroupDiv = createWinnerGroupElement(winnerGroupCounter); // ✅ No existing winner for new groups
+  winnersContainer.appendChild(winnerGroupDiv);
 
-    // Initialize result time picker for this group
-    const resultTimeInput = winnerGroupDiv.querySelector('.winner-group-time input');
-    const picker = initResultTimePicker(resultTimeInput, winnerGroupCounter);
+  // Initialize result time picker for this group
+  const resultTimeInput = winnerGroupDiv.querySelector('.winner-group-time input');
+  const picker = initResultTimePicker(resultTimeInput, winnerGroupCounter);
 
-    // Set default result time (2 hours after draw time)
-    if (drawDatePicker && drawDatePicker.selectedDates.length > 0) {
-      const drawDateTime = new Date(drawDatePicker.selectedDates[0]);
-      drawDateTime.setHours(drawDateTime.getHours() + 2);
-      picker.setDate(drawDateTime, true);
-    }
-
-    // Add first winning number
-    addWinnerNumber(winnerGroupCounter);
+  // Set default result time (2 hours after draw time)
+  if (drawDatePicker && drawDatePicker.selectedDates.length > 0) {
+    const drawDateTime = new Date(drawDatePicker.selectedDates[0]);
+    drawDateTime.setHours(drawDateTime.getHours() + 2);
+    picker.setDate(drawDateTime, true);
   }
 
-  function createWinnerGroupElement(groupIndex) {
-    const winnerGroupDiv = document.createElement('div');
-    winnerGroupDiv.className = 'winner-group';
-    winnerGroupDiv.dataset.groupIndex = groupIndex;
-    winnerGroupDiv.innerHTML = `
-            <div class="winner-group-header">
-                <div class="winner-group-title">Group ${groupIndex}</div>
-                <div class="winner-group-time">
-                    <input type="text" placeholder="DD/MM/YYYY HH:MM" required>
-                </div>
-                <button type="button" class="remove-winner-group" onclick="removeWinnerGroup(${groupIndex})">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
-            <div class="win-numbers-container"></div>
-            <button type="button" class="add-winner-number" onclick="addWinnerNumber(${groupIndex})">
-                <i class="fas fa-plus"></i>
-                Add Winning Number
-            </button>
-        `;
-    return winnerGroupDiv;
-  }
+  // Add first winning number
+  addWinnerNumber(winnerGroupCounter);
+}
+
+  function createWinnerGroupElement(groupIndex, existingWinner = null) {
+  const winnerGroupDiv = document.createElement('div');
+  winnerGroupDiv.className = 'winner-group';
+  winnerGroupDiv.dataset.groupIndex = groupIndex;
+  winnerGroupDiv.dataset.winnerId = existingWinner?._id || ''; // ✅ Store the _id
+  
+  winnerGroupDiv.innerHTML = `
+    <div class="winner-group-header">
+      <div class="winner-group-title">Group ${groupIndex}</div>
+      <div class="winner-group-time">
+        <input type="text" placeholder="DD/MM/YYYY HH:MM" required>
+      </div>
+      <button type="button" class="remove-winner-group" onclick="removeWinnerGroup(${groupIndex})">
+        <i class="fas fa-trash"></i>
+      </button>
+    </div>
+    <div class="win-numbers-container"></div>
+    <button type="button" class="add-winner-number" onclick="addWinnerNumber(${groupIndex})">
+      <i class="fas fa-plus"></i>
+      Add Winning Number
+    </button>
+  `;
+  return winnerGroupDiv;
+}
 
   function removeWinnerGroup(groupIndex) {
     const winnerGroup = document.querySelector(`[data-group-index="${groupIndex}"]`);
@@ -1656,59 +1658,61 @@ document.getElementById('lotteryForm').addEventListener('submit', function(e) {
   });
 
   // Collect winner groups
-  const winnerGroups = document.querySelectorAll('.winner-group');
-  winnerGroups.forEach(group => {
-    const groupIndex = group.dataset.groupIndex;
+const winnerGroups = document.querySelectorAll('.winner-group');
+winnerGroups.forEach(group => {
+  const groupIndex = group.dataset.groupIndex;
+  const winnerId = group.dataset.winnerId || ''; // ✅ Get the stored _id
+  
+  // Get result time from Flatpickr and convert to UTC
+  let resultTimeUTC;
+  if (resultTimePickers[groupIndex] && resultTimePickers[groupIndex].input.value) {
+    const dateString = resultTimePickers[groupIndex].input.value;
     
-    // Get result time from Flatpickr and convert to UTC
-    let resultTimeUTC;
-    if (resultTimePickers[groupIndex] && resultTimePickers[groupIndex].input.value) {
-      const dateString = resultTimePickers[groupIndex].input.value;
-      
-      // Parse the date string manually and treat it as Dubai time
-      const [datePart, timePart, period] = dateString.split(' ');
-      const [day, month, year] = datePart.split('/');
-      const [hours, minutes] = timePart.split(':');
-      
-      let hours24 = parseInt(hours);
-      if (period === 'PM' && hours24 !== 12) {
-        hours24 += 12;
-      } else if (period === 'AM' && hours24 === 12) {
-        hours24 = 0;
-      }
-      
-      const dubaiTimeString = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${hours24.toString().padStart(2, '0')}:${minutes}:00`;
-      const dubaiMoment = moment.tz(dubaiTimeString, 'Asia/Dubai');
-      resultTimeUTC = dubaiMoment.utc().toISOString();
-      
-    } else {
-      return;
+    // Parse the date string manually and treat it as Dubai time
+    const [datePart, timePart, period] = dateString.split(' ');
+    const [day, month, year] = datePart.split('/');
+    const [hours, minutes] = timePart.split(':');
+    
+    let hours24 = parseInt(hours);
+    if (period === 'PM' && hours24 !== 12) {
+      hours24 += 12;
+    } else if (period === 'AM' && hours24 === 12) {
+      hours24 = 0;
     }
+    
+    const dubaiTimeString = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${hours24.toString().padStart(2, '0')}:${minutes}:00`;
+    const dubaiMoment = moment.tz(dubaiTimeString, 'Asia/Dubai');
+    resultTimeUTC = dubaiMoment.utc().toISOString();
+    
+  } else {
+    return; // Skip if no result time
+  }
 
-    const winNumbers = [];
-    const winnerNumbers = group.querySelectorAll('.winner-number-item');
+  const winNumbers = [];
+  const winnerNumbers = group.querySelectorAll('.winner-number-item');
 
-    winnerNumbers.forEach(numberItem => {
-      const prizeRank = parseInt(numberItem.querySelector('.winner-prize-select').value);
-      const ticketNumber = numberItem.querySelector('.winner-ticket-input').value.trim();
-      const resultStatus = numberItem.querySelector('.result-status-switch').checked;
+  winnerNumbers.forEach(numberItem => {
+    const prizeRank = parseInt(numberItem.querySelector('.winner-prize-select').value);
+    const ticketNumber = numberItem.querySelector('.winner-ticket-input').value.trim();
+    const resultStatus = numberItem.querySelector('.result-status-switch').checked;
 
-      if (prizeRank && ticketNumber) {
-        winNumbers.push({
-          prizeRank: prizeRank,
-          ticketNumber: ticketNumber,
-          resultStatus: resultStatus
-        });
-      }
-    });
-
-    if (winNumbers.length > 0) {
-      formData.winners.push({
-        resultTime: resultTimeUTC,
-        winNumbers: winNumbers
+    if (prizeRank && ticketNumber) {
+      winNumbers.push({
+        prizeRank: prizeRank,
+        ticketNumber: ticketNumber,
+        resultStatus: resultStatus
       });
     }
   });
+
+  if (winNumbers.length > 0) {
+    formData.winners.push({
+      _id: winnerId, // ✅ MUST be first field for clarity
+      resultTime: resultTimeUTC,
+      winNumbers: winNumbers
+    });
+  }
+});
 
   // Validate
   if (formData.prizes.length === 0) {

@@ -1,65 +1,45 @@
-let j={
-  "customer": {
-    "name": "Arun",
-    "phone": "1124"
+db.tickets.insertOne({
+  ticketNumber: "TEST-003",
+  customer: {
+    name: "Paid Winner",
+    phone: "4444444444"
   },
-  "tickets": [
-    {
-      "lottery": {
-        "id": "69311e7c3f133dacff4e59ae",
-        "name": "Thursday choice lottery",
-        "drawNumber": 1,
-        "drawDate": "04/12/2025 09:00",
-        "timeId": "winner-1764826748911-e9s4p"
-      },
-      "number": "3345",
-      "type": 4,
-      "chargeAmount": 12
-    },
-    {
-      "lottery": {
-        "id": "69311e7c3f133dacff4e59ae",
-        "name": "Thursday choice lottery",
-        "drawNumber": 1,
-        "drawDate": "04/12/2025 09:00",
-        "timeId": "winner-1764826748911-e9s4p"
-      },
-      "number": "B5",
-      "type": 1,
-      "chargeAmount": 12
-    },
-    {
-      "lottery": {
-        "id": "69311e7c3f133dacff4e59ae",
-        "name": "Thursday choice lottery",
-        "drawNumber": 1,
-        "drawDate": "04/12/2025 09:00",
-        "timeId": "winner-1764826748911-e9s4p"
-      },
-      "number": "554",
-      "type": 3,
-      "chargeAmount": 12
-    },
-    {
-      "lottery": {
-        "id": "69311e7c3f133dacff4e59ae",
-        "name": "Thursday choice lottery",
-        "drawNumber": 1,
-        "drawDate": "04/12/2025 09:00",
-        "timeId": "winner-1764826748912-u8u3k"
-      },
-      "number": "332",
-      "type": 3,
-      "chargeAmount": 12
-    }
-  ],
-  "financial": {
-    "quantity": 4,
-    "subtotal": 48,
-    "totalAmount": 48
+  agent: {
+    name: "Test Agent",
+    id: ObjectId("507f1f77bcf86cd799439011"),
+    phone: "2222222222",
+    role: ["agent"]
   },
-  "meta": {
-    "uniqueLotteries": 1,
-    "uniqueDrawTimes": 2
+  tickets: [{
+    lottery: {
+      id: ObjectId("69368301eeef8d503f81c171"),
+      name: "Test Lottery",
+      drawNumber: 1,
+      drawDate: new Date("2025-12-08T20:00:00Z"),
+      timeId: "evening-draw"
+    },
+    numberId: "NUM-003",
+    number: "55555",
+    type: 1,
+    quantity: 1,
+    chargeAmount: 100,
+    status: "PAID",
+    isWon: false
+  }],
+  financial: {
+    quantity: 1,
+    subtotal: 100,
+    tax: 0,
+    totalAmount: 100,
+    currency: "NU"
+  },
+  payment: {
+    method: "cash",
+    status: "paid",
+    reference: "REF-003"
+  },
+  booking: {
+    date: new Date(),
+    status: "active"
   }
-}
+})
