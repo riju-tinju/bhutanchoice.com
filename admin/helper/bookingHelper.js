@@ -9,233 +9,59 @@ const moment = require("moment-timezone");
 
 const bookingHelper = {
 
-  // Get bookings with filters, sorting, and pagination + KPIs
-  getBookingsWithFiltersorg: async (queryParams) => {
+  // Add this function to calculate total prizes
+  calculateTotalPrizesWorkaround: async (matchConditions) => {
     try {
-      const {
-        page = 1,
-        limit = 25,
-        customerSearch,
-        fromDateTime,
-        toDateTime,
-        childLotteryId,
-        agentId,
-        status,
-        sort = 'booking.date_desc',
-        win
-      } = queryParams;
+      // 1. Get all bookings with won tickets
+      const bookings = await Booking.find({
+        ...matchConditions,
+        "tickets.isWon": true
+      }).lean();
 
-      // Build match conditions
-      const matchConditions = {};
+      let totalPrizes = 0;
 
-      // Customer search (name or phone)
-      if (customerSearch && customerSearch.trim()) {
-        matchConditions.$or = [
-          { "customer.name": { $regex: customerSearch.trim(), $options: 'i' } },
-          { "customer.phone": { $regex: customerSearch.trim(), $options: 'i' } }
-        ];
-      }
+      // 2. Process each booking
+      for (const booking of bookings) {
+        for (const ticket of booking.tickets) {
+          if (ticket.isWon) {
+            // 3. Get the lottery to find prize amount
+            const lottery = await Lottery.findById(ticket.lottery.id).lean();
 
+            if (lottery && lottery.winners) {
+              // 4. Find this ticket in lottery winners to get prizeRank
+               for (const winner of lottery.winners) {
+            //  for (let i = lottery.winners.length - 1; i >= 0; i--){
+             //   const winner = lottery.winners[i]; // Get the winner element
+                if (winner._id === ticket.lottery.timeId) {
+                  const winNumber = winner.winNumbers.find(
+                    wn => wn.ticketNumber === ticket.number
+                  );
 
+                  if (winNumber && winNumber.prizeRank) {
+                    // 5. Find prize amount for this rank
+                    const prize = lottery.prizes.find(
+                      p => p.rank === winNumber.prizeRank
+                    );
 
-      // Date range filter
-      if (fromDateTime || toDateTime) {
-        matchConditions["booking.date"] = {};
-        if (fromDateTime) {
-          matchConditions["booking.date"].$gte = new Date(fromDateTime);
-        }
-        if (toDateTime) {
-          matchConditions["booking.date"].$lte = new Date(toDateTime);
-        }
-      }
-
-      // Child lottery filter
-      if (childLotteryId && childLotteryId.trim()) {
-        matchConditions["tickets.lottery.timeId"] = childLotteryId
-      }
-
-      // Agent filter
-      if (agentId && agentId.trim()) {
-        matchConditions["agent.id"] = new mongoose.Types.ObjectId(agentId);
-      }
-
-      // Status filter
-      if (status && status.trim()) {
-        if (status === "ALL") {
-          // If status is ALL, we don't need to filter by status
-        }
-        else if (status === "PAID" || status === "UNPAID" || status === "IN_AGENT")
-          matchConditions["tickets.status"] = status;
-        else if (status === "NOT_WINNER") {
-          // Get documents where ALL tickets have status "NOT_WINNER"
-          // AND exclude documents that have at least one ticket with "PAID" or "UNPAID"
-          matchConditions["tickets.status"] = "NOT_WINNER";
-          matchConditions["tickets"] = {
-            $not: {
-              $elemMatch: {
-                status: { $in: ["PAID", "UNPAID"] }
+                    if (prize) {
+                      // 6. Add to total (prize amount × quantity)
+                      totalPrizes += prize.amount * ticket.quantity;
+                    }
+                  }
+                  break;
+                }
               }
             }
-          };
-        }
-
-      }
-
-      // 🟢 WIN filter (newly added)
-      if (win && win.trim()) {
-        if (win === "WON") {
-          // Get documents having at least one ticket with isWon = true
-          matchConditions["tickets"] = { $elemMatch: { isWon: true } };
-        } else if (win === "NOT_WON") {
-          // Get documents having NO ticket with isWon = true
-          matchConditions["tickets.isWon"] = { $ne: true };
-        }
-      }
-
-      // Build sort conditions
-      const [sortField, sortDirection] = sort.split('_');
-      const sortConditions = {};
-
-      switch (sortField) {
-        case 'booking.date':
-          sortConditions["booking.date"] = sortDirection === 'desc' ? -1 : 1;
-          break;
-        case 'agent.name':
-          sortConditions["agent.name"] = sortDirection === 'desc' ? -1 : 1;
-          break;
-        case 'financial.totalAmount':
-          sortConditions["financial.totalAmount"] = sortDirection === 'desc' ? -1 : 1;
-          break;
-        case 'financial.quantity':
-          sortConditions["financial.quantity"] = sortDirection === 'desc' ? -1 : 1;
-          break;
-        default:
-          sortConditions["booking.date"] = -1; // Default sort
-      }
-
-      // Calculate pagination
-      const pageNumber = parseInt(page);
-      const limitNumber = parseInt(limit);
-      const skip = (pageNumber - 1) * limitNumber;
-
-      // Execute query with aggregation for better performance + KPIs
-      const pipeline = [
-        { $match: matchConditions },
-        { $sort: sortConditions },
-        {
-          $facet: {
-            // Paginated bookings data
-            bookings: [
-              { $skip: skip },
-              { $limit: limitNumber },
-              {
-                $addFields: {
-                  displayId: {
-                    $concat: ["", "$ticketNumber"]
-                  }
-                }
-              }
-            ],
-
-            // Total count for pagination
-            totalCount: [
-              { $count: "count" }
-            ],
-
-            // KPI calculations based on filtered data
-            kpiData: [
-              {
-                $group: {
-                  _id: null,
-                  // Total number of bookings (totalTickets)
-                  totalTickets: { $sum: 1 },
-
-                  // Total number of individual ticket numbers across all bookings
-                  totalTicketNumbers: { $sum: { $size: "$tickets" } },
-
-                  // Total revenue from all bookings
-                  totalRevenue: { $sum: "$financial.totalAmount" },
-
-                  // Total won ticket numbers (sum of tickets where isWon = true)
-                  totalWonTicketNumbers: {
-                    $sum: {
-                      $size: {
-                        $filter: {
-                          input: "$tickets",
-                          cond: { $eq: ["$$this.isWon", true] }
-                        }
-                      }
-                    }
-                  },
-
-                  // Additional useful KPIs
-                  totalActiveBookings: {
-                    $sum: {
-                      $cond: [{ $eq: ["$booking.status", "active"] }, 1, 0]
-                    }
-                  },
-                  totalCancelledBookings: {
-                    $sum: {
-                      $cond: [{ $eq: ["$booking.status", "cancelled"] }, 1, 0]
-                    }
-                  },
-                  averageBookingValue: { $avg: "$financial.totalAmount" },
-                  totalSubtotal: { $sum: "$financial.subtotal" },
-                  totalTax: { $sum: "$financial.tax" }
-                }
-              }
-            ]
           }
         }
-      ];
+      }
 
-      const result = await Booking.aggregate(pipeline);
-      const bookings = result[0].bookings;
-      const totalItems = result[0].totalCount[0]?.count || 0;
-      const totalPages = Math.ceil(totalItems / limitNumber);
-      const kpiData = result[0].kpiData[0] || {};
-
-      // Prepare KPI object with proper formatting
-      const kpi = {
-        totalTickets: kpiData.totalTickets || 0,
-        totalTicketNumbers: kpiData.totalTicketNumbers || 0,
-        totalRevenue: parseFloat((kpiData.totalRevenue || 0).toFixed(2)),
-        totalWonTicketNumbers: kpiData.totalWonTicketNumbers || 0,
-
-        // Additional KPIs for better insights
-        totalActiveBookings: kpiData.totalActiveBookings || 0,
-        totalCancelledBookings: kpiData.totalCancelledBookings || 0,
-        averageBookingValue: parseFloat((kpiData.averageBookingValue || 0).toFixed(2)),
-        totalSubtotal: parseFloat((kpiData.totalSubtotal || 0).toFixed(2)),
-        totalTax: parseFloat((kpiData.totalTax || 0).toFixed(2)),
-
-        // Calculated metrics
-        winRate: kpiData.totalTicketNumbers > 0
-          ? parseFloat(((kpiData.totalWonTicketNumbers / kpiData.totalTicketNumbers) * 100).toFixed(2))
-          : 0,
-        cancelRate: kpiData.totalTickets > 0
-          ? parseFloat(((kpiData.totalCancelledBookings / kpiData.totalTickets) * 100).toFixed(2))
-          : 0
-      };
-
-      return {
-        success: true,
-        bookings: bookings,
-        pagination: {
-          currentPage: pageNumber,
-          totalPages: totalPages,
-          totalItems: totalItems,
-          itemsPerPage: limitNumber
-        },
-        kpi: kpi
-      };
-
+      return totalPrizes;
     } catch (error) {
-      console.error('Error in getBookingsWithFilters:', error);
-      throw error;
+      console.error('Error calculating total prizes:', error);
+      return 0;
     }
   },
-
   // Get bookings with filters, sorting, and pagination + KPIs
   getBookingsWithFilters: async (queryParams) => {
     try {
@@ -379,7 +205,7 @@ const bookingHelper = {
 
                   // Total number of individual ticket entries across all bookings - KEEP SAME NAME
                   totalTicketNumbers: { $sum: "$financial.quantity" }, //{ $sum: { $size: "$tickets" } },
-                  
+
 
                   // ADDED: Total quantity of tickets (sum of all ticket quantities) - NEW FIELD
                   totalTicketQuantity: { $sum: "$financial.quantity" },
@@ -441,7 +267,7 @@ const bookingHelper = {
       const totalItems = result[0].totalCount[0]?.count || 0;
       const totalPages = Math.ceil(totalItems / limitNumber);
       const kpiData = result[0].kpiData[0] || {};
-
+       
       // Prepare KPI object with proper formatting
       const kpi = {
         totalTickets: kpiData.totalTickets || 0,
@@ -468,6 +294,9 @@ const bookingHelper = {
           ? parseFloat(((kpiData.totalCancelledBookings / kpiData.totalTickets) * 100).toFixed(2))
           : 0
       };
+
+      const totalPrizes = await bookingHelper.calculateTotalPrizesWorkaround(matchConditions) || null
+      kpi.totalPrizes = parseFloat(totalPrizes.toFixed(2));
 
       return {
         success: true,
@@ -1253,435 +1082,435 @@ const bookingHelper = {
     }
   },
   createBookingLast: async (bookingData, req, res) => {
-  try {
-    // Validate required fields
-    if (!bookingData.customer || !bookingData.customer.name || !bookingData.customer.phone) {
-      return res.status(400).json({
-        success: false,
-        message: "Customer name and phone are required",
-        data: null
-      });
-    }
+    try {
+      // Validate required fields
+      if (!bookingData.customer || !bookingData.customer.name || !bookingData.customer.phone) {
+        return res.status(400).json({
+          success: false,
+          message: "Customer name and phone are required",
+          data: null
+        });
+      }
 
-    if (!bookingData.tickets || !Array.isArray(bookingData.tickets) || bookingData.tickets.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "At least one ticket is required",
-        data: null
-      });
-    }
+      if (!bookingData.tickets || !Array.isArray(bookingData.tickets) || bookingData.tickets.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: "At least one ticket is required",
+          data: null
+        });
+      }
 
-    // Generate unique ticket number
-    const ticketNumber = await bookingHelper.generateUniqueTicketNumber();
+      // Generate unique ticket number
+      const ticketNumber = await bookingHelper.generateUniqueTicketNumber();
 
-    // Process tickets with validation
-    const processedTickets = [];
-    let subtotal = 0;
-    let totalQuantity = 0;
-    let validationErrors = [];
+      // Process tickets with validation
+      const processedTickets = [];
+      let subtotal = 0;
+      let totalQuantity = 0;
+      let validationErrors = [];
 
-    for (const [index, ticket] of bookingData.tickets.entries()) {
-      try {
-        // Validate required ticket fields
-        if (!ticket.number || !ticket.type || !ticket.lottery || !ticket.lottery.id) {
-          validationErrors.push(`Ticket ${index + 1}: Number, type, and lottery ID are required`);
-          continue;
-        }
-
-        // Validate ticket type
-        if (ticket.type < 1 || ticket.type > 5) {
-          validationErrors.push(`Ticket ${index + 1}: Invalid ticket type ${ticket.type}. Must be 1-5`);
-          continue;
-        }
-
-        // Get lottery
-        const lottery = await Lottery.findById(ticket.lottery.id);
-        if (!lottery) {
-          validationErrors.push(`Ticket ${index + 1}: Lottery not found: ${ticket.lottery.id}`);
-          continue;
-        }
-
-        // Get ticket charge for this type
-        const chargeRecord = await ticketCharge.findOne({ ticketType: ticket.type });
-        if (!chargeRecord) {
-          validationErrors.push(`Ticket ${index + 1}: No price found for type ${ticket.type}`);
-          continue;
-        }
-
-        // Validate timeId (draw time)
-        let timeId = ticket.lottery.timeId || 'main';
-        let drawDate = lottery.drawDate; // Default to parent lottery draw date
-
-        if (timeId !== 'main') {
-          const childLottery = lottery.winners.find(w => w._id.toString() === timeId.toString());
-          if (!childLottery) {
-            validationErrors.push(`Ticket ${index + 1}: Draw time not found: ${timeId}`);
+      for (const [index, ticket] of bookingData.tickets.entries()) {
+        try {
+          // Validate required ticket fields
+          if (!ticket.number || !ticket.type || !ticket.lottery || !ticket.lottery.id) {
+            validationErrors.push(`Ticket ${index + 1}: Number, type, and lottery ID are required`);
             continue;
           }
-          drawDate = childLottery.resultTime || drawDate;
-        }
 
-        // Validate quantity
-        const quantity = ticket.quantity || 1;
-        if (quantity < 1 || quantity > 99) {
-          validationErrors.push(`Ticket ${index + 1}: Quantity must be 1-99`);
-          continue;
-        }
-
-        // Generate unique numberId for this ticket entry
-        const uniqueNumberId = `${ticket.number}-${Date.now()}-${Math.random().toString(36).substr(2, 8)}`;
-
-        // Create single ticket entry with quantity
-        processedTickets.push({
-          lottery: {
-            id: lottery._id,
-            name: lottery.name,
-            drawNumber: lottery.drawNumber,
-            drawDate: drawDate,
-            timeId: timeId
-          },
-          numberId: uniqueNumberId,
-          isWon: false,
-          number: ticket.number,
-          type: ticket.type,
-          quantity: quantity, // Single entry with quantity field
-          chargeAmount: chargeRecord.chargeAmount * quantity,
-          status: "NOT_WINNER"
-        });
-
-        // Calculate total price for this ticket (price × quantity)
-        const ticketTotal = chargeRecord.chargeAmount * quantity;
-        subtotal += ticketTotal;
-        totalQuantity += quantity;
-
-      } catch (error) {
-        validationErrors.push(`Ticket ${index + 1}: ${error.message}`);
-      }
-    }
-
-    // Check for validation errors
-    if (validationErrors.length > 0) {
-      return res.status(400).json({
-        success: false,
-        message: "Ticket validation failed",
-        errors: validationErrors,
-        data: null
-      });
-    }
-
-    if (processedTickets.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "No valid tickets to book",
-        data: null
-      });
-    }
-
-    // Get agent info from session
-    const agent = {
-      name: req.session?.admin?.name || 'NA',
-      id: req.session?.admin?.id || null,
-      phone: req.session?.admin?.phone || 'N/A',
-      role: req.session?.admin?.role || ['admin']
-    };
-
-    // Create booking object
-    const newBooking = new Booking({
-      ticketNumber: ticketNumber,
-      customer: {
-        name: bookingData.customer.name.trim(),
-        phone: bookingData.customer.phone.trim()
-      },
-      agent: agent,
-      booking: {
-        date: new Date(),
-        status: 'active'
-      },
-      tickets: processedTickets,
-      financial: {
-        quantity: processedTickets.reduce((acc, ticket) => acc + ticket.quantity, 0), // Total quantity across all tickets
-        subtotal: subtotal,
-        tax: 0,
-        totalAmount: subtotal,
-        currency: "NU"
-      },
-      payment: bookingData.payment || {
-        method: 'cash',
-        status: 'paid',
-        reference: `PAY-${Date.now()}`
-      }
-    });
-
-    // Save booking
-    const savedBooking = await newBooking.save();
-
-    // Add displayId virtual field
-    const bookingObj = savedBooking.toObject();
-    bookingObj.displayId = `TKT-${savedBooking.ticketNumber}`;
-
-    return res.status(201).json({
-      success: true,
-      message: "Booking created successfully",
-      data: {
-        ticketNumber: savedBooking.ticketNumber,
-        displayId: bookingObj.displayId,
-        customer: savedBooking.customer,
-        totalAmount: savedBooking.financial.totalAmount,
-        totalTickets: processedTickets.length, // Number of unique ticket entries
-        totalQuantity: savedBooking.financial.quantity, // Total quantity across all tickets
-        bookingDate: savedBooking.booking.date
-      }
-    });
-
-  } catch (error) {
-    console.error('Error in createBooking:', error);
-
-    // Handle specific error types
-    if (error.name === 'ValidationError') {
-      const errors = Object.values(error.errors).map(err => err.message);
-      return res.status(400).json({
-        success: false,
-        message: "Validation failed",
-        errors: errors,
-        data: null
-      });
-    }
-
-    if (error.code === 11000) {
-      return res.status(400).json({
-        success: false,
-        message: "Duplicate ticket number detected",
-        data: null
-      });
-    }
-
-    return res.status(500).json({
-      success: false,
-      message: "An error occurred while creating booking",
-      data: null,
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
-  }
-},
-createBooking: async (bookingData, req, res) => {
-  try {
-    
-    // Validate required fields
-    if (!bookingData.customer || !bookingData.customer.name || !bookingData.customer.phone) {
-      return res.status(400).json({
-        success: false,
-        message: "Customer name and phone are required",
-        data: null
-      });
-    }
-
-    if (!bookingData.tickets || !Array.isArray(bookingData.tickets) || bookingData.tickets.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "At least one ticket is required",
-        data: null
-      });
-    }
-
-    // Generate unique ticket number
-    const ticketNumber = await bookingHelper.generateUniqueTicketNumber();
-
-    // Process tickets with validation
-    const processedTickets = [];
-    let subtotal = 0;
-    let totalQuantity = 0;
-    let validationErrors = [];
-
-    for (const [index, ticket] of bookingData.tickets.entries()) {
-      try {
-        // Validate required ticket fields
-        if (!ticket.number || !ticket.type || !ticket.lottery || !ticket.lottery.id) {
-          validationErrors.push(`Ticket ${index + 1}: Number, type, and lottery ID are required`);
-          continue;
-        }
-
-        // Validate ticket type
-        if (ticket.type < 1 || ticket.type > 5) {
-          validationErrors.push(`Ticket ${index + 1}: Invalid ticket type ${ticket.type}. Must be 1-5`);
-          continue;
-        }
-
-        // Get lottery
-        const lottery = await Lottery.findById(ticket.lottery.id);
-        if (!lottery) {
-          validationErrors.push(`Ticket ${index + 1}: Lottery not found: ${ticket.lottery.id}`);
-          continue;
-        }
-
-        // Get ticket charge for this type
-        const chargeRecord = await ticketCharge.findOne({ ticketType: ticket.type });
-        if (!chargeRecord) {
-          validationErrors.push(`Ticket ${index + 1}: No price found for type ${ticket.type}`);
-          continue;
-        }
-
-        // Validate timeId (draw time)
-        let timeId = ticket.lottery.timeId || 'main';
-        let drawDate = lottery.drawDate; // Default to parent lottery draw date
-
-        if (timeId !== 'main') {
-          const childLottery = lottery.winners.find(w => w._id.toString() === timeId.toString());
-          if (!childLottery) {
-            validationErrors.push(`Ticket ${index + 1}: Draw time not found: ${timeId}`);
+          // Validate ticket type
+          if (ticket.type < 1 || ticket.type > 5) {
+            validationErrors.push(`Ticket ${index + 1}: Invalid ticket type ${ticket.type}. Must be 1-5`);
             continue;
           }
-          drawDate = childLottery.resultTime || drawDate;
+
+          // Get lottery
+          const lottery = await Lottery.findById(ticket.lottery.id);
+          if (!lottery) {
+            validationErrors.push(`Ticket ${index + 1}: Lottery not found: ${ticket.lottery.id}`);
+            continue;
+          }
+
+          // Get ticket charge for this type
+          const chargeRecord = await ticketCharge.findOne({ ticketType: ticket.type });
+          if (!chargeRecord) {
+            validationErrors.push(`Ticket ${index + 1}: No price found for type ${ticket.type}`);
+            continue;
+          }
+
+          // Validate timeId (draw time)
+          let timeId = ticket.lottery.timeId || 'main';
+          let drawDate = lottery.drawDate; // Default to parent lottery draw date
+
+          if (timeId !== 'main') {
+            const childLottery = lottery.winners.find(w => w._id.toString() === timeId.toString());
+            if (!childLottery) {
+              validationErrors.push(`Ticket ${index + 1}: Draw time not found: ${timeId}`);
+              continue;
+            }
+            drawDate = childLottery.resultTime || drawDate;
+          }
+
+          // Validate quantity
+          const quantity = ticket.quantity || 1;
+          if (quantity < 1 || quantity > 99) {
+            validationErrors.push(`Ticket ${index + 1}: Quantity must be 1-99`);
+            continue;
+          }
+
+          // Generate unique numberId for this ticket entry
+          const uniqueNumberId = `${ticket.number}-${Date.now()}-${Math.random().toString(36).substr(2, 8)}`;
+
+          // Create single ticket entry with quantity
+          processedTickets.push({
+            lottery: {
+              id: lottery._id,
+              name: lottery.name,
+              drawNumber: lottery.drawNumber,
+              drawDate: drawDate,
+              timeId: timeId
+            },
+            numberId: uniqueNumberId,
+            isWon: false,
+            number: ticket.number,
+            type: ticket.type,
+            quantity: quantity, // Single entry with quantity field
+            chargeAmount: chargeRecord.chargeAmount * quantity,
+            status: "NOT_WINNER"
+          });
+
+          // Calculate total price for this ticket (price × quantity)
+          const ticketTotal = chargeRecord.chargeAmount * quantity;
+          subtotal += ticketTotal;
+          totalQuantity += quantity;
+
+        } catch (error) {
+          validationErrors.push(`Ticket ${index + 1}: ${error.message}`);
         }
+      }
 
-        // Validate quantity
-        const quantity = ticket.quantity || 1;
-        if (quantity < 1 || quantity > 99) {
-          validationErrors.push(`Ticket ${index + 1}: Quantity must be 1-99`);
-          continue;
-        }
-
-        // Generate unique numberId for this ticket entry
-        const uniqueNumberId = `${ticket.number}-${Date.now()}-${Math.random().toString(36).substr(2, 8)}`;
-
-        // Calculate total charge for this ticket entry (per-ticket price × quantity)
-        const singleTicketCharge = chargeRecord.chargeAmount;
-        const totalTicketCharge = singleTicketCharge * quantity;
-
-        // Create single ticket entry with quantity
-        processedTickets.push({
-          lottery: {
-            id: lottery._id,
-            name: lottery.name,
-            drawNumber: lottery.drawNumber,
-            drawDate: drawDate,
-            timeId: timeId
-          },
-          numberId: uniqueNumberId,
-          isWon: false,
-          number: ticket.number,
-          type: ticket.type,
-          quantity: quantity, // Quantity for this ticket entry
-          chargeAmount: totalTicketCharge, // TOTAL charge for this ticket entry (quantity × per-ticket price)
-          status: "NOT_WINNER"
+      // Check for validation errors
+      if (validationErrors.length > 0) {
+        return res.status(400).json({
+          success: false,
+          message: "Ticket validation failed",
+          errors: validationErrors,
+          data: null
         });
-
-        // Add to totals
-        subtotal += totalTicketCharge;
-        totalQuantity += quantity;
-
-      } catch (error) {
-        validationErrors.push(`Ticket ${index + 1}: ${error.message}`);
       }
-    }
 
-    // Check for validation errors
-    if (validationErrors.length > 0) {
-      return res.status(400).json({
-        success: false,
-        message: "Ticket validation failed",
-        errors: validationErrors,
-        data: null
-      });
-    }
-
-    if (processedTickets.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "No valid tickets to book",
-        data: null
-      });
-    }
-
-    // Get agent info from session
-    const agent = {
-      name: req.session?.admin?.name || 'NA',
-      id: req.session?.admin?.id || null,
-      phone: req.session?.admin?.phone || 'N/A',
-      role: req.session?.admin?.role || ['admin']
-    };
-
-    // Create booking object
-    const newBooking = new Booking({
-      ticketNumber: ticketNumber,
-      customer: {
-        name: bookingData.customer.name.trim(),
-        phone: bookingData.customer.phone.trim()
-      },
-      agent: agent,
-      booking: {
-        date: new Date(),
-        status: 'active'
-      },
-      tickets: processedTickets,
-      financial: {
-        quantity: totalQuantity, // Total quantity (sum of all ticket quantities)
-        subtotal: subtotal,
-        tax: 0,
-        totalAmount: subtotal,
-        currency: "NU"
-      },
-      payment: bookingData.payment || {
-        method: 'cash',
-        status: 'paid',
-        reference: `PAY-${Date.now()}`
+      if (processedTickets.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: "No valid tickets to book",
+          data: null
+        });
       }
-    });
 
-    console.log('Booking data:\n', bookingData);
-    console.log('Tickets data:\n', bookingData.tickets);
-    console.log('processedTickets Before saving the book :\n',processedTickets)
-    // Save booking
-    const savedBooking = await newBooking.save();
-    console.log('Saved Booking:\n', savedBooking);
+      // Get agent info from session
+      const agent = {
+        name: req.session?.admin?.name || 'NA',
+        id: req.session?.admin?.id || null,
+        phone: req.session?.admin?.phone || 'N/A',
+        role: req.session?.admin?.role || ['admin']
+      };
 
-    // Add displayId virtual field
-    const bookingObj = savedBooking.toObject();
-    bookingObj.displayId = `TKT-${savedBooking.ticketNumber}`;
+      // Create booking object
+      const newBooking = new Booking({
+        ticketNumber: ticketNumber,
+        customer: {
+          name: bookingData.customer.name.trim(),
+          phone: bookingData.customer.phone.trim()
+        },
+        agent: agent,
+        booking: {
+          date: new Date(),
+          status: 'active'
+        },
+        tickets: processedTickets,
+        financial: {
+          quantity: processedTickets.reduce((acc, ticket) => acc + ticket.quantity, 0), // Total quantity across all tickets
+          subtotal: subtotal,
+          tax: 0,
+          totalAmount: subtotal,
+          currency: "NU"
+        },
+        payment: bookingData.payment || {
+          method: 'cash',
+          status: 'paid',
+          reference: `PAY-${Date.now()}`
+        }
+      });
 
-    return res.status(201).json({
-      success: true,
-      message: "Booking created successfully",
-      data: {
-        ticketNumber: savedBooking.ticketNumber,
-        displayId: bookingObj.displayId,
-        customer: savedBooking.customer,
-        totalAmount: savedBooking.financial.totalAmount,
-        totalTickets: processedTickets.length, // Number of unique ticket entries
-        totalQuantity: savedBooking.financial.quantity, // Total quantity across all tickets
-        bookingDate: savedBooking.booking.date
+      // Save booking
+      const savedBooking = await newBooking.save();
+
+      // Add displayId virtual field
+      const bookingObj = savedBooking.toObject();
+      bookingObj.displayId = `TKT-${savedBooking.ticketNumber}`;
+
+      return res.status(201).json({
+        success: true,
+        message: "Booking created successfully",
+        data: {
+          ticketNumber: savedBooking.ticketNumber,
+          displayId: bookingObj.displayId,
+          customer: savedBooking.customer,
+          totalAmount: savedBooking.financial.totalAmount,
+          totalTickets: processedTickets.length, // Number of unique ticket entries
+          totalQuantity: savedBooking.financial.quantity, // Total quantity across all tickets
+          bookingDate: savedBooking.booking.date
+        }
+      });
+
+    } catch (error) {
+      console.error('Error in createBooking:', error);
+
+      // Handle specific error types
+      if (error.name === 'ValidationError') {
+        const errors = Object.values(error.errors).map(err => err.message);
+        return res.status(400).json({
+          success: false,
+          message: "Validation failed",
+          errors: errors,
+          data: null
+        });
       }
-    });
 
-  } catch (error) {
-    console.error('Error in createBooking:', error);
+      if (error.code === 11000) {
+        return res.status(400).json({
+          success: false,
+          message: "Duplicate ticket number detected",
+          data: null
+        });
+      }
 
-    // Handle specific error types
-    if (error.name === 'ValidationError') {
-      const errors = Object.values(error.errors).map(err => err.message);
-      return res.status(400).json({
+      return res.status(500).json({
         success: false,
-        message: "Validation failed",
-        errors: errors,
-        data: null
+        message: "An error occurred while creating booking",
+        data: null,
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
     }
+  },
+  createBooking: async (bookingData, req, res) => {
+    try {
 
-    if (error.code === 11000) {
-      return res.status(400).json({
+      // Validate required fields
+      if (!bookingData.customer || !bookingData.customer.name || !bookingData.customer.phone) {
+        return res.status(400).json({
+          success: false,
+          message: "Customer name and phone are required",
+          data: null
+        });
+      }
+
+      if (!bookingData.tickets || !Array.isArray(bookingData.tickets) || bookingData.tickets.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: "At least one ticket is required",
+          data: null
+        });
+      }
+
+      // Generate unique ticket number
+      const ticketNumber = await bookingHelper.generateUniqueTicketNumber();
+
+      // Process tickets with validation
+      const processedTickets = [];
+      let subtotal = 0;
+      let totalQuantity = 0;
+      let validationErrors = [];
+
+      for (const [index, ticket] of bookingData.tickets.entries()) {
+        try {
+          // Validate required ticket fields
+          if (!ticket.number || !ticket.type || !ticket.lottery || !ticket.lottery.id) {
+            validationErrors.push(`Ticket ${index + 1}: Number, type, and lottery ID are required`);
+            continue;
+          }
+
+          // Validate ticket type
+          if (ticket.type < 1 || ticket.type > 5) {
+            validationErrors.push(`Ticket ${index + 1}: Invalid ticket type ${ticket.type}. Must be 1-5`);
+            continue;
+          }
+
+          // Get lottery
+          const lottery = await Lottery.findById(ticket.lottery.id);
+          if (!lottery) {
+            validationErrors.push(`Ticket ${index + 1}: Lottery not found: ${ticket.lottery.id}`);
+            continue;
+          }
+
+          // Get ticket charge for this type
+          const chargeRecord = await ticketCharge.findOne({ ticketType: ticket.type });
+          if (!chargeRecord) {
+            validationErrors.push(`Ticket ${index + 1}: No price found for type ${ticket.type}`);
+            continue;
+          }
+
+          // Validate timeId (draw time)
+          let timeId = ticket.lottery.timeId || 'main';
+          let drawDate = lottery.drawDate; // Default to parent lottery draw date
+
+          if (timeId !== 'main') {
+            const childLottery = lottery.winners.find(w => w._id.toString() === timeId.toString());
+            if (!childLottery) {
+              validationErrors.push(`Ticket ${index + 1}: Draw time not found: ${timeId}`);
+              continue;
+            }
+            drawDate = childLottery.resultTime || drawDate;
+          }
+
+          // Validate quantity
+          const quantity = ticket.quantity || 1;
+          if (quantity < 1 || quantity > 99) {
+            validationErrors.push(`Ticket ${index + 1}: Quantity must be 1-99`);
+            continue;
+          }
+
+          // Generate unique numberId for this ticket entry
+          const uniqueNumberId = `${ticket.number}-${Date.now()}-${Math.random().toString(36).substr(2, 8)}`;
+
+          // Calculate total charge for this ticket entry (per-ticket price × quantity)
+          const singleTicketCharge = chargeRecord.chargeAmount;
+          const totalTicketCharge = singleTicketCharge * quantity;
+
+          // Create single ticket entry with quantity
+          processedTickets.push({
+            lottery: {
+              id: lottery._id,
+              name: lottery.name,
+              drawNumber: lottery.drawNumber,
+              drawDate: drawDate,
+              timeId: timeId
+            },
+            numberId: uniqueNumberId,
+            isWon: false,
+            number: ticket.number,
+            type: ticket.type,
+            quantity: quantity, // Quantity for this ticket entry
+            chargeAmount: totalTicketCharge, // TOTAL charge for this ticket entry (quantity × per-ticket price)
+            status: "NOT_WINNER"
+          });
+
+          // Add to totals
+          subtotal += totalTicketCharge;
+          totalQuantity += quantity;
+
+        } catch (error) {
+          validationErrors.push(`Ticket ${index + 1}: ${error.message}`);
+        }
+      }
+
+      // Check for validation errors
+      if (validationErrors.length > 0) {
+        return res.status(400).json({
+          success: false,
+          message: "Ticket validation failed",
+          errors: validationErrors,
+          data: null
+        });
+      }
+
+      if (processedTickets.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: "No valid tickets to book",
+          data: null
+        });
+      }
+
+      // Get agent info from session
+      const agent = {
+        name: req.session?.admin?.name || 'NA',
+        id: req.session?.admin?.id || null,
+        phone: req.session?.admin?.phone || 'N/A',
+        role: req.session?.admin?.role || ['admin']
+      };
+
+      // Create booking object
+      const newBooking = new Booking({
+        ticketNumber: ticketNumber,
+        customer: {
+          name: bookingData.customer.name.trim(),
+          phone: bookingData.customer.phone.trim()
+        },
+        agent: agent,
+        booking: {
+          date: new Date(),
+          status: 'active'
+        },
+        tickets: processedTickets,
+        financial: {
+          quantity: totalQuantity, // Total quantity (sum of all ticket quantities)
+          subtotal: subtotal,
+          tax: 0,
+          totalAmount: subtotal,
+          currency: "NU"
+        },
+        payment: bookingData.payment || {
+          method: 'cash',
+          status: 'paid',
+          reference: `PAY-${Date.now()}`
+        }
+      });
+
+      console.log('Booking data:\n', bookingData);
+      console.log('Tickets data:\n', bookingData.tickets);
+      console.log('processedTickets Before saving the book :\n', processedTickets)
+      // Save booking
+      const savedBooking = await newBooking.save();
+      console.log('Saved Booking:\n', savedBooking);
+
+      // Add displayId virtual field
+      const bookingObj = savedBooking.toObject();
+      bookingObj.displayId = `TKT-${savedBooking.ticketNumber}`;
+
+      return res.status(201).json({
+        success: true,
+        message: "Booking created successfully",
+        data: {
+          ticketNumber: savedBooking.ticketNumber,
+          displayId: bookingObj.displayId,
+          customer: savedBooking.customer,
+          totalAmount: savedBooking.financial.totalAmount,
+          totalTickets: processedTickets.length, // Number of unique ticket entries
+          totalQuantity: savedBooking.financial.quantity, // Total quantity across all tickets
+          bookingDate: savedBooking.booking.date
+        }
+      });
+
+    } catch (error) {
+      console.error('Error in createBooking:', error);
+
+      // Handle specific error types
+      if (error.name === 'ValidationError') {
+        const errors = Object.values(error.errors).map(err => err.message);
+        return res.status(400).json({
+          success: false,
+          message: "Validation failed",
+          errors: errors,
+          data: null
+        });
+      }
+
+      if (error.code === 11000) {
+        return res.status(400).json({
+          success: false,
+          message: "Duplicate ticket number detected",
+          data: null
+        });
+      }
+
+      return res.status(500).json({
         success: false,
-        message: "Duplicate ticket number detected",
-        data: null
+        message: "An error occurred while creating booking",
+        data: null,
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
     }
-
-    return res.status(500).json({
-      success: false,
-      message: "An error occurred while creating booking",
-      data: null,
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
-  }
-},
+  },
 
   // Generate unique ticket number
   generateUniqueTicketNumber: async () => {
