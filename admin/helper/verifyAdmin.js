@@ -11,7 +11,6 @@ const verifyAdmin = async (req, res, next) => {
     //     req.session.admin = {
     //       id: findAdmin._id,
     //     }
-      
     // }
     
     if (req.session.admin && req.session.admin.id) {

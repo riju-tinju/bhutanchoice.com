@@ -899,7 +899,7 @@
   // 1. Construct the message
   // Use encodeURIComponent to ensure the message is safely URL-encoded
   // This handles spaces, commas, and other special characters correctly.
-  const message = encodeURIComponent(`Hi ${name}, you booked a ticket from BSL. Here is the ticket URL: ${url}`);
+  const message = encodeURIComponent(`${url}`);
 
   // 2. Construct the WhatsApp API URL
   // The 'phone' should be the full international number without any '+' or leading zeros.
