@@ -176,6 +176,18 @@
           <div class="kpi-label">Won Tickets</div>
         </div>
       </div>
+      
+      <div class="kpi-card kpi-warning">
+        <div class="kpi-icon">
+          <i class="fas fa-coins"></i>
+        </div>
+        <div class="kpi-content">
+          <div class="kpi-value" id="kpiTotalWonPrizes">Nu. 0</div>
+          <div class="kpi-label">Won Prize</div>
+        </div>
+      </div>
+
+
     </div>
   </div>
 
@@ -1655,6 +1667,7 @@ body {
         document.getElementById('kpiTotalRevenue').textContent = `Nu. ${(currentKpiData.totalRevenue || 0).toLocaleString()}`;
         document.getElementById('kpiTotalTicketNumbers').textContent = (currentKpiData.totalTicketNumbers || 0).toLocaleString();
         document.getElementById('kpiTotalWonNumbers').textContent = (currentKpiData.totalWonTicketNumbers || 0).toLocaleString();
+        document.getElementById('kpiTotalWonPrizes').textContent = `Nu. ${(currentKpiData.totalPrizes || 0).toLocaleString()}`;
         
         // Show KPI section
         showKpiSection();

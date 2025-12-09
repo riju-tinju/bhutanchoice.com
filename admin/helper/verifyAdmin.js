@@ -5,22 +5,15 @@ const moment = require("moment-timezone");
 const verifyAdmin = async (req, res, next) => {
   try {
     console.log(req.session.admin);
-    let findAdmin= await Admin.findOne({});
-    if (findAdmin) {
+    // let findAdmin= await Admin.findOne({});
+    // if (findAdmin) {
       
-        req.session.admin = {
-          id: findAdmin._id,
-        }
+    //     req.session.admin = {
+    //       id: findAdmin._id,
+    //     }
       
-    }
-    //  req.session.admin = {id: '69311b0220bbe0753e43c865',}
-      // req.session.admin = {
-        //  id: '69311b0220bbe0753e43c865',
-    //   name: 'Riju',
-    //   email: 'riju@gmail.com',
-    //   phone: '+975111112345',
-    //   roll: 'admin'
-      // }// For testing purposes, remove this line in production
+    // }
+    
     if (req.session.admin && req.session.admin.id) {
       let admin = await Admin.findById(req.session.admin.id);
       if (!admin) {

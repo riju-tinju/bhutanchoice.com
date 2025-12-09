@@ -4,11 +4,11 @@ const moment = require("moment-timezone");
 
 const verifyAgent = async (req, res, next) => {
   try {
-    let findAgent= await Agent.findOne({});
-    console.log("findAgent", findAgent);
-    if(findAgent){
-      req.session.agent ={id: findAgent._id, }
-    }
+    // let findAgent= await Agent.findOne({});
+    // console.log("findAgent", findAgent);
+    // if(findAgent){
+    //   req.session.agent ={id: findAgent._id, }
+    // }
     if (req.session.agent && req.session.agent.id) {
       let agent= await Agent.findOne({_id: req.session.agent.id});
       if (!agent) {
