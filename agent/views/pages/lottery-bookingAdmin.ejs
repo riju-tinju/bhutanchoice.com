@@ -73,15 +73,20 @@
       left: -50%;
       width: 200%;
       height: 200%;
-      background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
       background-size: 20px 20px;
       opacity: 0.3;
       animation: float 20s linear infinite;
     }
 
     @keyframes float {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
     }
 
     .page-title {
@@ -301,6 +306,7 @@
       letter-spacing: 2px;
       transition: var(--transition);
     }
+
     .ticket-input.placeholder {
       color: var(--gray);
       font-size: 2px;
@@ -434,6 +440,7 @@
         opacity: 0;
         transform: translateX(-20px);
       }
+
       to {
         opacity: 1;
         transform: translateX(0);
@@ -658,6 +665,7 @@
         transform: translateX(100%);
         opacity: 0;
       }
+
       to {
         transform: translateX(0);
         opacity: 1;
@@ -744,8 +752,13 @@
     }
 
     @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
     }
 
     .skeleton {
@@ -756,8 +769,13 @@
     }
 
     @keyframes shimmer {
-      0% { background-position: -200% 0; }
-      100% { background-position: 200% 0; }
+      0% {
+        background-position: -200% 0;
+      }
+
+      100% {
+        background-position: 200% 0;
+      }
     }
 
     /* ===== Empty States ===== */
@@ -784,23 +802,23 @@
       .booking-header {
         padding: 20px 16px;
       }
-      
+
       .page-title {
         font-size: 1.5rem;
       }
-      
+
       .form-section {
         padding: 20px 16px;
       }
-      
+
       .summary-grid {
         grid-template-columns: 1fr;
       }
-      
+
       .actions-bar {
         flex-direction: column;
       }
-      
+
       .toast-container {
         left: 16px;
         right: 16px;
@@ -814,12 +832,12 @@
         background: none;
         padding: 0;
       }
-      
+
       .booking-container {
         box-shadow: none;
         border-radius: 0;
       }
-      
+
       .actions-bar,
       .add-ticket-btn,
       .remove-ticket-btn {
@@ -828,7 +846,7 @@
     }
   </style>
 
-  
+
 </head>
 
 <body>
@@ -837,7 +855,7 @@
     <header class="booking-header">
       <h1 class="page-title">
         <i class="fas fa-ticket-alt"></i>
-       Ticket Booking System
+        Ticket Booking System
       </h1>
       <!-- <p class="page-subtitle">Quick Ticket Booking System</p> -->
     </header>
@@ -919,12 +937,11 @@
 
         <div class="ticket-input-grid">
           <div class="ticket-input-wrapper">
-            <input type="text" id="ticketNumberInput" class="ticket-input" 
-                   placeholder="Enter ticket number (e.g., 12345, A7)"
-                   maxlength="5">
+            <input type="text" id="ticketNumberInput" class="ticket-input"
+              placeholder="Enter ticket number (e.g., 12345, A7)" maxlength="5">
             <div class="form-error" id="ticketNumberError"></div>
           </div>
-          
+
           <div class="quantity-controls">
             <button type="button" class="quantity-btn" id="decreaseQuantity">-</button>
             <input type="number" id="ticketQuantity" class="quantity-input" value="1" min="1" max="99">
@@ -933,7 +950,8 @@
         </div>
 
         <div class="input-helper" id="ticketInputHelper">
-          <strong>Format Examples:</strong> 5 digits (12345), 4 digits (1234), 3 digits (123), 2 digits (12), or Letter+Digit (A7)
+          <strong>Format Examples:</strong> 5 digits (12345), 4 digits (1234), 3 digits (123), 2 digits (12), or
+          Letter+Digit (A7)
         </div>
 
         <button type="button" class="add-ticket-btn" id="addTicketBtn" disabled>
@@ -950,7 +968,7 @@
         Booking Summary
         <span class="ticket-count-badge" id="ticketCountBadge">0 tickets</span>
       </h2>
-      
+
       <div class="tickets-list" id="ticketsList">
         <!-- Tickets will be added here dynamically -->
       </div>
@@ -1011,7 +1029,7 @@
   </div>
 
   <script>
-    (function() {
+    (function () {
       'use strict';
 
       // State Management
@@ -1075,13 +1093,13 @@
       };
 
       // Initialize
-      document.addEventListener('DOMContentLoaded', function() {
+      document.addEventListener('DOMContentLoaded', function () {
         initializeApp();
       });
 
       async function initializeApp() {
         showLoading(true);
-        
+
         try {
           await Promise.all([
             loadActiveLottery(),
@@ -1107,7 +1125,7 @@
 
         // Ticket number input
         elements.ticketNumberInput.addEventListener('input', handleTicketNumberInput);
-        elements.ticketNumberInput.addEventListener('keypress', function(e) {
+        elements.ticketNumberInput.addEventListener('keypress', function (e) {
           if (e.key === 'Enter' && !elements.addTicketBtn.disabled) {
             addTicketToBooking();
           }
@@ -1130,11 +1148,39 @@
           }
         });
 
-        elements.ticketQuantity.addEventListener('input', function() {
-          let value = parseInt(this.value) || 1;
-          if (value < 1) value = 1;
-          if (value > 99) value = 99;
-          this.value = value;
+
+
+        // Ticket quantity input
+        elements.ticketQuantity.addEventListener('input', function () {
+          let rawValue = this.value.trim();
+          let numericValue = parseInt(rawValue) || 1;
+
+          // 1. Enforce Minimum of 1
+          if (numericValue < 1) {
+            numericValue = 1;
+          }
+
+          // 2. Handle the '123' becomes '23' logic
+          if (numericValue > 99) {
+            // If the number is 3 or more digits long (e.g., '123', '5234')
+            if (rawValue.length > 2) {
+              // Get the last two digits from the string
+              let lastTwoDigits = rawValue.slice(-2);
+              numericValue = parseInt(lastTwoDigits) || 1; // Default to 1 if the slice is '00' or empty
+
+              // Re-check the minimum after slicing (e.g., if input was '100', slice is '00', which becomes 1)
+              if (numericValue < 1) {
+                numericValue = 1;
+              }
+            } else {
+              // If the number is > 99 but was not 3 or more digits (e.g., started as 98, user hit 9 and now it is 99)
+              // This is unlikely in a single 'input' event but is a safeguard.
+              numericValue = 99;
+            }
+          }
+
+          // 3. Update the input field
+          this.value = numericValue;
           updateAddButtonText();
         });
 
@@ -1154,7 +1200,7 @@
           if (!response.ok) throw new Error('Failed to load lottery data');
 
           const data = await response.json();
-          
+
           if (!data.success || !data.currentLottery) {
             throw new Error(data.message || 'No active lottery found');
           }
@@ -1167,14 +1213,14 @@
 
         } catch (error) {
           console.error('Error loading active lottery:', error);
-          
+
           // Show error state
           elements.lotteryBanner.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
           elements.lotteryName.textContent = 'No Active Lottery';
           elements.drawNumber.textContent = '#000';
           elements.drawDate.textContent = '--/--/----';
           elements.nextDrawTime.textContent = 'Not Available';
-          
+
           showToast('No active lottery available for booking', 'warning');
           disableTicketInput();
         }
@@ -1183,7 +1229,7 @@
       // ===== Ticket Type Detection =====
       function detectTicketType(ticketNumber) {
         const num = ticketNumber.trim().toUpperCase();
-        
+
         // Type 1: One letter (A-E) followed by one digit
         if (/^[A-E][0-9]$/.test(num)) {
           return { type: 1, valid: true, example: 'A7' };
@@ -1225,14 +1271,14 @@
         }
 
         const detection = detectTicketType(ticketNumber);
-        
+
         if (detection.valid) {
           const price = calculateTicketPrice(detection.type);
-          
+
           elements.detectedTicketType.textContent = `Type ${detection.type} (Nu ${price})`;
           elements.ticketNumberError.textContent = '';
           elements.addTicketBtn.disabled = false;
-          
+
           // Update helper text
           elements.ticketInputHelper.innerHTML = `
             <strong>Ticket Type ${detection.type}:</strong> 
@@ -1242,7 +1288,7 @@
           elements.detectedTicketType.textContent = 'Invalid Format';
           elements.ticketNumberError.textContent = 'Invalid ticket number format';
           elements.addTicketBtn.disabled = true;
-          
+
           elements.ticketInputHelper.innerHTML = `
             <strong>Invalid Format:</strong> 
             Must be 5 digits (12345), 4 digits (1234), 3 digits (123), 2 digits (12), or Letter+Digit (A7)
@@ -1265,7 +1311,7 @@
       function updateAddButtonText() {
         const quantity = parseInt(elements.ticketQuantity.value) || 1;
         const ticketNumber = elements.ticketNumberInput.value.trim();
-        
+
         if (!ticketNumber) {
           elements.addTicketBtn.innerHTML = `<i class="fas fa-plus"></i> Add to Booking`;
           return;
@@ -1314,8 +1360,8 @@
         }
 
         // Check for duplicate in current session
-        const isDuplicate = state.addedTickets.some(ticket => 
-          ticket.number === ticketNumber && 
+        const isDuplicate = state.addedTickets.some(ticket =>
+          ticket.number === ticketNumber &&
           ticket.type === detection.type
         );
 
@@ -1327,7 +1373,7 @@
         // Optional: Check with backend for existing tickets
         try {
           showLoading(true);
-          
+
           const checkResponse = await fetch('/api/booking/check-ticket', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1340,7 +1386,7 @@
           });
 
           const checkData = await checkResponse.json();
-          
+
           if (checkData.exists) {
             showToast('This ticket number already exists in the system', 'error');
             return;
@@ -1354,7 +1400,7 @@
 
         // Add ticket(s) to state
         const price = calculateTicketPrice(detection.type);
-        
+
         for (let i = 0; i < quantity; i++) {
           const ticket = {
             id: `ticket_${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${i}`,
@@ -1384,7 +1430,7 @@
         elements.ticketNumberInput.value = '';
         elements.ticketQuantity.value = '1';
         resetTicketDisplay();
-        
+
         // Show success message
         if (quantity > 1) {
           showToast(`Added ${quantity} tickets with number ${ticketNumber}`, 'success');
@@ -1400,27 +1446,27 @@
 
       function removeTicket(ticketId) {
         state.addedTickets = state.addedTickets.filter(ticket => ticket.id !== ticketId);
-        
+
         updateTicketsList();
         updateSummary();
-        
+
         if (state.addedTickets.length === 0) {
           hideTicketsSection();
         }
-        
+
         showToast('Ticket removed from booking', 'info');
       }
 
       function clearAllTickets() {
         if (state.addedTickets.length === 0) return;
-        
+
         if (!confirm('Remove all tickets from the booking?')) return;
-        
+
         state.addedTickets = [];
         updateTicketsList();
         updateSummary();
         hideTicketsSection();
-        
+
         showToast('All tickets removed', 'info');
       }
 
@@ -1429,26 +1475,26 @@
         if (!state.currentLottery) return;
 
         const lottery = state.currentLottery;
-        
+
         elements.lotteryName.textContent = lottery.name;
         elements.drawNumber.textContent = `#${lottery.drawNumber}`;
         // elements.drawDate.textContent = lottery.drawDate
         // 1. Convert the ISO string into a Date object
-const drawDateObject = new Date(lottery.drawDate);
+        const drawDateObject = new Date(lottery.drawDate);
 
-// 2. Use the Date object's toLocaleString method for formatting
-elements.drawDate.textContent = drawDateObject.toLocaleDateString('en-IN', {
-  day: '2-digit',
-  month: 'long',
-  year: 'numeric',
-  timeZone: 'Asia/Dubai'
-});
-// .toLocaleString('en-IN', {
-//     hour: 'numeric',
-//     minute: '2-digit',
-//     hour12: true,
-//     timeZone: 'Asia/Dubai'
-// });
+        // 2. Use the Date object's toLocaleString method for formatting
+        elements.drawDate.textContent = drawDateObject.toLocaleDateString('en-IN', {
+          day: '2-digit',
+          month: 'long',
+          year: 'numeric',
+          timeZone: 'Asia/Dubai'
+        });
+        // .toLocaleString('en-IN', {
+        //     hour: 'numeric',
+        //     minute: '2-digit',
+        //     hour12: true,
+        //     timeZone: 'Asia/Dubai'
+        // });
         const drawTimeObject = new Date(lottery.nextDrawTime);
         elements.nextDrawTime.textContent = drawTimeObject.toLocaleString('en-IN', {
           hour: 'numeric',
@@ -1462,7 +1508,7 @@ elements.drawDate.textContent = drawDateObject.toLocaleDateString('en-IN', {
           // Upcoming draw
           const hoursUntil = Math.floor(lottery.timeUntilDraw / (1000 * 60 * 60));
           const minutesUntil = Math.floor((lottery.timeUntilDraw % (1000 * 60 * 60)) / (1000 * 60));
-          
+
           if (hoursUntil < 1) {
             elements.lotteryBanner.style.background = 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
           }
@@ -1475,7 +1521,7 @@ elements.drawDate.textContent = drawDateObject.toLocaleDateString('en-IN', {
       function updateTicketsList() {
         // Group tickets by number and type
         const groupedTickets = {};
-        
+
         state.addedTickets.forEach(ticket => {
           const key = `${ticket.number}_${ticket.type}`;
           if (!groupedTickets[key]) {
@@ -1500,7 +1546,7 @@ elements.drawDate.textContent = drawDateObject.toLocaleDateString('en-IN', {
         // Add grouped tickets
         Object.values(groupedTickets).forEach(group => {
           const totalPrice = group.price * group.count;
-          
+
           const ticketCard = document.createElement('div');
           ticketCard.className = 'ticket-card';
           ticketCard.innerHTML = `
@@ -1518,7 +1564,7 @@ elements.drawDate.textContent = drawDateObject.toLocaleDateString('en-IN', {
               </button>
             </div>
           `;
-          
+
           elements.ticketsList.appendChild(ticketCard);
         });
 
@@ -1594,10 +1640,10 @@ elements.drawDate.textContent = drawDateObject.toLocaleDateString('en-IN', {
       // ===== Booking Functions =====
       function cancelBooking() {
         if (!confirm('Cancel this booking? All tickets will be removed.')) return;
-        
+
         clearAllTickets();
         resetForm();
-        
+
         showToast('Booking cancelled', 'info');
       }
 
@@ -1659,7 +1705,7 @@ elements.drawDate.textContent = drawDateObject.toLocaleDateString('en-IN', {
 
           const response = await fetch('bookings/api/bookings', {
             method: 'POST',
-            headers: { 
+            headers: {
               'Content-Type': 'application/json',
               // Add authentication token if needed
               // 'Authorization': `Bearer ${getAuthToken()}`
@@ -1679,7 +1725,7 @@ elements.drawDate.textContent = drawDateObject.toLocaleDateString('en-IN', {
 
           // Success
           showToast('Booking confirmed successfully!', 'success');
-          
+
           // Reset form
           setTimeout(() => {
             // resetForm();
@@ -1724,14 +1770,14 @@ elements.drawDate.textContent = drawDateObject.toLocaleDateString('en-IN', {
       }
 
       //custom function
-       function gotoReceipt(ticketNumber) {
+      function gotoReceipt(ticketNumber) {
         // Simulate a delay before navigation
         setTimeout(() => {
           console.log(`Navigating to receipt for ticket: ${ticketNumber}`);
           location.href = `<%= url %>/receipt/${ticketNumber}`;
           // No resolve/reject needed, as the script stops here
         }, 1000);
-       }
+      }
 
       // ===== Utility Functions =====
       function showLoading(show) {
@@ -1741,7 +1787,7 @@ elements.drawDate.textContent = drawDateObject.toLocaleDateString('en-IN', {
       function showToast(message, type = 'info') {
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
-        
+
         const icons = {
           success: 'fas fa-check-circle',
           error: 'fas fa-exclamation-circle',
@@ -1780,4 +1826,5 @@ elements.drawDate.textContent = drawDateObject.toLocaleDateString('en-IN', {
     })();
   </script>
 </body>
+
 </html>

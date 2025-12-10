@@ -715,6 +715,8 @@
     .modal {
       padding: 0;
       align-items: stretch;
+      height: 100vh; 
+      z-index: 10000 !important;
     }
 
     .modal.show {
@@ -724,12 +726,12 @@
     }
 
     .modal-content {
-      width: 100%;
+      width: 100% !important;
       height: 100vh;
-      max-height: 100vh;
+      max-height: 100% !important;
       max-width: 100%;
-      border-radius: 0;
-      margin: 0;
+      border-radius: 0 !important;
+      margin: 0 auto !important;
       display: flex;
       flex-direction: column;
     }
@@ -739,12 +741,13 @@
       border-radius: 0;
       flex-shrink: 0;
     }
-
+    
     .modal-title {
       font-size: 1.25rem;
     }
 
     .modal-body {
+      max-height: 100% !important;
       padding: 16px 20px 20px;
       flex: 1;
       overflow-y: auto;
@@ -915,7 +918,7 @@
       gap: 12px;
       padding-top: 20px;
       margin-top: 24px;
-      position: sticky;
+      /* position: sticky; */
       bottom: 0;
       background: white;
       border-top: 2px solid #E5E7EB;

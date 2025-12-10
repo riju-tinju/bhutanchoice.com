@@ -351,8 +351,12 @@
             
             if (result.success) {
                 showToast('Booking removed successfully', 'success');
-                document.querySelector('[data-booking-id="' + bookingId + '"]').remove()
+                try{
+                  document.querySelector('[data-booking-id="' + bookingId + '"]').remove()
                 document.querySelector('[detailed-tableRow-id="' + bookingId + '"]').remove()
+                }catch(e){
+                  console.error('Error removing booking row:', e);
+                }
             } else {
                 throw new Error(result.message || 'Failed to remove booking');
             }

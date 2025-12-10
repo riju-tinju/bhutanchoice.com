@@ -192,7 +192,11 @@
     if (audio) {
       audio.currentTime = 0;
       audio.loop = true; 
-      audio.play();
+      if(winningNumberElements.length === 0){
+      console.log('No winning numbers found for card:', cardId);
+      }else{
+        audio.play();
+      }
     }
 
     // Animate all digits immediately for all winning numbers

@@ -287,7 +287,7 @@ const bookingHelper = {
   // Get bookings with filters, sorting, and pagination + KPIs
   getBookingsWithFilters: async (queryParams,req) => {
     try {
-      const {
+      let {
         page = 1,
         limit = 25,
         customerSearch,
@@ -319,9 +319,11 @@ const bookingHelper = {
       if (fromDateTime || toDateTime) {
         matchConditions["booking.date"] = {};
         if (fromDateTime) {
+          fromDateTime = moment.tz(fromDateTime, 'Asia/Dubai');
           matchConditions["booking.date"].$gte = new Date(fromDateTime);
         }
         if (toDateTime) {
+          toDateTime= moment.tz(toDateTime, 'Asia/Dubai');
           matchConditions["booking.date"].$lte = new Date(toDateTime);
         }
       }
@@ -520,7 +522,14 @@ const bookingHelper = {
       };
 
       const totalPrizes = await bookingHelper.calculateTotalPrizesWorkaround(matchConditions) || null
-      kpi.totalPrizes = parseFloat(totalPrizes.toFixed(2)) || 0;
+      if (typeof totalPrizes === 'number' && !isNaN(totalPrizes)) {
+        // If it's a valid number, perform the formatting
+        kpi.totalPrizes = parseFloat(totalPrizes.toFixed(2));
+      } else {
+        // If it's null, undefined, or invalid, set it to a safe default (like 0)
+        // This prevents the application from crashing.
+        kpi.totalPrizes = 0.00;
+      }
 
       return {
         success: true,

@@ -29,9 +29,9 @@ const bookingHelper = {
 
             if (lottery && lottery.winners) {
               // 4. Find this ticket in lottery winners to get prizeRank
-               for (const winner of lottery.winners) {
-            //  for (let i = lottery.winners.length - 1; i >= 0; i--){
-             //   const winner = lottery.winners[i]; // Get the winner element
+              for (const winner of lottery.winners) {
+                //  for (let i = lottery.winners.length - 1; i >= 0; i--){
+                //   const winner = lottery.winners[i]; // Get the winner element
                 if (winner._id === ticket.lottery.timeId) {
                   const winNumber = winner.winNumbers.find(
                     wn => wn.ticketNumber === ticket.number
@@ -65,7 +65,7 @@ const bookingHelper = {
   // Get bookings with filters, sorting, and pagination + KPIs
   getBookingsWithFilters: async (queryParams) => {
     try {
-      const {
+      let {
         page = 1,
         limit = 25,
         customerSearch,
@@ -95,9 +95,11 @@ const bookingHelper = {
       if (fromDateTime || toDateTime) {
         matchConditions["booking.date"] = {};
         if (fromDateTime) {
+          fromDateTime = moment.tz(fromDateTime, 'Asia/Dubai');
           matchConditions["booking.date"].$gte = new Date(fromDateTime);
         }
         if (toDateTime) {
+          toDateTime = moment.tz(toDateTime, 'Asia/Dubai');
           matchConditions["booking.date"].$lte = new Date(toDateTime);
         }
       }
@@ -267,7 +269,7 @@ const bookingHelper = {
       const totalItems = result[0].totalCount[0]?.count || 0;
       const totalPages = Math.ceil(totalItems / limitNumber);
       const kpiData = result[0].kpiData[0] || {};
-       
+
       // Prepare KPI object with proper formatting
       const kpi = {
         totalTickets: kpiData.totalTickets || 0,
@@ -296,7 +298,15 @@ const bookingHelper = {
       };
 
       const totalPrizes = await bookingHelper.calculateTotalPrizesWorkaround(matchConditions) || null
-      kpi.totalPrizes = parseFloat(totalPrizes.toFixed(2));
+      if (typeof totalPrizes === 'number' && !isNaN(totalPrizes)) {
+        // If it's a valid number, perform the formatting
+        kpi.totalPrizes = parseFloat(totalPrizes.toFixed(2));
+      } else {
+        // If it's null, undefined, or invalid, set it to a safe default (like 0)
+        // This prevents the application from crashing.
+        kpi.totalPrizes = 0.00;
+      }
+     
 
       return {
         success: true,
