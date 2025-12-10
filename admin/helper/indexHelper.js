@@ -329,10 +329,14 @@ const indexHelper = {
       });
     }
   },
-  updateLottery334: async (req, res) => {
+  updateLottery12345: async (req, res) => {
     try {
       const lotteryId = req.params.id;
       const { name, name2, drawNumber, drawDate, prizes, winners } = req.body;
+
+      console.log("\n\n\nwe arrived in updateLottery1\n\n\n")
+      console.log("\n\n📋 Full Request Body:\n");
+      console.log(JSON.stringify(req.body, null, 2));
 
       if (!lotteryId) {
         return res.status(400).json({ success: false, message: "Lottery ID is required" });
@@ -373,14 +377,16 @@ const indexHelper = {
           return res.status(400).json({ success: false, message: "Winners must be an array." });
         }
 
-        // 🚨 CRITICAL: Preserve existing custom _ids
+        // 🚨 CRITICAL: Preserve existing custom _ids by MATCHING _id, not by index
         const existingWinners = existingLottery.winners || [];
 
-        const processedWinners = winners.map((winner, index) => {
+        const processedWinners = winners.map((winner) => {
+          // Validate required fields
           if (!winner.resultTime) {
             throw new Error("Each winner entry must have a resultTime.");
           }
 
+          // Validate winNumbers structure
           if (winner.winNumbers && Array.isArray(winner.winNumbers)) {
             for (const winNumber of winner.winNumbers) {
               if (!winNumber.prizeRank || !winNumber.ticketNumber) {
@@ -392,9 +398,22 @@ const indexHelper = {
             }
           }
 
-          // 🚨 PRESERVE existing custom _id or generate new one
-          const existingWinner = existingWinners[index];
-          const winnerId = existingWinner ? existingWinner._id : `winner-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
+          // 🚨 FIXED: Handle empty strings properly
+          let winnerId = winner._id; // Start with the provided _id
+
+          // Only look for existing match if _id is truthy (not empty string)
+          if (winner._id) {
+            const existingWinner = existingWinners.find(w => w._id === winner._id);
+            if (existingWinner) {
+              winnerId = existingWinner._id; // Preserve existing ID
+            } else {
+              // No match found for provided _id, generate new one
+              winnerId = `winner-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
+            }
+          } else {
+            // _id is empty string (new winner group), generate new ID
+            winnerId = `winner-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
+          }
 
           return {
             ...winner,
@@ -420,134 +439,175 @@ const indexHelper = {
       console.log("\nCurrent all Tickets for debugging (JSON):\n");
       console.log(JSON.stringify(currentBookings, null, 2));
 
-// Start the update booking
-let lottery = updatedLottery;
-console.log('🔍 DEBUG: Starting booking update process');
+      // Start the update booking
+      let lottery = updatedLottery;
+      console.log('🔍 DEBUG: Starting booking update process');
 
-if (lottery.winners && lottery.winners.length > 0) {
-  console.log(`🎯 DEBUG: Found ${lottery.winners.length} child lotteries`);
-  let totalUpdated = 0;
+      if (lottery.winners && lottery.winners.length > 0) {
+        console.log(`🎯 DEBUG: Found ${lottery.winners.length} child lotteries`);
+        let totalUpdated = 0;
+        let totalStatusUpdated = 0;
 
-  // STEP 1: First, reset ALL tickets for ALL child lotteries to false
-  console.log(`🔄 STEP 1: Resetting ALL tickets for ALL child lotteries`);
-  let totalReset = 0;
-  
-  for (const winner of lottery.winners) {
-    const bookings = await Booking.find({
-      'tickets.lottery.id': lottery._id,
-      'tickets.lottery.timeId': winner._id
-    });
-    
-    if (bookings.length === 0) {
-      console.log(`   ⏭️ No bookings for child lottery ${winner._id}, skipping reset`);
-      continue;
-    }
-    
-    console.log(`   🔄 Resetting ${bookings.length} bookings for child lottery: ${winner._id}`);
-    
-    for (const booking of bookings) {
-      const resetOperations = [];
-      
-      for (let i = 0; i < booking.tickets.length; i++) {
-        const ticket = booking.tickets[i];
-        if (ticket.lottery.id.toString() === lottery._id.toString() && 
-            ticket.lottery.timeId === winner._id) {
-          
-          resetOperations.push({
-            updateOne: {
-              filter: { 
-                _id: booking._id,
-                [`tickets.${i}.number`]: ticket.number
-              },
-              update: {
-                $set: {
-                  [`tickets.${i}.isWon`]: false
-                }
+        // STEP 1: First, reset ALL tickets for ALL child lotteries to false
+        console.log(`🔄 STEP 1: Resetting ALL tickets for ALL child lotteries`);
+        let totalReset = 0;
+
+        // Optimize: Get all bookings once instead of per child lottery
+        const allBookings = await Booking.find({
+          'tickets.lottery.id': lottery._id
+        });
+
+        // Group bookings by timeId for faster processing
+        const bookingsByTimeId = {};
+        allBookings.forEach(booking => {
+          booking.tickets.forEach(ticket => {
+            if (ticket.lottery.id.toString() === lottery._id.toString()) {
+              const timeId = ticket.lottery.timeId;
+              if (!bookingsByTimeId[timeId]) {
+                bookingsByTimeId[timeId] = [];
+              }
+              if (!bookingsByTimeId[timeId].find(b => b._id.toString() === booking._id.toString())) {
+                bookingsByTimeId[timeId].push(booking);
               }
             }
           });
+        });
+
+        // Reset tickets for each child lottery
+        for (const winner of lottery.winners) {
+          const bookings = bookingsByTimeId[winner._id] || [];
+
+          if (bookings.length === 0) {
+            console.log(`   ⏭️ No bookings for child lottery ${winner._id}, skipping reset`);
+            continue;
+          }
+
+          console.log(`   🔄 Resetting ${bookings.length} bookings for child lottery: ${winner._id}`);
+
+          const resetOperations = [];
+
+          for (const booking of bookings) {
+            for (let i = 0; i < booking.tickets.length; i++) {
+              const ticket = booking.tickets[i];
+              if (ticket.lottery.id.toString() === lottery._id.toString() &&
+                ticket.lottery.timeId === winner._id) {
+
+                resetOperations.push({
+                  updateOne: {
+                    filter: {
+                      _id: booking._id,
+                      [`tickets.${i}.number`]: ticket.number
+                    },
+                    update: {
+                      $set: {
+                        [`tickets.${i}.isWon`]: false
+                      }
+                    }
+                  }
+                });
+              }
+            }
+          }
+
+          if (resetOperations.length > 0) {
+            const result = await Booking.bulkWrite(resetOperations);
+            totalReset += result.modifiedCount;
+          }
         }
-      }
-      
-      if (resetOperations.length > 0) {
-        const result = await Booking.bulkWrite(resetOperations);
-        totalReset += result.modifiedCount;
-      }
-    }
-  }
-  console.log(`   ✅ TOTAL RESET: ${totalReset} tickets reset to false`);
+        console.log(`   ✅ TOTAL RESET: ${totalReset} tickets reset to false`);
 
-  // STEP 2: Now mark winners for ALL child lotteries
-  console.log(`\n✅ STEP 2: Marking winners for ALL child lotteries`);
-  
-  for (const winner of lottery.winners) {
-    console.log(`\n🔍 Processing child lottery: ${winner._id}`);
-    
-    const bookings = await Booking.find({
-      'tickets.lottery.id': lottery._id,
-      'tickets.lottery.timeId': winner._id
-    });
-    
-    if (bookings.length === 0) {
-      console.log(`   ⏭️ No bookings found for this child lottery, skipping...`);
-      continue;
-    }
-    
-    console.log(`   📊 Found ${bookings.length} bookings for this child lottery`);
+        // STEP 2: Now mark winners for ALL child lotteries and update payment status
+        console.log(`\n✅ STEP 2: Marking winners and updating payment status for ALL child lotteries`);
 
-    if (winner.winNumbers && winner.winNumbers.length > 0) {
-      console.log(`   📊 Found ${winner.winNumbers.length} win numbers`);
-      
-      for (const winNumber of winner.winNumbers) {
-        if (winNumber.resultStatus === true) {
-          console.log(`   🎯 Processing winner: ${winNumber.ticketNumber}`);
-          
-          const winningBookings = await Booking.find({
-            'tickets.lottery.id': lottery._id,
-            'tickets.lottery.timeId': winner._id,
-            'tickets.number': winNumber.ticketNumber
-          });
+        for (const winner of lottery.winners) {
+          console.log(`\n🔍 Processing child lottery: ${winner._id}`);
 
-          console.log(`      📊 Found ${winningBookings.length} bookings with ticket: ${winNumber.ticketNumber}`);
+          const bookings = bookingsByTimeId[winner._id] || [];
 
-          for (const booking of winningBookings) {
-            const ticketIndex = booking.tickets.findIndex(ticket =>
-              ticket.lottery.id.toString() === lottery._id.toString() &&
-              ticket.lottery.timeId === winner._id &&
-              ticket.number === winNumber.ticketNumber
-            );
+          if (bookings.length === 0) {
+            console.log(`   ⏭️ No bookings found for this child lottery, skipping...`);
+            continue;
+          }
 
-            if (ticketIndex !== -1) {
-              console.log(`      🎫 Found ticket at index ${ticketIndex} in booking ${booking.ticketNumber}`);
-              
-              const updateResult = await Booking.updateOne(
-                {
-                  _id: booking._id,
-                  [`tickets.${ticketIndex}.number`]: winNumber.ticketNumber
-                },
-                {
-                  $set: {
-                    [`tickets.${ticketIndex}.isWon`]: true
+          console.log(`   📊 Found ${bookings.length} bookings for this child lottery`);
+
+          if (winner.winNumbers && winner.winNumbers.length > 0) {
+            console.log(`   📊 Found ${winner.winNumbers.length} win numbers`);
+
+            for (const winNumber of winner.winNumbers) {
+              if (winNumber.resultStatus === true) {
+                console.log(`   🎯 Processing winner: ${winNumber.ticketNumber}`);
+
+                // Find winning tickets in already filtered bookings
+                const winningBookings = bookings.filter(booking =>
+                  booking.tickets.some(ticket =>
+                    ticket.lottery.id.toString() === lottery._id.toString() &&
+                    ticket.lottery.timeId === winner._id &&
+                    ticket.number === winNumber.ticketNumber
+                  )
+                );
+
+                console.log(`📊 Found ${winningBookings.length} bookings with ticket: ${winNumber.ticketNumber}`);
+
+                for (const booking of winningBookings) {
+                  const ticketIndex = booking.tickets.findIndex(ticket =>
+                    ticket.lottery.id.toString() === lottery._id.toString() &&
+                    ticket.lottery.timeId === winner._id &&
+                    ticket.number === winNumber.ticketNumber
+                  );
+
+                  if (ticketIndex !== -1) {
+                    console.log(`      🎫 Found ticket at index ${ticketIndex} in booking ${booking.ticketNumber}`);
+
+                    const currentTicket = booking.tickets[ticketIndex];
+
+                    // Prepare update object
+                    const updateFields = {
+                      [`tickets.${ticketIndex}.isWon`]: true
+                    };
+
+                    // 🆕 UPDATE PAYMENT STATUS: Only update if current status is "NOT_WINNER"
+                    if (currentTicket.status === "NOT_WINNER") {
+                      updateFields[`tickets.${ticketIndex}.status`] = "UNPAID";
+                      console.log(`      💰 Updated status from "NOT_WINNER" to "UNPAID"`);
+                      totalStatusUpdated++;
+                    } else if (currentTicket.status === "PAID") {
+                      console.log(`      ⏭️ Status already "PAID", no change needed`);
+                    } else if (currentTicket.status === "IN_AGENT") {
+                      console.log(`      ⏭️ Status is "IN_AGENT", no change needed`);
+                    } else {
+                      console.log(`      ℹ️ Current status: "${currentTicket.status}", no automatic update`);
+                    }
+
+                    const updateResult = await Booking.updateOne(
+                      {
+                        _id: booking._id,
+                        [`tickets.${ticketIndex}.number`]: winNumber.ticketNumber
+                      },
+                      {
+                        $set: updateFields
+                      }
+                    );
+
+                    if (updateResult.modifiedCount > 0) {
+                      totalUpdated++;
+                      console.log(`      ✅ SUCCESS: Updated ticket ${winNumber.ticketNumber} to isWon: true`);
+                    }
                   }
                 }
-              );
-              
-              if (updateResult.modifiedCount > 0) {
-                totalUpdated++;
-                console.log(`      ✅ SUCCESS: Updated ticket ${winNumber.ticketNumber} to isWon: true`);
               }
             }
           }
         }
-      }
-    }
-  }
 
-  console.log(`\n🎯 FINAL RESULT: ${totalUpdated} tickets successfully marked as winners across ${lottery.winners.length} child lotteries`);
-} else {
-  console.log('❌ No winners found in lottery');
-}
-// End of update booking
+        console.log(`\n🎯 FINAL RESULT:`);
+        console.log(`   - ${totalUpdated} tickets successfully marked as winners`);
+        console.log(`   - ${totalStatusUpdated} tickets updated from "NOT_WINNER" to "UNPAID"`);
+        console.log(`   - Across ${lottery.winners.length} child lotteries`);
+      } else {
+        console.log('❌ No winners found in lottery');
+      }
+      // End of update booking
 
       return res.status(200).json({
         success: true,
@@ -563,264 +623,6 @@ if (lottery.winners && lottery.winners.length > 0) {
       });
     }
   },
-
-  // updateLottery1: async (req, res) => {
-  //   try {
-  //     const lotteryId = req.params.id;
-  //     const { name, name2, drawNumber, drawDate, prizes, winners } = req.body;
-
-  //     if (!lotteryId) {
-  //       return res.status(400).json({ success: false, message: "Lottery ID is required" });
-  //     }
-
-  //     // Check if lottery exists
-  //     const existingLottery = await Lottery.findById(lotteryId);
-  //     if (!existingLottery) {
-  //       return res.status(404).json({ success: false, message: "Lottery not found" });
-  //     }
-
-  //     const updateData = {};
-
-  //     if (name !== undefined) updateData.name = name;
-  //     if (name2 !== undefined) updateData.name2 = name2;
-  //     if (drawNumber !== undefined) updateData.drawNumber = drawNumber;
-  //     if (drawDate !== undefined) updateData.drawDate = drawDate;
-
-  //     // Validate prizes array structure if provided
-  //     if (prizes !== undefined) {
-  //       if (!Array.isArray(prizes)) {
-  //         return res.status(400).json({ success: false, message: "Prizes must be an array." });
-  //       }
-  //       for (const prize of prizes) {
-  //         if (!prize.rank || !prize.amount) {
-  //           return res.status(400).json({
-  //             success: false,
-  //             message: "Each prize must have rank and amount.",
-  //           });
-  //         }
-  //       }
-  //       updateData.prizes = prizes;
-  //     }
-
-  //     // Validate winners array structure if provided
-  //     if (winners !== undefined) {
-  //       if (!Array.isArray(winners)) {
-  //         return res.status(400).json({ success: false, message: "Winners must be an array." });
-  //       }
-
-  //       // 🚨 CRITICAL: Preserve existing custom _ids
-  //       const existingWinners = existingLottery.winners || [];
-
-  //       const processedWinners = winners.map((winner, index) => {
-  //         if (!winner.resultTime) {
-  //           throw new Error("Each winner entry must have a resultTime.");
-  //         }
-
-  //         if (winner.winNumbers && Array.isArray(winner.winNumbers)) {
-  //           for (const winNumber of winner.winNumbers) {
-  //             if (!winNumber.prizeRank || !winNumber.ticketNumber) {
-  //               throw new Error("Each winNumber must have prizeRank and ticketNumber.");
-  //             }
-  //             if (!/^.{1,5}$/.test(winNumber.ticketNumber)) {
-  //               throw new Error("Ticket number must have at least one character.");
-  //             }
-  //           }
-  //         }
-
-  //         // 🚨 PRESERVE existing custom _id or generate new one
-  //         const existingWinner = existingWinners[index];
-  //         const winnerId = existingWinner ? existingWinner._id : `winner-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
-
-  //         return {
-  //           ...winner,
-  //           _id: winnerId // Preserve or generate custom ID
-  //         };
-  //       });
-
-  //       updateData.winners = processedWinners;
-  //     }
-
-  //     updateData.updatedAt = new Date();
-
-  //     const updatedLottery = await Lottery.findByIdAndUpdate(
-  //       lotteryId,
-  //       { $set: updateData },
-  //       { new: true, runValidators: true }
-  //     );
-
-  //     console.log("\nLottery updated successfully (JSON):\n");
-  //     console.log(JSON.stringify(updatedLottery, null, 2));
-
-  //     let currentBookings = await Booking.find({ 'tickets.lottery.id': lotteryId });
-  //     console.log("\nCurrent all Tickets for debugging (JSON):\n");
-  //     console.log(JSON.stringify(currentBookings, null, 2));
-
-  //     // Start the update booking
-  //     let lottery = updatedLottery;
-  //     console.log('🔍 DEBUG: Starting booking update process');
-
-  //     if (lottery.winners && lottery.winners.length > 0) {
-  //       console.log(`🎯 DEBUG: Found ${lottery.winners.length} child lotteries`);
-  //       let totalUpdated = 0;
-  //       let totalStatusUpdated = 0;
-
-  //       // STEP 1: First, reset ALL tickets for ALL child lotteries to false
-  //       console.log(`🔄 STEP 1: Resetting ALL tickets for ALL child lotteries`);
-  //       let totalReset = 0;
-        
-  //       for (const winner of lottery.winners) {
-  //         const bookings = await Booking.find({
-  //           'tickets.lottery.id': lottery._id,
-  //           'tickets.lottery.timeId': winner._id
-  //         });
-          
-  //         if (bookings.length === 0) {
-  //           console.log(`   ⏭️ No bookings for child lottery ${winner._id}, skipping reset`);
-  //           continue;
-  //         }
-          
-  //         console.log(`   🔄 Resetting ${bookings.length} bookings for child lottery: ${winner._id}`);
-          
-  //         for (const booking of bookings) {
-  //           const resetOperations = [];
-            
-  //           for (let i = 0; i < booking.tickets.length; i++) {
-  //             const ticket = booking.tickets[i];
-  //             if (ticket.lottery.id.toString() === lottery._id.toString() && 
-  //                 ticket.lottery.timeId === winner._id) {
-                
-  //               resetOperations.push({
-  //                 updateOne: {
-  //                   filter: { 
-  //                     _id: booking._id,
-  //                     [`tickets.${i}.number`]: ticket.number
-  //                   },
-  //                   update: {
-  //                     $set: {
-  //                       [`tickets.${i}.isWon`]: false
-  //                     }
-  //                   }
-  //                 }
-  //               });
-  //             }
-  //           }
-            
-  //           if (resetOperations.length > 0) {
-  //             const result = await Booking.bulkWrite(resetOperations);
-  //             totalReset += result.modifiedCount;
-  //           }
-  //         }
-  //       }
-  //       console.log(`   ✅ TOTAL RESET: ${totalReset} tickets reset to false`);
-
-  //       // STEP 2: Now mark winners for ALL child lotteries and update payment status
-  //       console.log(`\n✅ STEP 2: Marking winners and updating payment status for ALL child lotteries`);
-        
-  //       for (const winner of lottery.winners) {
-  //         console.log(`\n🔍 Processing child lottery: ${winner._id}`);
-          
-  //         const bookings = await Booking.find({
-  //           'tickets.lottery.id': lottery._id,
-  //           'tickets.lottery.timeId': winner._id
-  //         });
-          
-  //         if (bookings.length === 0) {
-  //           console.log(`   ⏭️ No bookings found for this child lottery, skipping...`);
-  //           continue;
-  //         }
-          
-  //         console.log(`   📊 Found ${bookings.length} bookings for this child lottery`);
-
-  //         if (winner.winNumbers && winner.winNumbers.length > 0) {
-  //           console.log(`   📊 Found ${winner.winNumbers.length} win numbers`);
-            
-  //           for (const winNumber of winner.winNumbers) {
-  //             if (winNumber.resultStatus === true) {
-  //               console.log(`   🎯 Processing winner: ${winNumber.ticketNumber}`);
-                
-  //               const winningBookings = await Booking.find({
-  //                 'tickets.lottery.id': lottery._id,
-  //                 'tickets.lottery.timeId': winner._id,
-  //                 'tickets.number': winNumber.ticketNumber
-  //               });
-
-  //               console.log(`📊 Found ${winningBookings.length} bookings with ticket: ${winNumber.ticketNumber}`);
-
-  //               for (const booking of winningBookings) {
-  //                 const ticketIndex = booking.tickets.findIndex(ticket =>
-  //                   ticket.lottery.id.toString() === lottery._id.toString() &&
-  //                   ticket.lottery.timeId === winner._id &&
-  //                   ticket.number === winNumber.ticketNumber
-  //                 );
-
-  //                 if (ticketIndex !== -1) {
-  //                   console.log(`      🎫 Found ticket at index ${ticketIndex} in booking ${booking.ticketNumber}`);
-                    
-  //                   const currentTicket = booking.tickets[ticketIndex];
-                    
-  //                   // Prepare update object
-  //                   const updateFields = {
-  //                     [`tickets.${ticketIndex}.isWon`]: true
-  //                   };
-                    
-  //                   // 🆕 UPDATE PAYMENT STATUS: Only update if current status is "NOT_WINNER"
-  //                   if (currentTicket.status === "NOT_WINNER") {
-  //                     updateFields[`tickets.${ticketIndex}.status`] = "UNPAID";
-  //                     console.log(`      💰 Updated status from "NOT_WINNER" to "UNPAID"`);
-  //                     totalStatusUpdated++;
-  //                   } else if (currentTicket.status === "PAID") {
-  //                     console.log(`      ⏭️ Status already "PAID", no change needed`);
-  //                   } else if (currentTicket.status === "IN_AGENT") {
-  //                     console.log(`      ⏭️ Status is "IN_AGENT", no change needed`);
-  //                   } else {
-  //                     console.log(`      ℹ️ Current status: "${currentTicket.status}", no automatic update`);
-  //                   }
-                    
-  //                   const updateResult = await Booking.updateOne(
-  //                     {
-  //                       _id: booking._id,
-  //                       [`tickets.${ticketIndex}.number`]: winNumber.ticketNumber
-  //                     },
-  //                     {
-  //                       $set: updateFields
-  //                     }
-  //                   );
-                    
-  //                   if (updateResult.modifiedCount > 0) {
-  //                     totalUpdated++;
-  //                     console.log(`      ✅ SUCCESS: Updated ticket ${winNumber.ticketNumber} to isWon: true`);
-  //                   }
-  //                 }
-  //               }
-  //             }
-  //           }
-  //         }
-  //       }
-
-  //       console.log(`\n🎯 FINAL RESULT:`);
-  //       console.log(`   - ${totalUpdated} tickets successfully marked as winners`);
-  //       console.log(`   - ${totalStatusUpdated} tickets updated from "NOT_WINNER" to "UNPAID"`);
-  //       console.log(`   - Across ${lottery.winners.length} child lotteries`);
-  //     } else {
-  //       console.log('❌ No winners found in lottery');
-  //     }
-  //     // End of update booking
-
-  //     return res.status(200).json({
-  //       success: true,
-  //       message: "Lottery updated successfully",
-  //       data: updatedLottery,
-  //     });
-  //   } catch (err) {
-  //     console.error("Error in updateLottery:", err);
-  //     return res.status(500).json({
-  //       success: false,
-  //       message: "Failed to update lottery",
-  //       error: err.message,
-  //     });
-  //   }
-  // },
-
   updateLottery1: async (req, res) => {
     try {
       const lotteryId = req.params.id;
@@ -873,45 +675,45 @@ if (lottery.winners && lottery.winners.length > 0) {
         const existingWinners = existingLottery.winners || [];
 
         const processedWinners = winners.map((winner) => {
-  // Validate required fields
-  if (!winner.resultTime) {
-    throw new Error("Each winner entry must have a resultTime.");
-  }
+          // Validate required fields
+          if (!winner.resultTime) {
+            throw new Error("Each winner entry must have a resultTime.");
+          }
 
-  // Validate winNumbers structure
-  if (winner.winNumbers && Array.isArray(winner.winNumbers)) {
-    for (const winNumber of winner.winNumbers) {
-      if (!winNumber.prizeRank || !winNumber.ticketNumber) {
-        throw new Error("Each winNumber must have prizeRank and ticketNumber.");
-      }
-      if (!/^.{1,5}$/.test(winNumber.ticketNumber)) {
-        throw new Error("Ticket number must have at least one character.");
-      }
-    }
-  }
+          // Validate winNumbers structure
+          if (winner.winNumbers && Array.isArray(winner.winNumbers)) {
+            for (const winNumber of winner.winNumbers) {
+              if (!winNumber.prizeRank || !winNumber.ticketNumber) {
+                throw new Error("Each winNumber must have prizeRank and ticketNumber.");
+              }
+              if (!/^.{1,5}$/.test(winNumber.ticketNumber)) {
+                throw new Error("Ticket number must have at least one character.");
+              }
+            }
+          }
 
-  // 🚨 FIXED: Handle empty strings properly
-  let winnerId = winner._id; // Start with the provided _id
-  
-  // Only look for existing match if _id is truthy (not empty string)
-  if (winner._id) {
-    const existingWinner = existingWinners.find(w => w._id === winner._id);
-    if (existingWinner) {
-      winnerId = existingWinner._id; // Preserve existing ID
-    } else {
-      // No match found for provided _id, generate new one
-      winnerId = `winner-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
-    }
-  } else {
-    // _id is empty string (new winner group), generate new ID
-    winnerId = `winner-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
-  }
+          // 🚨 FIXED: Handle empty strings properly
+          let winnerId = winner._id; // Start with the provided _id
 
-  return {
-    ...winner,
-    _id: winnerId // Preserve or generate custom ID
-  };
-});
+          // Only look for existing match if _id is truthy (not empty string)
+          if (winner._id) {
+            const existingWinner = existingWinners.find(w => w._id === winner._id);
+            if (existingWinner) {
+              winnerId = existingWinner._id; // Preserve existing ID
+            } else {
+              // No match found for provided _id, generate new one
+              winnerId = `winner-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
+            }
+          } else {
+            // _id is empty string (new winner group), generate new ID
+            winnerId = `winner-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
+          }
+
+          return {
+            ...winner,
+            _id: winnerId // Preserve or generate custom ID
+          };
+        });
 
         updateData.winners = processedWinners;
       }
@@ -943,12 +745,12 @@ if (lottery.winners && lottery.winners.length > 0) {
         // STEP 1: First, reset ALL tickets for ALL child lotteries to false
         console.log(`🔄 STEP 1: Resetting ALL tickets for ALL child lotteries`);
         let totalReset = 0;
-        
+
         // Optimize: Get all bookings once instead of per child lottery
         const allBookings = await Booking.find({
           'tickets.lottery.id': lottery._id
         });
-        
+
         // Group bookings by timeId for faster processing
         const bookingsByTimeId = {};
         allBookings.forEach(booking => {
@@ -964,29 +766,29 @@ if (lottery.winners && lottery.winners.length > 0) {
             }
           });
         });
-        
+
         // Reset tickets for each child lottery
         for (const winner of lottery.winners) {
           const bookings = bookingsByTimeId[winner._id] || [];
-          
+
           if (bookings.length === 0) {
             console.log(`   ⏭️ No bookings for child lottery ${winner._id}, skipping reset`);
             continue;
           }
-          
+
           console.log(`   🔄 Resetting ${bookings.length} bookings for child lottery: ${winner._id}`);
-          
+
           const resetOperations = [];
-          
+
           for (const booking of bookings) {
             for (let i = 0; i < booking.tickets.length; i++) {
               const ticket = booking.tickets[i];
-              if (ticket.lottery.id.toString() === lottery._id.toString() && 
-                  ticket.lottery.timeId === winner._id) {
-                
+              if (ticket.lottery.id.toString() === lottery._id.toString() &&
+                ticket.lottery.timeId === winner._id) {
+
                 resetOperations.push({
                   updateOne: {
-                    filter: { 
+                    filter: {
                       _id: booking._id,
                       [`tickets.${i}.number`]: ticket.number
                     },
@@ -1000,7 +802,7 @@ if (lottery.winners && lottery.winners.length > 0) {
               }
             }
           }
-          
+
           if (resetOperations.length > 0) {
             const result = await Booking.bulkWrite(resetOperations);
             totalReset += result.modifiedCount;
@@ -1010,54 +812,90 @@ if (lottery.winners && lottery.winners.length > 0) {
 
         // STEP 2: Now mark winners for ALL child lotteries and update payment status
         console.log(`\n✅ STEP 2: Marking winners and updating payment status for ALL child lotteries`);
-        
+
         for (const winner of lottery.winners) {
           console.log(`\n🔍 Processing child lottery: ${winner._id}`);
-          
+
           const bookings = bookingsByTimeId[winner._id] || [];
-          
+
           if (bookings.length === 0) {
             console.log(`   ⏭️ No bookings found for this child lottery, skipping...`);
             continue;
           }
-          
+
           console.log(`   📊 Found ${bookings.length} bookings for this child lottery`);
 
           if (winner.winNumbers && winner.winNumbers.length > 0) {
             console.log(`   📊 Found ${winner.winNumbers.length} win numbers`);
-            
+
             for (const winNumber of winner.winNumbers) {
               if (winNumber.resultStatus === true) {
-                console.log(`   🎯 Processing winner: ${winNumber.ticketNumber}`);
-                
-                // Find winning tickets in already filtered bookings
+                console.log(`   🎯 Processing winner: ${winNumber.ticketNumber} (Prize Rank: ${winNumber.prizeRank})`);
+
+                // 🆕 5TH PRIZE LOGIC: Generate valid ticket numbers for prize rank 5
+                let validTicketNumbers = [];
+                if (winNumber.prizeRank === 5) {
+                  // For 5th prize: A+n, B+n, C+n, D+n, E+n
+                  const letters = ['A', 'B', 'C', 'D', 'E'];
+                  validTicketNumbers = letters.map(letter => letter + winNumber.ticketNumber);
+                  console.log(`      🎫 5th Prize - Valid tickets: ${validTicketNumbers.join(', ')}`);
+                } else {
+                  // For other prizes: Exact match only
+                  validTicketNumbers = [winNumber.ticketNumber];
+                }
+
+                // Find winning tickets based on prize rank logic
                 const winningBookings = bookings.filter(booking =>
-                  booking.tickets.some(ticket =>
-                    ticket.lottery.id.toString() === lottery._id.toString() &&
-                    ticket.lottery.timeId === winner._id &&
-                    ticket.number === winNumber.ticketNumber
-                  )
+                  booking.tickets.some(ticket => {
+                    // Basic matching conditions
+                    const basicMatch = ticket.lottery.id.toString() === lottery._id.toString() &&
+                      ticket.lottery.timeId === winner._id;
+
+                    if (!basicMatch) return false;
+
+                    // 🆕 Ticket number matching based on prize rank
+                    if (winNumber.prizeRank === 5) {
+                      // 5th prize: Check if ticket.number is in validTicketNumbers
+                      return validTicketNumbers.includes(ticket.number);
+                    } else {
+                      // Other prizes: Exact match
+                      return ticket.number === winNumber.ticketNumber;
+                    }
+                  })
                 );
 
-                console.log(`📊 Found ${winningBookings.length} bookings with ticket: ${winNumber.ticketNumber}`);
+                console.log(`📊 Found ${winningBookings.length} bookings with matching tickets`);
 
                 for (const booking of winningBookings) {
-                  const ticketIndex = booking.tickets.findIndex(ticket =>
-                    ticket.lottery.id.toString() === lottery._id.toString() &&
-                    ticket.lottery.timeId === winner._id &&
-                    ticket.number === winNumber.ticketNumber
-                  );
+                  // 🆕 Find ticket index based on prize rank logic
+                  const ticketIndex = booking.tickets.findIndex(ticket => {
+                    // Basic matching conditions
+                    const basicMatch = ticket.lottery.id.toString() === lottery._id.toString() &&
+                      ticket.lottery.timeId === winner._id;
+
+                    if (!basicMatch) return false;
+
+                    // Ticket number matching based on prize rank
+                    if (winNumber.prizeRank === 5) {
+                      // 5th prize: Check if ticket.number is in validTicketNumbers
+                      return validTicketNumbers.includes(ticket.number);
+                    } else {
+                      // Other prizes: Exact match
+                      return ticket.number === winNumber.ticketNumber;
+                    }
+                  });
 
                   if (ticketIndex !== -1) {
                     console.log(`      🎫 Found ticket at index ${ticketIndex} in booking ${booking.ticketNumber}`);
-                    
+                    console.log(`      📝 Ticket number: ${booking.tickets[ticketIndex].number}, Prize Rank: ${winNumber.prizeRank}`);
+
                     const currentTicket = booking.tickets[ticketIndex];
-                    
+
                     // Prepare update object
                     const updateFields = {
                       [`tickets.${ticketIndex}.isWon`]: true
                     };
-                    
+
                     // 🆕 UPDATE PAYMENT STATUS: Only update if current status is "NOT_WINNER"
                     if (currentTicket.status === "NOT_WINNER") {
                       updateFields[`tickets.${ticketIndex}.status`] = "UNPAID";
@@ -1070,20 +908,20 @@ if (lottery.winners && lottery.winners.length > 0) {
                     } else {
                       console.log(`      ℹ️ Current status: "${currentTicket.status}", no automatic update`);
                     }
-                    
+
                     const updateResult = await Booking.updateOne(
                       {
                         _id: booking._id,
-                        [`tickets.${ticketIndex}.number`]: winNumber.ticketNumber
+                        [`tickets.${ticketIndex}.number`]: booking.tickets[ticketIndex].number
                       },
                       {
                         $set: updateFields
                       }
                     );
-                    
+
                     if (updateResult.modifiedCount > 0) {
                       totalUpdated++;
-                      console.log(`      ✅ SUCCESS: Updated ticket ${winNumber.ticketNumber} to isWon: true`);
+                      console.log(`      ✅ SUCCESS: Updated ticket ${booking.tickets[ticketIndex].number} to isWon: true`);
                     }
                   }
                 }
@@ -1586,385 +1424,385 @@ if (lottery.winners && lottery.winners.length > 0) {
     }
   },
   getActiveLotteriesorg: async (req, res) => {
-  try {
-    // Get current Dubai time
-    const moment = require('moment-timezone');
-    const now = moment().tz('Asia/Dubai');
-    const todayStart = now.clone().startOf('day').toDate();
-    const todayEnd = now.clone().endOf('day').toDate();
+    try {
+      // Get current Dubai time
+      const moment = require('moment-timezone');
+      const now = moment().tz('Asia/Dubai');
+      const todayStart = now.clone().startOf('day').toDate();
+      const todayEnd = now.clone().endOf('day').toDate();
 
-    // 1. Find parent lotteries where drawDate is today (Dubai date)
-    const parentLotteries = await Lottery.find({
-      drawDate: {
-        $gte: todayStart,
-        $lte: todayEnd
-      }
-    })
-    .sort({ drawDate: 1 }) // Sort by drawDate ascending
-    .lean();
-
-    if (parentLotteries.length === 0) {
-      return res.status(200).json({
-        success: true,
-        message: "No active lotteries found for Booking",
-        activeLotteries: [],
-        currentLottery: null
-      });
-    }
-
-    // 2. Process each parent lottery to find next child lottery
-    const activeLotteries = [];
-
-    parentLotteries.forEach(parentLottery => {
-      if (!parentLottery.winners || parentLottery.winners.length === 0) {
-        // If no child lotteries (draw times), use parent as default
-        activeLotteries.push({
-          _id: `${parentLottery._id}_main`,
-          parentId: parentLottery._id,
-          name: parentLottery.name,
-          name2: parentLottery.name2,
-          drawNumber: parentLottery.drawNumber,
-          drawDate: parentLottery.drawDate,
-          drawTime: 'Main Draw',
-          drawTimeId: 'main',
-          drawTimeDisplay: 'Main Draw',
-          drawTimeData: null,
-          nextDrawTime: parentLottery.drawDate,
-          isNext: true,
-          parentLottery: parentLottery
-        });
-        return;
-      }
-
-      // 3. Find the next child lottery based on resultTime
-      let nextChild = null;
-      let minTimeDiff = Infinity;
-
-      parentLottery.winners.forEach((winner, index) => {
-        if (!winner.resultTime) return;
-
-        const resultTime = moment(winner.resultTime).tz('Asia/Dubai');
-        const timeDiff = resultTime.diff(now); // milliseconds until draw
-
-        // Find the next upcoming draw (timeDiff > 0 means future)
-        if (timeDiff > 0 && timeDiff < minTimeDiff) {
-          minTimeDiff = timeDiff;
-          nextChild = {
-            winner,
-            index,
-            resultTime,
-            timeDiff
-          };
+      // 1. Find parent lotteries where drawDate is today (Dubai date)
+      const parentLotteries = await Lottery.find({
+        drawDate: {
+          $gte: todayStart,
+          $lte: todayEnd
         }
-      });
+      })
+        .sort({ drawDate: 1 }) // Sort by drawDate ascending
+        .lean();
 
-      if (nextChild) {
-        // Found a future draw time
-        const drawTimeName = `Draw Time ${nextChild.index + 1}`;
-        const drawTimeDisplay = nextChild.resultTime.format('hh:mm A');
-        
-        activeLotteries.push({
-          _id: `${parentLottery._id}_${nextChild.winner._id}`,
-          parentId: parentLottery._id,
-          name: parentLottery.name,
-          name2: parentLottery.name2,
-          drawNumber: parentLottery.drawNumber,
-          drawDate: parentLottery.drawDate,
-          drawTime: drawTimeName,
-          drawTimeId: nextChild.winner._id,
-          drawTimeDisplay: drawTimeDisplay,
-          drawTimeData: nextChild.winner,
-          nextDrawTime: nextChild.resultTime.toDate(),
-          timeUntilDraw: nextChild.timeDiff, // milliseconds until draw
-          isNext: true,
-          parentLottery: parentLottery
+      if (parentLotteries.length === 0) {
+        return res.status(200).json({
+          success: true,
+          message: "No active lotteries found for Booking",
+          activeLotteries: [],
+          currentLottery: null
         });
-      } else {
-        // No future draws found, get the most recent past draw
-        const lastChild = parentLottery.winners.reduce((latest, winner, index) => {
-          if (!winner.resultTime) return latest;
-          const resultTime = moment(winner.resultTime).tz('Asia/Dubai');
-          return (resultTime > latest.resultTime) ? { winner, index, resultTime } : latest;
-        }, { winner: null, index: 0, resultTime: moment(0) });
+      }
 
-        if (lastChild.winner) {
-          const drawTimeName = `Draw Time ${lastChild.index + 1}`;
-          const drawTimeDisplay = lastChild.resultTime.format('hh:mm A');
-          
+      // 2. Process each parent lottery to find next child lottery
+      const activeLotteries = [];
+
+      parentLotteries.forEach(parentLottery => {
+        if (!parentLottery.winners || parentLottery.winners.length === 0) {
+          // If no child lotteries (draw times), use parent as default
           activeLotteries.push({
-            _id: `${parentLottery._id}_${lastChild.winner._id}`,
+            _id: `${parentLottery._id}_main`,
+            parentId: parentLottery._id,
+            name: parentLottery.name,
+            name2: parentLottery.name2,
+            drawNumber: parentLottery.drawNumber,
+            drawDate: parentLottery.drawDate,
+            drawTime: 'Main Draw',
+            drawTimeId: 'main',
+            drawTimeDisplay: 'Main Draw',
+            drawTimeData: null,
+            nextDrawTime: parentLottery.drawDate,
+            isNext: true,
+            parentLottery: parentLottery
+          });
+          return;
+        }
+
+        // 3. Find the next child lottery based on resultTime
+        let nextChild = null;
+        let minTimeDiff = Infinity;
+
+        parentLottery.winners.forEach((winner, index) => {
+          if (!winner.resultTime) return;
+
+          const resultTime = moment(winner.resultTime).tz('Asia/Dubai');
+          const timeDiff = resultTime.diff(now); // milliseconds until draw
+
+          // Find the next upcoming draw (timeDiff > 0 means future)
+          if (timeDiff > 0 && timeDiff < minTimeDiff) {
+            minTimeDiff = timeDiff;
+            nextChild = {
+              winner,
+              index,
+              resultTime,
+              timeDiff
+            };
+          }
+        });
+
+        if (nextChild) {
+          // Found a future draw time
+          const drawTimeName = `Draw Time ${nextChild.index + 1}`;
+          const drawTimeDisplay = nextChild.resultTime.format('hh:mm A');
+
+          activeLotteries.push({
+            _id: `${parentLottery._id}_${nextChild.winner._id}`,
             parentId: parentLottery._id,
             name: parentLottery.name,
             name2: parentLottery.name2,
             drawNumber: parentLottery.drawNumber,
             drawDate: parentLottery.drawDate,
             drawTime: drawTimeName,
-            drawTimeId: lastChild.winner._id,
+            drawTimeId: nextChild.winner._id,
             drawTimeDisplay: drawTimeDisplay,
-            drawTimeData: lastChild.winner,
-            nextDrawTime: lastChild.resultTime.toDate(),
-            timeUntilDraw: lastChild.resultTime.diff(now), // negative for past
-            isNext: false, // This is a past draw
+            drawTimeData: nextChild.winner,
+            nextDrawTime: nextChild.resultTime.toDate(),
+            timeUntilDraw: nextChild.timeDiff, // milliseconds until draw
+            isNext: true,
             parentLottery: parentLottery
           });
-        }
-      }
-    });
+        } else {
+          // No future draws found, get the most recent past draw
+          const lastChild = parentLottery.winners.reduce((latest, winner, index) => {
+            if (!winner.resultTime) return latest;
+            const resultTime = moment(winner.resultTime).tz('Asia/Dubai');
+            return (resultTime > latest.resultTime) ? { winner, index, resultTime } : latest;
+          }, { winner: null, index: 0, resultTime: moment(0) });
 
-    // 4. Sort active lotteries by nextDrawTime (closest first)
-    activeLotteries.sort((a, b) => {
-      return new Date(a.nextDrawTime) - new Date(b.nextDrawTime);
-    });
+          if (lastChild.winner) {
+            const drawTimeName = `Draw Time ${lastChild.index + 1}`;
+            const drawTimeDisplay = lastChild.resultTime.format('hh:mm A');
 
-    // 5. Mark the first one as current/primary
-    if (activeLotteries.length > 0) {
-      activeLotteries[0].isCurrent = true;
-    }
-
-    // 6. Also get ticket charges for pricing
-    const ticketCharges = await ticketCharge.find()
-      .sort({ ticketType: -1 }) // Type 5 first, then 4, etc.
-      .lean();
-
-    // Format ticket charges as a map for easy lookup
-    const ticketChargesMap = {};
-    ticketCharges.forEach(charge => {
-      ticketChargesMap[charge.ticketType] = charge.chargeAmount;
-    });
-
-    // 7. Prepare response
-    const response = {
-      success: true,
-      activeLotteries: activeLotteries.map(lottery => ({
-        _id: lottery._id,
-        parentId: lottery.parentId,
-        name: lottery.name,
-        name2: lottery.name2,
-        drawNumber: lottery.drawNumber,
-        drawDate: moment(lottery.drawDate).tz('Asia/Dubai').format('DD/MM/YYYY'),
-        drawTime: lottery.drawTime,
-        drawTimeId: lottery.drawTimeId,
-        drawTimeDisplay: lottery.drawTimeDisplay,
-        nextDrawTime: moment(lottery.nextDrawTime).tz('Asia/Dubai').format('DD/MM/YYYY hh:mm A'),
-        timeUntilDraw: lottery.timeUntilDraw,
-        isCurrent: lottery.isCurrent || false,
-        isNext: lottery.isNext,
-        prizes: lottery.parentLottery.prizes || [],
-        // Include original winner data if needed
-        winner: lottery.drawTimeData ? {
-          _id: lottery.drawTimeData._id,
-          resultTime: moment(lottery.drawTimeData.resultTime).tz('Asia/Dubai').format('DD/MM/YYYY hh:mm A'),
-          winNumbers: lottery.drawTimeData.winNumbers || []
-        } : null
-      })),
-      currentLottery: activeLotteries.length > 0 ? activeLotteries[0] : null,
-      ticketCharges: ticketChargesMap,
-      serverTime: now.format('DD/MM/YYYY hh:mm A'),
-      serverTimezone: 'Asia/Dubai'
-    };
-
-    res.status(200).json(response);
-
-  } catch (err) {
-    console.error("Error fetching active lotteries:", err);
-
-    res.status(500).json({
-      success: false,
-      message: "Failed to retrieve active lotteries",
-      error: process.env.NODE_ENV === "development" ? err.message : "Internal server error"
-    });
-  }
-},
-getActiveLotteries: async (req, res) => {
-  try {
-    // Get current Dubai time
-    const moment = require('moment-timezone');
-    const now = moment().tz('Asia/Dubai');
-    const fiveMinutesFromNow = now.clone().add(5, 'minutes');
-    const todayStart = now.clone().startOf('day').toDate();
-    const todayEnd = now.clone().endOf('day').toDate();
-
-    console.log(`Current Dubai time: ${now.format('DD/MM/YYYY HH:mm:ss')}`);
-    console.log(`Cut-off time (5 minutes from now): ${fiveMinutesFromNow.format('HH:mm:ss')}`);
-
-    // 1. Find parent lotteries where drawDate is today (Dubai date)
-    const parentLotteries = await Lottery.find({
-      drawDate: {
-        $gte: todayStart,
-        $lte: todayEnd
-      }
-    })
-    .sort({ drawDate: 1 }) // Sort by drawDate ascending
-    .lean();
-
-    if (parentLotteries.length === 0) {
-      return res.status(200).json({
-        success: true,
-        message: "No lotteries scheduled for today",
-        activeLotteries: [],
-        currentLottery: null
-      });
-    }
-
-    console.log(`Found ${parentLotteries.length} parent lotteries for today`);
-
-    // 2. Process each parent lottery to find valid child lottery for booking
-    const activeLotteries = [];
-
-    parentLotteries.forEach(parentLottery => {
-      // Skip if no child lotteries (draw times)
-      if (!parentLottery.winners || parentLottery.winners.length === 0) {
-        console.log(`Skipping ${parentLottery.name} - No draw times available`);
-        return; // Don't include parent lottery
-      }
-
-      console.log(`Processing ${parentLottery.name} with ${parentLottery.winners.length} draw times`);
-
-      // 3. Find the next available child lottery for booking
-      let availableChild = null;
-      let minTimeDiff = Infinity;
-
-      parentLottery.winners.forEach((winner, index) => {
-        if (!winner.resultTime) {
-          console.log(`Skipping draw time ${index + 1} - No result time set`);
-          return;
-        }
-
-        const resultTime = moment(winner.resultTime).tz('Asia/Dubai');
-        const timeDiff = resultTime.diff(now); // milliseconds until draw
-        
-        console.log(`Draw Time ${index + 1}: ${resultTime.format('HH:mm:ss')}, Time until: ${Math.floor(timeDiff / 60000)} minutes`);
-
-        // Criteria for valid booking:
-        // 1. Draw is in the future (timeDiff > 0)
-        // 2. At least 5 minutes away (resultTime > fiveMinutesFromNow)
-        // 3. Closest available draw time
-        
-        if (timeDiff > 0 && resultTime.isAfter(fiveMinutesFromNow) && timeDiff < minTimeDiff) {
-          minTimeDiff = timeDiff;
-          availableChild = {
-            winner,
-            index,
-            resultTime,
-            timeDiff
-          };
+            activeLotteries.push({
+              _id: `${parentLottery._id}_${lastChild.winner._id}`,
+              parentId: parentLottery._id,
+              name: parentLottery.name,
+              name2: parentLottery.name2,
+              drawNumber: parentLottery.drawNumber,
+              drawDate: parentLottery.drawDate,
+              drawTime: drawTimeName,
+              drawTimeId: lastChild.winner._id,
+              drawTimeDisplay: drawTimeDisplay,
+              drawTimeData: lastChild.winner,
+              nextDrawTime: lastChild.resultTime.toDate(),
+              timeUntilDraw: lastChild.resultTime.diff(now), // negative for past
+              isNext: false, // This is a past draw
+              parentLottery: parentLottery
+            });
+          }
         }
       });
 
-      if (availableChild) {
-        // Found a valid draw time for booking
-        const drawTimeName = `Draw Time ${availableChild.index + 1}`;
-        const drawTimeDisplay = availableChild.resultTime.format('hh:mm A');
-        const minutesUntil = Math.floor(availableChild.timeDiff / 60000);
-        
-        console.log(`✅ Selected ${drawTimeName} at ${drawTimeDisplay} (${minutesUntil} minutes away)`);
-        
-        activeLotteries.push({
-          _id: `${parentLottery._id}_${availableChild.winner._id}`,
-          parentId: parentLottery._id,
-          name: parentLottery.name,
-          name2: parentLottery.name2,
-          drawNumber: parentLottery.drawNumber,
-          drawDate: parentLottery.drawDate,
-          drawTime: drawTimeName,
-          drawTimeId: availableChild.winner._id,
-          drawTimeDisplay: drawTimeDisplay,
-          drawTimeData: availableChild.winner,
-          nextDrawTime: availableChild.resultTime.toDate(),
-          timeUntilDraw: availableChild.timeDiff,
-          minutesUntilDraw: minutesUntil,
-          isNext: true,
-          isBookable: true,
-          parentLottery: parentLottery
-        });
-      } else {
-        console.log(`❌ No bookable draw times found for ${parentLottery.name}`);
-        // Don't include this parent lottery
-      }
-    });
+      // 4. Sort active lotteries by nextDrawTime (closest first)
+      activeLotteries.sort((a, b) => {
+        return new Date(a.nextDrawTime) - new Date(b.nextDrawTime);
+      });
 
-    // 4. If no active lotteries found after processing
-    if (activeLotteries.length === 0) {
-      return res.status(200).json({
+      // 5. Mark the first one as current/primary
+      if (activeLotteries.length > 0) {
+        activeLotteries[0].isCurrent = true;
+      }
+
+      // 6. Also get ticket charges for pricing
+      const ticketCharges = await ticketCharge.find()
+        .sort({ ticketType: -1 }) // Type 5 first, then 4, etc.
+        .lean();
+
+      // Format ticket charges as a map for easy lookup
+      const ticketChargesMap = {};
+      ticketCharges.forEach(charge => {
+        ticketChargesMap[charge.ticketType] = charge.chargeAmount;
+      });
+
+      // 7. Prepare response
+      const response = {
         success: true,
-        message: "No lotteries available for booking at this time. Next draws are either within 5 minutes or have already started.",
-        activeLotteries: [],
-        currentLottery: null,
+        activeLotteries: activeLotteries.map(lottery => ({
+          _id: lottery._id,
+          parentId: lottery.parentId,
+          name: lottery.name,
+          name2: lottery.name2,
+          drawNumber: lottery.drawNumber,
+          drawDate: moment(lottery.drawDate).tz('Asia/Dubai').format('DD/MM/YYYY'),
+          drawTime: lottery.drawTime,
+          drawTimeId: lottery.drawTimeId,
+          drawTimeDisplay: lottery.drawTimeDisplay,
+          nextDrawTime: moment(lottery.nextDrawTime).tz('Asia/Dubai').format('DD/MM/YYYY hh:mm A'),
+          timeUntilDraw: lottery.timeUntilDraw,
+          isCurrent: lottery.isCurrent || false,
+          isNext: lottery.isNext,
+          prizes: lottery.parentLottery.prizes || [],
+          // Include original winner data if needed
+          winner: lottery.drawTimeData ? {
+            _id: lottery.drawTimeData._id,
+            resultTime: moment(lottery.drawTimeData.resultTime).tz('Asia/Dubai').format('DD/MM/YYYY hh:mm A'),
+            winNumbers: lottery.drawTimeData.winNumbers || []
+          } : null
+        })),
+        currentLottery: activeLotteries.length > 0 ? activeLotteries[0] : null,
+        ticketCharges: ticketChargesMap,
         serverTime: now.format('DD/MM/YYYY hh:mm A'),
         serverTimezone: 'Asia/Dubai'
+      };
+
+      res.status(200).json(response);
+
+    } catch (err) {
+      console.error("Error fetching active lotteries:", err);
+
+      res.status(500).json({
+        success: false,
+        message: "Failed to retrieve active lotteries",
+        error: process.env.NODE_ENV === "development" ? err.message : "Internal server error"
       });
     }
+  },
+  getActiveLotteries: async (req, res) => {
+    try {
+      // Get current Dubai time
+      const moment = require('moment-timezone');
+      const now = moment().tz('Asia/Dubai');
+      const fiveMinutesFromNow = now.clone().add(5, 'minutes');
+      const todayStart = now.clone().startOf('day').toDate();
+      const todayEnd = now.clone().endOf('day').toDate();
 
-    // 5. Sort active lotteries by nextDrawTime (closest first)
-    activeLotteries.sort((a, b) => {
-      return new Date(a.nextDrawTime) - new Date(b.nextDrawTime);
-    });
+      console.log(`Current Dubai time: ${now.format('DD/MM/YYYY HH:mm:ss')}`);
+      console.log(`Cut-off time (5 minutes from now): ${fiveMinutesFromNow.format('HH:mm:ss')}`);
 
-    // 6. Mark the first one as current/primary
-    if (activeLotteries.length > 0) {
-      activeLotteries[0].isCurrent = true;
+      // 1. Find parent lotteries where drawDate is today (Dubai date)
+      const parentLotteries = await Lottery.find({
+        drawDate: {
+          $gte: todayStart,
+          $lte: todayEnd
+        }
+      })
+        .sort({ drawDate: 1 }) // Sort by drawDate ascending
+        .lean();
+
+      if (parentLotteries.length === 0) {
+        return res.status(200).json({
+          success: true,
+          message: "No lotteries scheduled for today",
+          activeLotteries: [],
+          currentLottery: null
+        });
+      }
+
+      console.log(`Found ${parentLotteries.length} parent lotteries for today`);
+
+      // 2. Process each parent lottery to find valid child lottery for booking
+      const activeLotteries = [];
+
+      parentLotteries.forEach(parentLottery => {
+        // Skip if no child lotteries (draw times)
+        if (!parentLottery.winners || parentLottery.winners.length === 0) {
+          console.log(`Skipping ${parentLottery.name} - No draw times available`);
+          return; // Don't include parent lottery
+        }
+
+        console.log(`Processing ${parentLottery.name} with ${parentLottery.winners.length} draw times`);
+
+        // 3. Find the next available child lottery for booking
+        let availableChild = null;
+        let minTimeDiff = Infinity;
+
+        parentLottery.winners.forEach((winner, index) => {
+          if (!winner.resultTime) {
+            console.log(`Skipping draw time ${index + 1} - No result time set`);
+            return;
+          }
+
+          const resultTime = moment(winner.resultTime).tz('Asia/Dubai');
+          const timeDiff = resultTime.diff(now); // milliseconds until draw
+
+          console.log(`Draw Time ${index + 1}: ${resultTime.format('HH:mm:ss')}, Time until: ${Math.floor(timeDiff / 60000)} minutes`);
+
+          // Criteria for valid booking:
+          // 1. Draw is in the future (timeDiff > 0)
+          // 2. At least 5 minutes away (resultTime > fiveMinutesFromNow)
+          // 3. Closest available draw time
+
+          if (timeDiff > 0 && resultTime.isAfter(fiveMinutesFromNow) && timeDiff < minTimeDiff) {
+            minTimeDiff = timeDiff;
+            availableChild = {
+              winner,
+              index,
+              resultTime,
+              timeDiff
+            };
+          }
+        });
+
+        if (availableChild) {
+          // Found a valid draw time for booking
+          const drawTimeName = `Draw Time ${availableChild.index + 1}`;
+          const drawTimeDisplay = availableChild.resultTime.format('hh:mm A');
+          const minutesUntil = Math.floor(availableChild.timeDiff / 60000);
+
+          console.log(`✅ Selected ${drawTimeName} at ${drawTimeDisplay} (${minutesUntil} minutes away)`);
+
+          activeLotteries.push({
+            _id: `${parentLottery._id}_${availableChild.winner._id}`,
+            parentId: parentLottery._id,
+            name: parentLottery.name,
+            name2: parentLottery.name2,
+            drawNumber: parentLottery.drawNumber,
+            drawDate: parentLottery.drawDate,
+            drawTime: drawTimeName,
+            drawTimeId: availableChild.winner._id,
+            drawTimeDisplay: drawTimeDisplay,
+            drawTimeData: availableChild.winner,
+            nextDrawTime: availableChild.resultTime.toDate(),
+            timeUntilDraw: availableChild.timeDiff,
+            minutesUntilDraw: minutesUntil,
+            isNext: true,
+            isBookable: true,
+            parentLottery: parentLottery
+          });
+        } else {
+          console.log(`❌ No bookable draw times found for ${parentLottery.name}`);
+          // Don't include this parent lottery
+        }
+      });
+
+      // 4. If no active lotteries found after processing
+      if (activeLotteries.length === 0) {
+        return res.status(200).json({
+          success: true,
+          message: "No lotteries available for booking at this time. Next draws are either within 5 minutes or have already started.",
+          activeLotteries: [],
+          currentLottery: null,
+          serverTime: now.format('DD/MM/YYYY hh:mm A'),
+          serverTimezone: 'Asia/Dubai'
+        });
+      }
+
+      // 5. Sort active lotteries by nextDrawTime (closest first)
+      activeLotteries.sort((a, b) => {
+        return new Date(a.nextDrawTime) - new Date(b.nextDrawTime);
+      });
+
+      // 6. Mark the first one as current/primary
+      if (activeLotteries.length > 0) {
+        activeLotteries[0].isCurrent = true;
+      }
+
+      // 7. Also get ticket charges for pricing
+      const ticketCharges = await ticketCharge.find()
+        .sort({ ticketType: -1 })
+        .lean();
+
+      // Format ticket charges as a map for easy lookup
+      const ticketChargesMap = {};
+      ticketCharges.forEach(charge => {
+        ticketChargesMap[charge.ticketType] = charge.chargeAmount;
+      });
+
+      // 8. Prepare response
+      const response = {
+        success: true,
+        message: `${activeLotteries.length} lotteries available for booking`,
+        activeLotteries: activeLotteries.map(lottery => ({
+          _id: lottery._id,
+          parentId: lottery.parentId,
+          name: lottery.name,
+          name2: lottery.name2,
+          drawNumber: lottery.drawNumber,
+          drawDate: moment(lottery.drawDate).tz('Asia/Dubai').format('DD/MM/YYYY'),
+          drawTime: lottery.drawTime,
+          drawTimeId: lottery.drawTimeId,
+          drawTimeDisplay: lottery.drawTimeDisplay,
+          nextDrawTime: moment(lottery.nextDrawTime).tz('Asia/Dubai').format('DD/MM/YYYY hh:mm A'),
+          timeUntilDraw: lottery.timeUntilDraw,
+          minutesUntilDraw: lottery.minutesUntilDraw,
+          isCurrent: lottery.isCurrent || false,
+          isNext: lottery.isNext,
+          isBookable: lottery.isBookable,
+          prizes: lottery.parentLottery.prizes || [],
+          cutoffTime: fiveMinutesFromNow.format('HH:mm:ss'), // When booking closes for this draw
+          winner: lottery.drawTimeData ? {
+            _id: lottery.drawTimeData._id,
+            resultTime: moment(lottery.drawTimeData.resultTime).tz('Asia/Dubai').format('DD/MM/YYYY hh:mm A'),
+            winNumbers: lottery.drawTimeData.winNumbers || []
+          } : null
+        })),
+        currentLottery: activeLotteries.length > 0 ? activeLotteries[0] : null,
+        ticketCharges: ticketChargesMap,
+        serverTime: now.format('DD/MM/YYYY hh:mm A'),
+        serverTimezone: 'Asia/Dubai',
+        bookingCutoffMinutes: 5,
+        nextRefreshTime: moment().add(1, 'minute').tz('Asia/Dubai').format('HH:mm:ss') // Suggest when to check again
+      };
+
+      console.log(`✅ Returning ${activeLotteries.length} bookable lotteries`);
+      res.status(200).json(response);
+
+    } catch (err) {
+      console.error("Error fetching active lotteries:", err);
+
+      res.status(500).json({
+        success: false,
+        message: "Failed to retrieve lottery information",
+        error: process.env.NODE_ENV === "development" ? err.message : "Internal server error"
+      });
     }
-
-    // 7. Also get ticket charges for pricing
-    const ticketCharges = await ticketCharge.find()
-      .sort({ ticketType: -1 })
-      .lean();
-
-    // Format ticket charges as a map for easy lookup
-    const ticketChargesMap = {};
-    ticketCharges.forEach(charge => {
-      ticketChargesMap[charge.ticketType] = charge.chargeAmount;
-    });
-
-    // 8. Prepare response
-    const response = {
-      success: true,
-      message: `${activeLotteries.length} lotteries available for booking`,
-      activeLotteries: activeLotteries.map(lottery => ({
-        _id: lottery._id,
-        parentId: lottery.parentId,
-        name: lottery.name,
-        name2: lottery.name2,
-        drawNumber: lottery.drawNumber,
-        drawDate: moment(lottery.drawDate).tz('Asia/Dubai').format('DD/MM/YYYY'),
-        drawTime: lottery.drawTime,
-        drawTimeId: lottery.drawTimeId,
-        drawTimeDisplay: lottery.drawTimeDisplay,
-        nextDrawTime: moment(lottery.nextDrawTime).tz('Asia/Dubai').format('DD/MM/YYYY hh:mm A'),
-        timeUntilDraw: lottery.timeUntilDraw,
-        minutesUntilDraw: lottery.minutesUntilDraw,
-        isCurrent: lottery.isCurrent || false,
-        isNext: lottery.isNext,
-        isBookable: lottery.isBookable,
-        prizes: lottery.parentLottery.prizes || [],
-        cutoffTime: fiveMinutesFromNow.format('HH:mm:ss'), // When booking closes for this draw
-        winner: lottery.drawTimeData ? {
-          _id: lottery.drawTimeData._id,
-          resultTime: moment(lottery.drawTimeData.resultTime).tz('Asia/Dubai').format('DD/MM/YYYY hh:mm A'),
-          winNumbers: lottery.drawTimeData.winNumbers || []
-        } : null
-      })),
-      currentLottery: activeLotteries.length > 0 ? activeLotteries[0] : null,
-      ticketCharges: ticketChargesMap,
-      serverTime: now.format('DD/MM/YYYY hh:mm A'),
-      serverTimezone: 'Asia/Dubai',
-      bookingCutoffMinutes: 5,
-      nextRefreshTime: moment().add(1, 'minute').tz('Asia/Dubai').format('HH:mm:ss') // Suggest when to check again
-    };
-
-    console.log(`✅ Returning ${activeLotteries.length} bookable lotteries`);
-    res.status(200).json(response);
-
-  } catch (err) {
-    console.error("Error fetching active lotteries:", err);
-
-    res.status(500).json({
-      success: false,
-      message: "Failed to retrieve lottery information",
-      error: process.env.NODE_ENV === "development" ? err.message : "Internal server error"
-    });
-  }
-},
+  },
   getAllTicketCharges: async (req, res) => {
     try {
       let charges = await Charge.find({}).sort({ ticketType: 1 })

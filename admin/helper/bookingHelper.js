@@ -306,6 +306,8 @@ const bookingHelper = {
         // This prevents the application from crashing.
         kpi.totalPrizes = 0.00;
       }
+      let ticketNumbersData= await bookingHelper.getTicketLevelData(queryParams) || null
+
      
 
       return {
@@ -317,11 +319,320 @@ const bookingHelper = {
           totalItems: totalItems,
           itemsPerPage: limitNumber
         },
-        kpi: kpi
+        kpi: kpi,
+        ticketLevelData:ticketNumbersData || null
       };
 
     } catch (error) {
       console.error('Error in getBookingsWithFilters:', error);
+      throw error;
+    }
+  },
+
+  getTicketLevelData: async (queryParams) => {
+    try {
+      console.log('\n=== DEBUG getTicketLevelData START ===');
+      console.log('Query Params:', JSON.stringify(queryParams, null, 2));
+
+      let {
+        page = 1,
+        limit = 25,
+        customerSearch,
+        fromDateTime,
+        toDateTime,
+        childLotteryId,
+        agentId,
+        status,
+        sort = 'booking.date_desc',
+        win
+      } = queryParams;
+
+      // Build match conditions
+      const matchConditions = {};
+      
+      // IMPORTANT: Start with minimal filters for debugging
+      console.log('\n--- Building Filters ---');
+
+      // Customer search
+      if (customerSearch && customerSearch.trim()) {
+        matchConditions.$or = [
+          { "customer.name": { $regex: customerSearch.trim(), $options: 'i' } },
+          { "customer.phone": { $regex: customerSearch.trim(), $options: 'i' } }
+        ];
+        console.log('Customer filter added');
+      }
+
+      // Date range filter
+      if (fromDateTime || toDateTime) {
+        matchConditions["booking.date"] = {};
+        if (fromDateTime) {
+          fromDateTime = moment.tz(fromDateTime, 'Asia/Dubai');
+          matchConditions["booking.date"].$gte = new Date(fromDateTime);
+          console.log('From date filter:', fromDateTime);
+        }
+        if (toDateTime) {
+          toDateTime = moment.tz(toDateTime, 'Asia/Dubai');
+          matchConditions["booking.date"].$lte = new Date(toDateTime);
+          console.log('To date filter:', toDateTime);
+        }
+      }
+
+      // Child lottery filter
+      if (childLotteryId && childLotteryId.trim()) {
+        matchConditions["tickets.lottery.timeId"] = childLotteryId;
+        console.log('Child lottery filter:', childLotteryId);
+      }
+
+      // Agent filter
+      if (agentId && agentId.trim()) {
+        matchConditions["agent.id"] = new mongoose.Types.ObjectId(agentId);
+        console.log('Agent filter:', agentId);
+      }
+
+      console.log('Final matchConditions:', JSON.stringify(matchConditions, null, 2));
+
+      // Build sort conditions
+      const [sortField, sortDirection] = sort.split('_');
+      let sortConditions = {};
+      
+      switch (sortField) {
+        case 'ticket.number':
+          sortConditions["_id.number"] = sortDirection === 'desc' ? -1 : 1;
+          break;
+        case 'ticket.type':
+          sortConditions["_id.type"] = sortDirection === 'desc' ? -1 : 1;
+          break;
+        case 'ticket.quantity':
+          sortConditions["totalQuantity"] = sortDirection === 'desc' ? -1 : 1;
+          break;
+        default:
+          sortConditions["_id.number"] = 1; // Default
+      }
+
+      // Pagination
+      const pageNumber = parseInt(page);
+      const limitNumber = parseInt(limit);
+      const skip = (pageNumber - 1) * limitNumber;
+
+      console.log('\n--- Building Pipeline ---');
+
+      // CRITICAL FIX: Build ticket-level match separately
+      const ticketLevelMatch = {};
+      
+      // Status filter at ticket level
+      if (status && status.trim() && status !== "ALL") {
+        if (status === "NOT_WINNER") {
+          ticketLevelMatch["tickets.status"] = "NOT_WINNER";
+        } else if (["PAID", "UNPAID", "IN_AGENT"].includes(status)) {
+          ticketLevelMatch["tickets.status"] = status;
+        }
+        console.log('Status filter (ticket level):', status);
+      }
+      
+      // Win filter at ticket level
+      if (win && win.trim()) {
+        if (win === "WON") {
+          ticketLevelMatch["tickets.isWon"] = true;
+        } else if (win === "NOT_WON") {
+          ticketLevelMatch["tickets.isWon"] = false;
+        }
+        console.log('Win filter (ticket level):', win);
+      }
+
+      console.log('Ticket level match:', JSON.stringify(ticketLevelMatch, null, 2));
+
+      // CORRECTED PIPELINE
+      const pipeline = [
+        // STAGE 1: Match at booking level only
+        { $match: matchConditions },
+        
+        // STAGE 2: Unwind to get individual tickets
+        { $unwind: "$tickets" },
+        
+        // STAGE 3: Match at ticket level (status, win)
+        ...(Object.keys(ticketLevelMatch).length > 0 ? [{ $match: ticketLevelMatch }] : []),
+        
+        // STAGE 4: Group by ticket number + type
+        {
+          $group: {
+            _id: {
+              number: "$tickets.number",
+              type: "$tickets.type"
+            },
+            totalQuantity: { $sum: "$tickets.quantity" },
+            
+            // Collect all relevant data for first occurrence
+            firstOccurrence: {
+              $first: {
+                ticketNumber: "$ticketNumber",
+                customer: "$customer",
+                agent: "$agent",
+                booking: "$booking",
+                tickets: "$tickets"
+              }
+            },
+            
+            // For KPI - check if ANY occurrence is won
+            anyIsWon: { $max: { $cond: [{ $eq: ["$tickets.isWon", true] }, 1, 0] } },
+            anyStatus: { $first: "$tickets.status" },
+            
+            // Count bookings for this ticket
+            bookingCount: { $sum: 1 }
+          }
+        },
+        
+        // STAGE 5: Add isWon field based on any occurrence
+        {
+          $addFields: {
+            isWon: { $eq: ["$anyIsWon", 1] }
+          }
+        },
+        
+        // STAGE 6: Facet for pagination + KPIs
+        {
+          $facet: {
+            // Paginated tickets
+            tickets: [
+              { $sort: sortConditions },
+              { $skip: skip },
+              { $limit: limitNumber },
+              {
+                $project: {
+                  ticketNumber: "$_id.number",
+                  totalQuantity: 1,
+                  type: "$_id.type",
+                  
+                  // Info from first occurrence
+                  bookingTicketNumber: "$firstOccurrence.ticketNumber",
+                  customerName: "$firstOccurrence.customer.name",
+                  agentName: "$firstOccurrence.agent.name",
+                  bookingDate: "$firstOccurrence.booking.date",
+                  status: "$anyStatus",
+                  isWon: 1,
+                  lotteryName: "$firstOccurrence.tickets.lottery.name",
+                  timeId: "$firstOccurrence.tickets.lottery.timeId",
+                  bookingCount: 1
+                }
+              }
+            ],
+            
+            // Total count
+            totalCount: [
+              { $count: "count" }
+            ],
+            
+            // KPI by type
+            kpiByType: [
+              {
+                $group: {
+                  _id: "$_id.type",
+                  totalQuantity: { $sum: "$totalQuantity" },
+                  totalUniqueTickets: { $sum: 1 },
+                  totalWonQuantity: {
+                    $sum: {
+                      $cond: [{ $eq: ["$isWon", true] }, "$totalQuantity", 0]
+                    }
+                  },
+                  totalWonUniqueTickets: {
+                    $sum: {
+                      $cond: [{ $eq: ["$isWon", true] }, 1, 0]
+                    }
+                  }
+                }
+              },
+              { $sort: { _id: 1 } }
+            ]
+          }
+        }
+      ];
+
+      console.log('\n--- Executing Pipeline ---');
+      console.log('Pipeline length:', pipeline.length);
+      
+      const result = await Booking.aggregate(pipeline);
+      
+      console.log('\n--- Pipeline Results ---');
+      console.log('Tickets found:', result[0]?.tickets?.length || 0);
+      console.log('Total items:', result[0]?.totalCount[0]?.count || 0);
+      
+      if (result[0]?.tickets?.length > 0) {
+        console.log('First 5 tickets:');
+        result[0].tickets.slice(0, 5).forEach((ticket, i) => {
+          console.log(`${i+1}. ${ticket.ticketNumber} - Qty: ${ticket.totalQuantity}, Type: ${ticket.type}, Won: ${ticket.isWon}`);
+        });
+      }
+
+      const tickets = result[0].tickets || [];
+      const totalItems = result[0].totalCount[0]?.count || 0;
+      const totalPages = Math.ceil(totalItems / limitNumber);
+      const kpiByTypeRaw = result[0].kpiByType || [];
+
+      // Initialize KPI
+      const kpiByType = {
+        type1: { totalQuantity: 0, totalUniqueTickets: 0, totalWonQuantity: 0, totalWonUniqueTickets: 0 },
+        type2: { totalQuantity: 0, totalUniqueTickets: 0, totalWonQuantity: 0, totalWonUniqueTickets: 0 },
+        type3: { totalQuantity: 0, totalUniqueTickets: 0, totalWonQuantity: 0, totalWonUniqueTickets: 0 },
+        type4: { totalQuantity: 0, totalUniqueTickets: 0, totalWonQuantity: 0, totalWonUniqueTickets: 0 },
+        type5: { totalQuantity: 0, totalUniqueTickets: 0, totalWonQuantity: 0, totalWonUniqueTickets: 0 },
+        total: { totalQuantity: 0, totalUniqueTickets: 0, totalWonQuantity: 0, totalWonUniqueTickets: 0 }
+      };
+
+      // Fill KPI
+      kpiByTypeRaw.forEach(item => {
+        const typeKey = `type${item._id}`;
+        if (kpiByType[typeKey]) {
+          kpiByType[typeKey] = {
+            totalQuantity: item.totalQuantity || 0,
+            totalUniqueTickets: item.totalUniqueTickets || 0,
+            totalWonQuantity: item.totalWonQuantity || 0,
+            totalWonUniqueTickets: item.totalWonUniqueTickets || 0,
+            winRateQuantity: item.totalQuantity > 0 
+              ? parseFloat(((item.totalWonQuantity / item.totalQuantity) * 100).toFixed(2))
+              : 0,
+            winRateTickets: item.totalUniqueTickets > 0
+              ? parseFloat(((item.totalWonUniqueTickets / item.totalUniqueTickets) * 100).toFixed(2))
+              : 0
+          };
+          
+          // Add to totals
+          kpiByType.total.totalQuantity += item.totalQuantity || 0;
+          kpiByType.total.totalUniqueTickets += item.totalUniqueTickets || 0;
+          kpiByType.total.totalWonQuantity += item.totalWonQuantity || 0;
+          kpiByType.total.totalWonUniqueTickets += item.totalWonUniqueTickets || 0;
+        }
+      });
+
+      // Calculate total win rates
+      kpiByType.total.winRateQuantity = kpiByType.total.totalQuantity > 0
+        ? parseFloat(((kpiByType.total.totalWonQuantity / kpiByType.total.totalQuantity) * 100).toFixed(2))
+        : 0;
+      
+      kpiByType.total.winRateTickets = kpiByType.total.totalUniqueTickets > 0
+        ? parseFloat(((kpiByType.total.totalWonUniqueTickets / kpiByType.total.totalUniqueTickets) * 100).toFixed(2))
+        : 0;
+
+      console.log('\n--- Final Results ---');
+      console.log('Returning tickets:', tickets.length);
+      console.log('KPI by type:', JSON.stringify(kpiByType, null, 2));
+      console.log('=== DEBUG getTicketLevelData END ===\n');
+
+      return {
+        success: true,
+        tickets: tickets,
+        pagination: {
+          currentPage: pageNumber,
+          totalPages: totalPages,
+          totalItems: totalItems,
+          itemsPerPage: limitNumber
+        },
+        kpi: {
+          byType: kpiByType
+        }
+      };
+
+    } catch (error) {
+      console.error('Error in getTicketLevelData:', error);
+      console.error('Error stack:', error.stack);
       throw error;
     }
   },

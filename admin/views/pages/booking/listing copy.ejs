@@ -256,84 +256,6 @@
       </button>
     </div>
   </div>
-
-  <!-- Ticket number kpi -->
-    <div style="margin-top: 20px;" class="kpi-section" id="kpiSection2" style="display: none;">
-    <div class="kpi-cards">
-      <div class="kpi-card kpi-info">
-        <div class="kpi-icon">
-          <i class="fas fa-ticket-alt"></i>
-        </div>
-        <div class="kpi-content">
-          <div class="kpi-value" id="type1ticketQty">Nan</div>
-          <div class="kpi-label">Type 1</div>
-        </div>
-      </div>
-      
-      <div class="kpi-card kpi-info">
-        <div class="kpi-icon">
-          <i class="fas fa-ticket-alt"></i>
-        </div>
-        <div class="kpi-content">
-          <div class="kpi-value" id="type2ticketQty">Nan</div>
-          <div class="kpi-label">Type 2</div>
-        </div>
-      </div>
-      
-      <div class="kpi-card kpi-info">
-        <div class="kpi-icon">
-          <i class="fas fa-ticket-alt"></i>
-        </div>
-        <div class="kpi-content">
-          <div class="kpi-value" id="type3ticketQty">Nan</div>
-          <div class="kpi-label">Type 3</div>
-        </div>
-      </div>
-      
-      <div class="kpi-card kpi-info">
-        <div class="kpi-icon">
-          <i class="fas fa-ticket-alt"></i>
-        </div>
-        <div class="kpi-content">
-          <div class="kpi-value" id="type4ticketQty">Nan</div>
-          <div class="kpi-label">Type 4</div>
-        </div>
-      </div>
-
-      <div class="kpi-card kpi-info">
-        <div class="kpi-icon">
-          <i class="fas fa-ticket-alt"></i>
-        </div>
-        <div class="kpi-content">
-          <div class="kpi-value" id="type5ticketQty">NaN</div>
-          <div class="kpi-label">Type 5</div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-  <!--  -->
-
-  <!-- Table2 container -->
-   <!-- Bookings Table -->
-  <div class="bookings-container" id="bookingsContainer2" style="display: none;">
-    <div class="table-container">
-      <table class="bookings-table" id="bookingsTable2">
-        <thead>
-          <tr>
-            <th class="expand-col"></th>
-            <th class="booking-id-col">Ticket Number</th>
-            <th class="customer-col">Ticket Type</th>
-            <th class="agent-col">Total Quantity</th>       
-          </tr>
-        </thead>
-        <tbody id="bookingsTableBody2">
-          <!-- Booking rows will be inserted here -->
-        </tbody>
-      </table>
-    </div>
-  </div>
-  <!--  -->
 </div>
 
 <!-- Booking Details Modal -->
@@ -1772,7 +1694,6 @@ body {
             totalPages = data.pagination?.totalPages || 1;
             currentPage = data.pagination?.currentPage || 1;
             currentKpiData = data.kpi || {};
-            let ticketNumberData= data.ticketLevelData
             
             // Update KPI display
             updateKpiDisplay();
@@ -1780,9 +1701,6 @@ body {
             renderBookings();
             updatePagination();
             showLoading(false);
-
-            updateKpiDisplay2(ticketNumberData);
-            renderTicketNumberTable(ticketNumberData.tickets);
             
         } catch (error) {
             console.error('Error loading bookings:', error);
@@ -1806,26 +1724,10 @@ body {
         // Show KPI section
         showKpiSection();
     }
-    // Update KPI display with the data from backend
-    function updateKpiDisplay2(ticketNumberData) {
-        // Update KPI values
-        document.getElementById('type1ticketQty').textContent = ticketNumberData.kpi.byType.type1.totalQuantity || 0
-        document.getElementById('type2ticketQty').textContent = ticketNumberData.kpi.byType.type2.totalQuantity || 0
-        document.getElementById('type3ticketQty').textContent = ticketNumberData.kpi.byType.type3.totalQuantity || 0
-        document.getElementById('type4ticketQty').textContent = ticketNumberData.kpi.byType.type4.totalQuantity || 0
-        document.getElementById('type5ticketQty').textContent = ticketNumberData.kpi.byType.type5.totalQuantity || 0
-        
-        // Show KPI section
-        showKpiSection2();
-    }
     
     // Show/hide KPI section
     function showKpiSection() {
         document.getElementById('kpiSection').style.display = 'block';
-    }
-    // Show/hide KPI section
-    function showKpiSection2() {
-        document.getElementById('kpiSection2').style.display = 'block';
     }
     
     function hideKpiSection() {
@@ -1888,66 +1790,6 @@ body {
 
     const tbody = document.getElementById('bookingsTableBody');
     
-  //  
-   // Render ticket number aggregation table (second table) - Simplified version
-function renderTicketNumberTable(ticketData) {
-    const tbody = document.getElementById('bookingsTableBody2');
-    const container = document.getElementById('bookingsContainer2');
-    
-    if (!ticketData || ticketData.length === 0) {
-        container.style.display = 'none';
-        tbody.innerHTML = '';
-        return;
-    }
-    
-    container.style.display = 'block';
-    
-    let html = '';
-    
-    // Sort by total quantity descending to show highest quantity tickets first
-    const sortedData = [...ticketData].sort((a, b) => b.totalQuantity - a.totalQuantity);
-    
-    sortedData.forEach((ticket, index) => {
-        html += `
-            <tr data-ticket-number="${ticket.ticketNumber}">
-                <td>
-                    <!-- No expand button needed -->
-                </td>
-                <td>
-                    <span class="booking-id ticket-number-display">
-                        <strong>${ticket.ticketNumber}</strong>
-                        
-                    </span>
-                </td>
-                <td>
-                    <span class="status-badge">
-                        Type ${ticket.type}
-                    </span>
-                </td>
-                <td class="text-center">
-                    <strong>${ticket.totalQuantity.toLocaleString()}</strong>
-                </td>
-            </tr>
-        `;
-    });
-    
-    tbody.innerHTML = html;
-}
-
-// Helper function to get CSS class for ticket type
-function getTicketTypeClass(ticketType) {
-    const typeMap = {
-        'type1': 'kpi-info',
-        'type2': 'kpi-success', 
-        'type3': 'kpi-warning',
-        'type4': 'kpi-primary',
-        'type5': 'kpi-secondary'
-    };
-    return typeMap[ticketType.toLowerCase()] || '';
-}
-  // 
-
-
     // Render bookings table
     function renderBookings() {
         if (bookings.length === 0) {

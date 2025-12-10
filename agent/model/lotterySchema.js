@@ -33,11 +33,7 @@ const lotterySchema = new Schema({
       required: true,
       min: 0
     },
-    // ticketCharge : {
-    //   type: Number,
-    //   required: true,
-    //   min: 0
-    // }
+    
   }],
   
   winners: [{
