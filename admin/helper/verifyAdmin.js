@@ -13,6 +13,7 @@ const verifyAdmin = async (req, res, next) => {
     //     }
     // }
     
+    
     if (req.session.admin && req.session.admin.id) {
       let admin = await Admin.findById(req.session.admin.id);
       if (!admin) {
