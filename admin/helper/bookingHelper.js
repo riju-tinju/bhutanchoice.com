@@ -306,9 +306,9 @@ const bookingHelper = {
         // This prevents the application from crashing.
         kpi.totalPrizes = 0.00;
       }
-      let ticketNumbersData= await bookingHelper.getTicketLevelData(queryParams) || null
+      let ticketNumbersData = await bookingHelper.getTicketLevelData(queryParams) || null
 
-     
+
 
       return {
         success: true,
@@ -320,7 +320,7 @@ const bookingHelper = {
           itemsPerPage: limitNumber
         },
         kpi: kpi,
-        ticketLevelData:ticketNumbersData || null
+        ticketLevelData: ticketNumbersData || null
       };
 
     } catch (error) {
@@ -344,23 +344,25 @@ const bookingHelper = {
         agentId,
         status,
         sort = 'booking.date_desc',
-        win
+        win,
+        prizeType = 'All' // NEW: Add prizeType parameter
       } = queryParams;
 
       // Build match conditions
       const matchConditions = {};
-      
+
       // IMPORTANT: Start with minimal filters for debugging
       console.log('\n--- Building Filters ---');
+      console.log('Prize Type filter:', prizeType);
 
-      // Customer search
-      if (customerSearch && customerSearch.trim()) {
-        matchConditions.$or = [
-          { "customer.name": { $regex: customerSearch.trim(), $options: 'i' } },
-          { "customer.phone": { $regex: customerSearch.trim(), $options: 'i' } }
-        ];
-        console.log('Customer filter added');
-      }
+      // Customer search__ No Need of this searcch
+      // if (customerSearch && customerSearch.trim()) {
+      //   matchConditions.$or = [
+      //     { "customer.name": { $regex: customerSearch.trim(), $options: 'i' } },
+      //     { "customer.phone": { $regex: customerSearch.trim(), $options: 'i' } }
+      //   ];
+      //   console.log('Customer filter added');
+      // }
 
       // Date range filter
       if (fromDateTime || toDateTime) {
@@ -391,10 +393,10 @@ const bookingHelper = {
 
       console.log('Final matchConditions:', JSON.stringify(matchConditions, null, 2));
 
-      // Build sort conditions
+      // Build sort conditions - will be overridden for prizeType = "All"
       const [sortField, sortDirection] = sort.split('_');
       let sortConditions = {};
-      
+
       switch (sortField) {
         case 'ticket.number':
           sortConditions["_id.number"] = sortDirection === 'desc' ? -1 : 1;
@@ -418,7 +420,7 @@ const bookingHelper = {
 
       // CRITICAL FIX: Build ticket-level match separately
       const ticketLevelMatch = {};
-      
+
       // Status filter at ticket level
       if (status && status.trim() && status !== "ALL") {
         if (status === "NOT_WINNER") {
@@ -428,7 +430,7 @@ const bookingHelper = {
         }
         console.log('Status filter (ticket level):', status);
       }
-      
+
       // Win filter at ticket level
       if (win && win.trim()) {
         if (win === "WON") {
@@ -439,20 +441,82 @@ const bookingHelper = {
         console.log('Win filter (ticket level):', win);
       }
 
+      // Prize Type filter at ticket level
+      if (prizeType !== 'All') {
+        const typeMap = {
+          'Prize1': 1, // Letter+Number
+          'Prize2': 2, // 2-digit
+          'Prize3': 3, // 3-digit
+          'Prize4': 4, // 4-digit
+          'Prize5': 5  // 5-digit
+        };
+
+        if (typeMap[prizeType]) {
+          ticketLevelMatch["tickets.type"] = typeMap[prizeType];
+          console.log('Prize Type filter (ticket level):', prizeType, '-> type', typeMap[prizeType]);
+        }
+      }
+
       console.log('Ticket level match:', JSON.stringify(ticketLevelMatch, null, 2));
 
-      // CORRECTED PIPELINE
+      // CORRECTED PIPELINE with prizeType sorting
       const pipeline = [
         // STAGE 1: Match at booking level only
         { $match: matchConditions },
-        
+
         // STAGE 2: Unwind to get individual tickets
         { $unwind: "$tickets" },
-        
-        // STAGE 3: Match at ticket level (status, win)
+
+        // STAGE 3: Match at ticket level (status, win, prizeType)
         ...(Object.keys(ticketLevelMatch).length > 0 ? [{ $match: ticketLevelMatch }] : []),
-        
-        // STAGE 4: Group by ticket number + type
+
+        // STAGE 4: Add fields for custom sorting when prizeType = "All"
+        {
+          $addFields: {
+            // Extract first character for Type 1 tickets (Letter+Number)
+            firstChar: {
+              $cond: [
+                { $eq: ["$tickets.type", 1] }, // Only for Type 1 tickets
+                { $substr: ["$tickets.number", 0, 1] }, // Get first character
+                "" // Empty string for other types
+              ]
+            },
+            // Custom sort order for Type 1 tickets: A-E first, then others
+            type1SortOrder: {
+              $cond: [
+                { $eq: ["$tickets.type", 1] },
+                {
+                  $switch: {
+                    branches: [
+                      { case: { $eq: ["$firstChar", "A"] }, then: 1 },
+                      { case: { $eq: ["$firstChar", "B"] }, then: 2 },
+                      { case: { $eq: ["$firstChar", "C"] }, then: 3 },
+                      { case: { $eq: ["$firstChar", "D"] }, then: 4 },
+                      { case: { $eq: ["$firstChar", "E"] }, then: 5 }
+                    ],
+                    default: 6 // Other letters come after A-E
+                  }
+                },
+                0 // Not Type 1
+              ]
+            },
+            // Custom type order: 1, 5, 4, 3, 2
+            customTypeOrder: {
+              $switch: {
+                branches: [
+                  { case: { $eq: ["$tickets.type", 1] }, then: 1 }, // Type 1 first
+                  { case: { $eq: ["$tickets.type", 5] }, then: 2 }, // Type 5 second
+                  { case: { $eq: ["$tickets.type", 4] }, then: 3 }, // Type 4 third
+                  { case: { $eq: ["$tickets.type", 3] }, then: 4 }, // Type 3 fourth
+                  { case: { $eq: ["$tickets.type", 2] }, then: 5 }  // Type 2 fifth
+                ],
+                default: 6 // Any other type
+              }
+            }
+          }
+        },
+
+        // STAGE 5: Group by ticket number + type
         {
           $group: {
             _id: {
@@ -460,7 +524,10 @@ const bookingHelper = {
               type: "$tickets.type"
             },
             totalQuantity: { $sum: "$tickets.quantity" },
-            
+            customTypeOrder: { $first: "$customTypeOrder" },
+            type1SortOrder: { $first: "$type1SortOrder" },
+            firstChar: { $first: "$firstChar" },
+
             // Collect all relevant data for first occurrence
             firstOccurrence: {
               $first: {
@@ -471,94 +538,109 @@ const bookingHelper = {
                 tickets: "$tickets"
               }
             },
-            
+
             // For KPI - check if ANY occurrence is won
             anyIsWon: { $max: { $cond: [{ $eq: ["$tickets.isWon", true] }, 1, 0] } },
             anyStatus: { $first: "$tickets.status" },
-            
+
             // Count bookings for this ticket
             bookingCount: { $sum: 1 }
           }
         },
-        
-        // STAGE 5: Add isWon field based on any occurrence
+
+        // STAGE 6: Add isWon field based on any occurrence
         {
           $addFields: {
             isWon: { $eq: ["$anyIsWon", 1] }
           }
-        },
-        
-        // STAGE 6: Facet for pagination + KPIs
-        {
-          $facet: {
-            // Paginated tickets
-            tickets: [
-              { $sort: sortConditions },
-              { $skip: skip },
-              { $limit: limitNumber },
-              {
-                $project: {
-                  ticketNumber: "$_id.number",
-                  totalQuantity: 1,
-                  type: "$_id.type",
-                  
-                  // Info from first occurrence
-                  bookingTicketNumber: "$firstOccurrence.ticketNumber",
-                  customerName: "$firstOccurrence.customer.name",
-                  agentName: "$firstOccurrence.agent.name",
-                  bookingDate: "$firstOccurrence.booking.date",
-                  status: "$anyStatus",
-                  isWon: 1,
-                  lotteryName: "$firstOccurrence.tickets.lottery.name",
-                  timeId: "$firstOccurrence.tickets.lottery.timeId",
-                  bookingCount: 1
-                }
-              }
-            ],
-            
-            // Total count
-            totalCount: [
-              { $count: "count" }
-            ],
-            
-            // KPI by type
-            kpiByType: [
-              {
-                $group: {
-                  _id: "$_id.type",
-                  totalQuantity: { $sum: "$totalQuantity" },
-                  totalUniqueTickets: { $sum: 1 },
-                  totalWonQuantity: {
-                    $sum: {
-                      $cond: [{ $eq: ["$isWon", true] }, "$totalQuantity", 0]
-                    }
-                  },
-                  totalWonUniqueTickets: {
-                    $sum: {
-                      $cond: [{ $eq: ["$isWon", true] }, 1, 0]
-                    }
-                  }
-                }
-              },
-              { $sort: { _id: 1 } }
-            ]
-          }
         }
       ];
 
+      // Determine sorting based on prizeType
+      if (prizeType === 'All') {
+        // Custom sort for "All": Type 1 → Type 5 → Type 4 → Type 3 → Type 2
+        // Within Type 1: A, B, C, D, E first, then other letters
+        pipeline.push({
+          $sort: {
+            customTypeOrder: 1,      // Type order: 1, 5, 4, 3, 2
+            type1SortOrder: 1,       // Within Type 1: A(1), B(2), C(3), D(4), E(5), others(6)
+            "_id.number": 1          // Then by ticket number
+          }
+        });
+      } else {
+        // Use original sort for specific prize types
+        pipeline.push({ $sort: sortConditions });
+      }
+
+      // Add facet stage for pagination and KPIs
+      pipeline.push({
+        $facet: {
+          // Paginated tickets
+          tickets: [
+            { $skip: skip },
+            { $limit: limitNumber },
+            {
+              $project: {
+                ticketNumber: "$_id.number",
+                totalQuantity: 1,
+                type: "$_id.type",
+
+                // Info from first occurrence
+                bookingTicketNumber: "$firstOccurrence.ticketNumber",
+                customerName: "$firstOccurrence.customer.name",
+                agentName: "$firstOccurrence.agent.name",
+                bookingDate: "$firstOccurrence.booking.date",
+                status: "$anyStatus",
+                isWon: 1,
+                lotteryName: "$firstOccurrence.tickets.lottery.name",
+                timeId: "$firstOccurrence.tickets.lottery.timeId",
+                bookingCount: 1
+              }
+            }
+          ],
+
+          // Total count
+          totalCount: [
+            { $count: "count" }
+          ],
+
+          // KPI by type
+          kpiByType: [
+            {
+              $group: {
+                _id: "$_id.type",
+                totalQuantity: { $sum: "$totalQuantity" },
+                totalUniqueTickets: { $sum: 1 },
+                totalWonQuantity: {
+                  $sum: {
+                    $cond: [{ $eq: ["$isWon", true] }, "$totalQuantity", 0]
+                  }
+                },
+                totalWonUniqueTickets: {
+                  $sum: {
+                    $cond: [{ $eq: ["$isWon", true] }, 1, 0]
+                  }
+                }
+              }
+            },
+            { $sort: { _id: 1 } }
+          ]
+        }
+      });
+
       console.log('\n--- Executing Pipeline ---');
       console.log('Pipeline length:', pipeline.length);
-      
+
       const result = await Booking.aggregate(pipeline);
-      
+
       console.log('\n--- Pipeline Results ---');
       console.log('Tickets found:', result[0]?.tickets?.length || 0);
       console.log('Total items:', result[0]?.totalCount[0]?.count || 0);
-      
+
       if (result[0]?.tickets?.length > 0) {
-        console.log('First 5 tickets:');
-        result[0].tickets.slice(0, 5).forEach((ticket, i) => {
-          console.log(`${i+1}. ${ticket.ticketNumber} - Qty: ${ticket.totalQuantity}, Type: ${ticket.type}, Won: ${ticket.isWon}`);
+        console.log('First 10 tickets (showing sorting):');
+        result[0].tickets.slice(0, 10).forEach((ticket, i) => {
+          console.log(`${i + 1}. ${ticket.ticketNumber} - Type: ${ticket.type}, Qty: ${ticket.totalQuantity}, Won: ${ticket.isWon}`);
         });
       }
 
@@ -567,7 +649,7 @@ const bookingHelper = {
       const totalPages = Math.ceil(totalItems / limitNumber);
       const kpiByTypeRaw = result[0].kpiByType || [];
 
-      // Initialize KPI
+      // Initialize KPI (EXACT SAME STRUCTURE AS ORIGINAL)
       const kpiByType = {
         type1: { totalQuantity: 0, totalUniqueTickets: 0, totalWonQuantity: 0, totalWonUniqueTickets: 0 },
         type2: { totalQuantity: 0, totalUniqueTickets: 0, totalWonQuantity: 0, totalWonUniqueTickets: 0 },
@@ -577,7 +659,7 @@ const bookingHelper = {
         total: { totalQuantity: 0, totalUniqueTickets: 0, totalWonQuantity: 0, totalWonUniqueTickets: 0 }
       };
 
-      // Fill KPI
+      // Fill KPI (EXACT SAME LOGIC AS ORIGINAL)
       kpiByTypeRaw.forEach(item => {
         const typeKey = `type${item._id}`;
         if (kpiByType[typeKey]) {
@@ -586,14 +668,14 @@ const bookingHelper = {
             totalUniqueTickets: item.totalUniqueTickets || 0,
             totalWonQuantity: item.totalWonQuantity || 0,
             totalWonUniqueTickets: item.totalWonUniqueTickets || 0,
-            winRateQuantity: item.totalQuantity > 0 
+            winRateQuantity: item.totalQuantity > 0
               ? parseFloat(((item.totalWonQuantity / item.totalQuantity) * 100).toFixed(2))
               : 0,
             winRateTickets: item.totalUniqueTickets > 0
               ? parseFloat(((item.totalWonUniqueTickets / item.totalUniqueTickets) * 100).toFixed(2))
               : 0
           };
-          
+
           // Add to totals
           kpiByType.total.totalQuantity += item.totalQuantity || 0;
           kpiByType.total.totalUniqueTickets += item.totalUniqueTickets || 0;
@@ -602,11 +684,11 @@ const bookingHelper = {
         }
       });
 
-      // Calculate total win rates
+      // Calculate total win rates (EXACT SAME LOGIC AS ORIGINAL)
       kpiByType.total.winRateQuantity = kpiByType.total.totalQuantity > 0
         ? parseFloat(((kpiByType.total.totalWonQuantity / kpiByType.total.totalQuantity) * 100).toFixed(2))
         : 0;
-      
+
       kpiByType.total.winRateTickets = kpiByType.total.totalUniqueTickets > 0
         ? parseFloat(((kpiByType.total.totalWonUniqueTickets / kpiByType.total.totalUniqueTickets) * 100).toFixed(2))
         : 0;
@@ -616,6 +698,7 @@ const bookingHelper = {
       console.log('KPI by type:', JSON.stringify(kpiByType, null, 2));
       console.log('=== DEBUG getTicketLevelData END ===\n');
 
+      // Return EXACT SAME STRUCTURE as original
       return {
         success: true,
         tickets: tickets,
@@ -636,7 +719,7 @@ const bookingHelper = {
       throw error;
     }
   },
-
+  
   // Get specific booking by ID
   getBookingById: async (bookingId) => {
     try {
@@ -664,7 +747,6 @@ const bookingHelper = {
       throw error;
     }
   },
-
   // Update booking status
   updateBookingStatus1: async (req, res) => {
     try {

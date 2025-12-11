@@ -314,11 +314,23 @@
   </div>
   <!--  -->
 
+
+  <!-- Table2 Filter -->
+   <div class="filter-group" style="max-width: 240px;">
+          <label class="filter-label">Ticket Type</label>
+          <select id="ticketTypeFilter" class="filter-select">
+            <option value="All" selected >All Type</option>
+            <option value="Prize5">Prize 5 Type</option>
+            <option value="Prize4">Prize 4 Type</option>
+            <option value="Prize3">Prize 3 Type</option>
+            <option value="Prize2">Prize 2 Type</option>
+            <option value="Prize1">Prize 1 Type</option>
+          </select>
+    </div>
   <!-- Table2 container -->
-   <!-- Bookings Table -->
   <div class="bookings-container" id="bookingsContainer2" style="display: none;">
     <div class="table-container">
-      <table class="bookings-table" id="bookingsTable2">
+      <table class="bookings-table" id="bookingsTable2" style="min-width: 100%">
         <thead>
           <tr>
             <th class="expand-col"></th>
@@ -1511,6 +1523,7 @@ body {
         status: '',
         sort: 'booking.date_desc',
         win: 'ALL',
+        prizeType: 'All'
     };
     
     // Initialize
@@ -1545,6 +1558,7 @@ body {
         document.getElementById('statusFilter').addEventListener('change', applyFilters);
         document.getElementById('sortFilter').addEventListener('change', applyFilters);
         document.getElementById('winnerFilter').addEventListener('change', applyFilters);
+        document.getElementById('ticketTypeFilter').addEventListener('change', applyFilters);
         document.getElementById('itemsPerPageFilter').addEventListener('change', handleItemsPerPageChange);
         document.getElementById('resetFilters').addEventListener('click', resetAllFilters);
         
@@ -1693,6 +1707,8 @@ body {
         currentFilters.status = document.getElementById('statusFilter').value;
         currentFilters.sort = document.getElementById('sortFilter').value;
         currentFilters.win = document.getElementById('winnerFilter').value;
+        currentFilters.prizeType = document.getElementById('ticketTypeFilter').value;
+
         
         currentPage = 1;
         loadBookings();
@@ -1704,9 +1720,10 @@ body {
         document.getElementById('clearSearch').style.display = 'none';
         document.getElementById('childLotteryFilter').value = '';
         document.getElementById('agentFilter').value = '';
-        document.getElementById('statusFilter').value = '';
+        document.getElementById('statusFilter').value = 'ALL';
         document.getElementById('winnerFilter').value = 'ALL';
         document.getElementById('sortFilter').value = 'booking.date_desc';
+        document.getElementById('ticketTypeFilter').value = 'All';
         setDefaultDateTimeRange();
         
         currentFilters = {
@@ -1716,7 +1733,8 @@ body {
             childLotteryId: '',
             agentId: '',
             status: '',
-            sort: 'booking.date_desc'
+            sort: 'booking.date_desc',
+            prizeType: 'ALL',
         };
         
         currentPage = 1;
@@ -1754,6 +1772,7 @@ body {
             if (currentFilters.agentId) params.append('agentId', currentFilters.agentId);
             if (currentFilters.status) params.append('status', currentFilters.status);
             if (currentFilters.win) params.append('win', currentFilters.win);
+            if (currentFilters.prizeType) params.append('prizeType', currentFilters.prizeType);
             
             const response = await fetch(`/bookings/api/bookings?${params.toString()}`, {
                 method: 'GET',
@@ -1905,8 +1924,8 @@ function renderTicketNumberTable(ticketData) {
     let html = '';
     
     // Sort by total quantity descending to show highest quantity tickets first
-    const sortedData = [...ticketData].sort((a, b) => b.totalQuantity - a.totalQuantity);
-    
+    // const sortedData = [...ticketData].sort((a, b) => b.totalQuantity - a.totalQuantity);
+    const sortedData = ticketData
     sortedData.forEach((ticket, index) => {
         html += `
             <tr data-ticket-number="${ticket.ticketNumber}">
