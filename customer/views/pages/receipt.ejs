@@ -821,14 +821,20 @@
           <div class="ticket-list">
             <% group.tickets.forEach(ticket => { %>
               <script>
-        console.groupCollapsed('Ticket Debug: <%= ticket.number %>');
-        console.log('--- Raw Ticket Data as JSON ---');
-        console.log(JSON.parse('<%- JSON.stringify(ticket) %>'));
-        console.log('ticket.quantity:', JSON.parse('<%- JSON.stringify(ticket) %>').quantity);
-        
-        console.log('---');
-        console.groupEnd();
-    </script>
+                console.groupCollapsed('Ticket Debug: <%= ticket.number %>');
+                console.log('--- Raw Ticket Data as JSON ---');
+                console.log(JSON.parse('<%- JSON.stringify(ticket) %>'));
+                console.log('ticket.quantity:', JSON.parse('<%- JSON.stringify(ticket) %>').quantity);
+                
+
+
+                console.log('---');
+                console.groupEnd();
+              </script>
+              <% 
+  // Assign the value of ticket.quantity to a new EJS variable
+  const ticketQuantity = ticket.quantity; 
+%>
 
       
 
@@ -840,7 +846,7 @@
 
               <span class="ticket-number"><%= String(ticket.number) %></span>
               
-              <span style="color: #d4a017;"> <%= ticket.quantity || '' %></span>
+              <span style="color: #d4a017;"><b>*</b> <%- JSON.parse(JSON.stringify(ticket)).quantity || '' %></span>
               
               <span class="ticket-amount">Nu. <%= ticket.chargeAmount.toFixed(2) %></span>
             </div>

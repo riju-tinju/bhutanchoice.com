@@ -591,6 +591,7 @@ const indexHelper = {
         return res.status(404).render('error');
         // return res.status(404).json({ success: false, message: "Booking not found" });
       }
+      console.log(booking)
      return res.status(200).render('pages/receipt', { ticketNumber: req.params.ticketNumber, booking, });
     
   }catch(err){
