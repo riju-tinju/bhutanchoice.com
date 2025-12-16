@@ -1427,6 +1427,15 @@
       });
       latestUpcomingLottery = upcomingLotteries[0];
     }
+
+    //
+     // SORT RESULT LOTTERIES by lastResultTime (latest first)
+    // If no resultTime, use lastDrawTime or drawDate as fallback
+    resultLotteries.sort((a, b) => {
+      const timeA = a.lastResultTime || new Date(a.lastDrawTime) || new Date(a.drawDate);
+      const timeB = b.lastResultTime || new Date(b.lastDrawTime) || new Date(b.drawDate);
+      return timeB - timeA; // DESCENDING (latest first)
+    });
     
     // Combine sorted lotteries
     sortedTodays = [];

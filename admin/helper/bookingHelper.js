@@ -719,7 +719,6 @@ const bookingHelper = {
       throw error;
     }
   },
-  
   // Get specific booking by ID
   getBookingById: async (bookingId) => {
     try {
