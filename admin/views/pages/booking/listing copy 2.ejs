@@ -1539,10 +1539,6 @@ body {
     let currentTable2Page = 1;
     let totalTable2Pages = 1;
     let totalTable2Items = 0;
-
-    let currentPage2 = 1;// For second table pagination err clear
-    let totalItems2 = 0;
-    let totalPages2 =1;
     
     // Current filters
     let currentFilters = {
@@ -1743,7 +1739,6 @@ body {
         currentFilters.sort = document.getElementById('sortFilter').value;
         currentFilters.win = document.getElementById('winnerFilter').value;
         currentFilters.prizeType = document.getElementById('ticketTypeFilter').value;
-        currentFilters.itemsPerPage = document.getElementById('itemsPerPageFilter').value;
 
         
         currentPage = 1;
@@ -1761,8 +1756,6 @@ body {
         document.getElementById('winnerFilter').value = 'ALL';
         document.getElementById('sortFilter').value = 'booking.date_desc';
         document.getElementById('ticketTypeFilter').value = 'All';
-        document.getElementById('itemsPerPageFilter').value = '25';
-
         setDefaultDateTimeRange();
         
         currentFilters = {
