@@ -335,8 +335,10 @@ const bookingHelper = {
       console.log('Query Params:', JSON.stringify(queryParams, null, 2));
 
       let {
+        table2Page = 1,       // Changed from 'page' to 'table2Page'
+        table2Limit, 
         page = 1,
-        limit = 25,
+        limit,
         customerSearch,
         fromDateTime,
         toDateTime,
@@ -412,8 +414,13 @@ const bookingHelper = {
       }
 
       // Pagination
-      const pageNumber = parseInt(page);
-      const limitNumber = parseInt(limit);
+      // const pageNumber = parseInt(page);
+      
+
+      // Pagination - use the new parameter names
+      const pageNumber = parseInt(table2Page);      // Changed
+      const limitNumber = parseInt(limit);   // Changed
+
       const skip = (pageNumber - 1) * limitNumber;
 
       console.log('\n--- Building Pipeline ---');

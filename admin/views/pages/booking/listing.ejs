@@ -15,7 +15,6 @@
 <body>
 
 
-
 <!-- Booking Management Page -->
 <div class="booking-container">
   <!-- Header Section -->
@@ -348,20 +347,19 @@
   <!--  -->
 
   <!-- Pagination2 -->
-   <!-- Pagination -->
   <div class="pagination-container" id="paginationContainer2" style="display: none;">
     <div class="pagination-info">
-      Showing <span id="startItem">0</span> to <span id="endItem">0</span> of <span id="totalItems">0</span> bookings
+      Showing <span id="startItem2">0</span> to <span id="endItem2">0</span> of <span id="totalItems2">0</span> bookings
     </div>
     <div class="pagination-controls">
-      <button type="button" class="btn btn-secondary btn-sm" id="prevPageBtn" disabled>
+      <button type="button" class="btn btn-secondary btn-sm" id="prevPageBtn2" disabled>
         <i class="fas fa-chevron-left"></i>
         Previous
       </button>
       <span class="page-info">
-        Page <span id="currentPage">1</span> of <span id="totalPages">1</span>
+        Page <span id="currentPage2">1</span> of <span id="totalPages2">1</span>
       </span>
-      <button type="button" class="btn btn-secondary btn-sm" id="nextPageBtn" disabled>
+      <button type="button" class="btn btn-secondary btn-sm" id="nextPageBtn2" disabled>
         Next
         <i class="fas fa-chevron-right"></i>
       </button>
@@ -1536,6 +1534,11 @@ body {
     let currentBookingId = null;
     let isLoading = false;
     let currentKpiData = {};
+
+
+    let currentTable2Page = 1;
+    let totalTable2Pages = 1;
+    let totalTable2Items = 0;
     
     // Current filters
     let currentFilters = {
@@ -1595,6 +1598,10 @@ body {
         // Pagination
         document.getElementById('prevPageBtn').addEventListener('click', () => changePage(currentPage - 1));
         document.getElementById('nextPageBtn').addEventListener('click', () => changePage(currentPage + 1));
+
+        // Pagination2
+        document.getElementById('prevPageBtn2').addEventListener('click', () => changePage2(currentPage2 - 1));
+        document.getElementById('nextPageBtn2').addEventListener('click', () => changePage2(currentPage2 + 1));
         
         // Modal buttons
         document.getElementById('updateBookingBtn').addEventListener('click', openStatusModal);
@@ -1735,6 +1742,7 @@ body {
 
         
         currentPage = 1;
+        currentPage2 = 1;
         loadBookings();
     }
     
@@ -1762,6 +1770,7 @@ body {
         };
         
         currentPage = 1;
+        currentPage2 = 1;
         loadBookings();
     }
     
@@ -1785,7 +1794,9 @@ body {
             const params = new URLSearchParams({
                 page: currentPage,
                 limit: itemsPerPage,
-                sort: currentFilters.sort
+                sort: currentFilters.sort,
+                table2Page: currentPage2,
+                table2Limit: itemsPerPage
             });
             
             // Add optional filters
@@ -1797,6 +1808,8 @@ body {
             if (currentFilters.status) params.append('status', currentFilters.status);
             if (currentFilters.win) params.append('win', currentFilters.win);
             if (currentFilters.prizeType) params.append('prizeType', currentFilters.prizeType);
+
+            console.log('Fetching bookings with params:', params.toString());
             
             const response = await fetch(`/bookings/api/bookings?${params.toString()}`, {
                 method: 'GET',
@@ -1815,13 +1828,22 @@ body {
             totalPages = data.pagination?.totalPages || 1;
             currentPage = data.pagination?.currentPage || 1;
             currentKpiData = data.kpi || {};
-            let ticketNumberData= data.ticketLevelData
+            // Extract Table 2 pagination data from the response
+            let ticketNumberData= data.ticketLevelData || {};
+
+            totalItems2 = ticketNumberData.pagination?.totalItems || 0;
+            totalPages2 = ticketNumberData.pagination?.totalPages || 1;
+            currentPage2 = ticketNumberData.pagination?.currentPage || 1;
+
+            
+
             
             // Update KPI display
             updateKpiDisplay();
             
             renderBookings();
             updatePagination();
+            updatePagination2()
             showLoading(false);
 
             updateKpiDisplay2(ticketNumberData);
@@ -1849,6 +1871,7 @@ body {
         // Show KPI section
         showKpiSection();
     }
+
     // Update KPI display with the data from backend
     function updateKpiDisplay2(ticketNumberData) {
         // Update KPI values
@@ -1910,6 +1933,14 @@ body {
             loadBookings();
         }
     }
+
+    // Change page for Table 2
+function changePage2(page) {
+    if (page >= 1 && page <= totalPages2 && !isLoading) {
+        currentPage2 = page;
+        loadBookings(); // This will reload data with new page
+    }
+}
     
     // Update pagination
     function updatePagination() {
@@ -1928,6 +1959,25 @@ body {
         document.getElementById('paginationContainer').style.display = 
             totalItems > 0 ? 'flex' : 'none';
     }
+
+    // Update Table 2 pagination
+function updatePagination2() {
+    const startItem = totalItems2 > 0 ? (currentPage2 - 1) * itemsPerPage + 1 : 0;
+    const endItem = Math.min(currentPage2 * itemsPerPage, totalItems2);
+    
+    document.getElementById('startItem2').textContent = startItem;
+    document.getElementById('endItem2').textContent = endItem;
+    document.getElementById('totalItems2').textContent = totalItems2;
+    document.getElementById('currentPage2').textContent = currentPage2;
+    document.getElementById('totalPages2').textContent = totalPages2;
+    
+    document.getElementById('prevPageBtn2').disabled = currentPage2 === 1;
+    document.getElementById('nextPageBtn2').disabled = currentPage2 === totalPages2;
+    
+    // Show pagination if there are items
+    document.getElementById('paginationContainer2').style.display = 
+        totalItems2 > 0 ? 'flex' : 'none';
+}
 
     const tbody = document.getElementById('bookingsTableBody');
     

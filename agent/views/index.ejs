@@ -1313,17 +1313,154 @@
     }
 %>
 
+    <%
+  // Replace your current sorting logic with this:
+  
+  let sortedTodays = [];
+  if (todays && todays.length > 0) {
+    const now = new Date();
+    
+    // Process each lottery with the SAME logic as todays-results.ejs
+    const processedLotteries = todays.map(lottery => {
+      let status, badgeClass, showCountdown = false, showRefresh = false;
+      
+      // Calculate the earliest upcoming resultTime for sorting
+      let earliestUpcomingTime = null;
+      if (lottery.winners && lottery.winners.length > 0) {
+        const upcomingTimes = lottery.winners
+          .filter(winner => winner.resultTime)
+          .map(winner => new Date(winner.resultTime))
+          .filter(time => time > now);
+        
+        if (upcomingTimes.length > 0) {
+          earliestUpcomingTime = new Date(Math.min(...upcomingTimes.map(t => t.getTime())));
+        }
+      }
+      
+      showCountdown = !!lottery.nextDrawTime;
+      
+      // EXACT SAME LOGIC as todays-results.ejs
+      const hasLiveResultTime = lottery.winners && lottery.winners.some(winner => {
+        if (winner.resultTime) {
+          const resultTime = new Date(winner.resultTime);
+          const timeDiff = now - resultTime;
+          return timeDiff >= 0 && timeDiff <= (60 * 60 * 1000);
+        }
+        return false;
+      });
+      
+      if (hasLiveResultTime) {
+        status = "LIVE";
+        badgeClass = "live-badge";
+        showRefresh = true;
+      } else {
+        const hasUpcomingResultTime = lottery.winners && lottery.winners.some(winner => {
+          if (winner.resultTime) {
+            const resultTime = new Date(winner.resultTime);
+            const timeDiff = resultTime - now;
+            return timeDiff > (60 * 60 * 1000);
+          }
+          return false;
+        });
+        
+        if (hasUpcomingResultTime) {
+          status = "UPCOMING";
+          badgeClass = "upcoming-badge";
+          showCountdown = true;
+          showRefresh = false;
+        } else {
+          const hasPastResultTime = lottery.winners && lottery.winners.some(winner => {
+            if (winner.resultTime) {
+              const resultTime = new Date(winner.resultTime);
+              const timeDiff = now - resultTime;
+              return timeDiff > (60 * 60 * 1000);
+            }
+            return false;
+          });
+          
+          if (hasPastResultTime) {
+            status = "RESULT";
+            badgeClass = "result-badge";
+            showRefresh = false;
+          } else {
+            const drawTime = new Date(lottery.drawDate);
+            const hoursAfterDraw = (now - drawTime) / (1000 * 60 * 60);
+
+            if (now < drawTime) {
+              status = "UPCOMING";
+              badgeClass = "upcoming-badge";
+              showCountdown = true;
+            } else if (hoursAfterDraw <= 2) {
+              status = "LIVE";
+              badgeClass = "live-badge";
+              showCountdown = false;
+              showRefresh = false;
+            } else {
+              status = "RESULT";
+              badgeClass = "result-badge";
+              showCountdown = false;
+              showRefresh = false;
+            }
+          }
+        }
+      }
+      
+      return {
+        ...lottery,
+        status,
+        badgeClass,
+        showCountdown,
+        showRefresh,
+        earliestUpcomingTime,
+        sortPriority: status === "UPCOMING" ? 1 : status === "LIVE" ? 2 : 3
+      };
+    });
+    
+    // Sort lotteries: UPCOMING first, then LIVE, then RESULT
+    const upcomingLotteries = processedLotteries.filter(l => l.status === "UPCOMING");
+    const liveLotteries = processedLotteries.filter(l => l.status === "LIVE");
+    const resultLotteries = processedLotteries.filter(l => l.status === "RESULT");
+    
+    // Find the latest upcoming lottery
+    let latestUpcomingLottery = null;
+    if (upcomingLotteries.length > 0) {
+      upcomingLotteries.sort((a, b) => {
+        const timeA = a.earliestUpcomingTime || new Date(a.nextDrawTime) || new Date(a.drawDate);
+        const timeB = b.earliestUpcomingTime || new Date(b.nextDrawTime) || new Date(b.drawDate);
+        return timeA - timeB;
+      });
+      latestUpcomingLottery = upcomingLotteries[0];
+    }
+
+    //
+     // SORT RESULT LOTTERIES by lastResultTime (latest first)
+    // If no resultTime, use lastDrawTime or drawDate as fallback
+    resultLotteries.sort((a, b) => {
+      const timeA = a.lastResultTime || new Date(a.lastDrawTime) || new Date(a.drawDate);
+      const timeB = b.lastResultTime || new Date(b.lastDrawTime) || new Date(b.drawDate);
+      return timeB - timeA; // DESCENDING (latest first)
+    });
+    
+    // Combine sorted lotteries
+    sortedTodays = [];
+    if (latestUpcomingLottery) {
+      sortedTodays.push(latestUpcomingLottery);
+    }
+    sortedTodays.push(...liveLotteries);
+    sortedTodays.push(...resultLotteries);
+  }
+%>
+
     <!-- Conditional section ordering -->
-    <% if (!shouldSwapSections) { %>
-    <!-- Original order (before draws) -->
-    <%- include('partials/todays-results') %>
-    <%- include('partials/upcoming-lotteries') %>
-    <% } else { %>
-    <!-- Swapped order (after draws) -->
-    <%- include('partials/upcoming-lotteries') %>
-    <%- include('partials/todays-results') %>
-    <% } %>
-    <%- include('partials/indexScript') %>
+    <!-- Modify these lines: -->
+<% if (!shouldSwapSections) { %>
+<%- include('partials/todays-results', { todays: sortedTodays }) %>
+<%- include('partials/upcoming-lotteries') %>
+<% } else { %>
+<%- include('partials/upcoming-lotteries') %>
+<%- include('partials/todays-results', { todays: sortedTodays }) %>
+<% } %>
+<%- include('partials/indexScript', { sortedTodays: sortedTodays }) %>
 
     <%- include('partials/past') %>
   </main>
