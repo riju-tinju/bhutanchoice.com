@@ -1,0 +1,306 @@
+<!-- partials/todays-results.ejs -->
+<% if (todays && todays.length > 0) { %>
+<section>
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="text-xl font-bold section-title flex items-center">
+      <i class="fas fa-calendar-day text-blue-500 mr-2 text-xl"></i>
+      Today's Results
+    </h2>
+    <span class="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-sm px-3 py-1 rounded-full font-semibold">
+      <%= todays.length %> Results
+    </span>
+  </div>
+
+  <div class="space-y-6">
+    <% todays.forEach((lottery, index) => { 
+    const now = new Date();
+    
+    let status, badgeClass, showCountdown = false, showRefresh = false;
+
+    showCountdown = !!lottery.nextDrawTime;
+    
+    // Check all resultTimes in winners array for ±1 hour match (LIVE status)
+    const hasLiveResultTime = lottery.winners && lottery.winners.some(winner => {
+        if (winner.resultTime) {
+            const resultTime = new Date(winner.resultTime);
+            //const timeDiff = Math.abs(now - resultTime);
+            const timeDiff = now - resultTime;
+            //return timeDiff <= (60 * 60 * 1000); // ±1 hour
+            return timeDiff >= 0 && timeDiff <= (60 * 60 * 1000);
+        }
+        return false;
+    });
+    
+    if (hasLiveResultTime) {
+        // Within ±1 hour of any result time - LIVE status
+        status = "LIVE";
+        badgeClass = "live-badge";
+        showRefresh = lottery.winners.some(winner => !winner.winNumbers || winner.winNumbers.length === 0);
+    } else {
+        // Check for UPCOMING result times (future result times not within ±1 hour)
+        const hasUpcomingResultTime = lottery.winners && lottery.winners.some(winner => {
+            if (winner.resultTime) {
+                const resultTime = new Date(winner.resultTime);
+                return resultTime > now && Math.abs(now - resultTime) > (60 * 60 * 1000);
+            }
+            return false;
+        });
+        
+        if (hasUpcomingResultTime) {
+            // Future result time exists but not within ±1 hour - UPCOMING status
+            status = "UPCOMING";
+            badgeClass = "upcoming-badge";
+            showCountdown = true;
+            showRefresh = false;
+        } else {
+            // Check if any past result time exists (not within ±1 hour)
+            const hasPastResultTime = lottery.winners && lottery.winners.some(winner => {
+                if (winner.resultTime) {
+                    const resultTime = new Date(winner.resultTime);
+                    return resultTime < now && Math.abs(now - resultTime) > (60 * 60 * 1000);
+                }
+                return false;
+            });
+            
+            if (hasPastResultTime) {
+                // Past result time exists but not within ±1 hour - RESULT status
+                status = "RESULT";
+                badgeClass = "result-badge";
+                showRefresh = lottery.winners.some(winner => !winner.winNumbers || winner.winNumbers.length === 0);
+            } else {
+                // No resultTime at all, fallback to drawDate logic
+                const drawTime = new Date(lottery.drawDate);
+                const hoursAfterDraw = (now - drawTime) / (1000 * 60 * 60);
+                
+                if (now < drawTime) {
+                    status = "UPCOMING";
+                    badgeClass = "upcoming-badge";
+                    showCountdown = true;
+                } else if (hoursAfterDraw <= 2) {
+                    status = "LIVE";
+                    badgeClass = "live-badge";
+                    showCountdown = false;
+                    showRefresh = lottery.winners.length === 0;
+                } else {
+                    status = "RESULT";
+                    badgeClass = "result-badge";
+                    showCountdown = false;
+                    showRefresh = lottery.winners.length === 0;
+                }
+            }
+        }
+    }
+    
+
+    
+    const firstPrize = lottery.prizes.find(p => p.rank === 1);
+    const drawTime = new Date(lottery.nextDrawTime?lottery.nextDrawTime:lottery.lastDrawTime);
+    const formattedDate = drawTime.toLocaleDateString('en-GB', { 
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+        timeZone: 'Asia/Dubai' 
+    }).replace(',', '');
+%>
+
+    <!-- Step 3b: Render lottery card -->
+    <div class="lottery-card <%= lottery.dayName %>-card cursor-pointer" onclick="toggleResult('today<%= index %>')">
+      <div class="flex items-center justify-between">
+        <div class="flex-1 card-element-spacing">
+          <!-- Status badge -->
+          <div class="flex flex-wrap items-center" style="row-gap: 9px; column-gap: 20px;">
+            <span class="<%= badgeClass %> rounded-full"><%= status %></span>
+            <span class="card-text-secondary card-date"><%= formattedDate %></span>
+          </div>
+
+          <!-- Lottery name -->
+          <h3 class="card-text card-lottery-name"><%= lottery.name %><br><%= lottery.name2 || '' %></h3>
+
+          <!-- Step 3c: Conditional countdown timer -->
+          <% if (showCountdown) { %>
+          <div class="countdown-container">
+            <div class="flex items-center justify-between">
+              <span class="countdown-label">Draws in:</span>
+              <div class="flex space-x-2 items-center">
+                <div class="countdown-badge" id="today-countdown<%= index %>-hours">00</div>
+                <span class="card-text font-bold">:</span>
+                <div class="countdown-badge" id="today-countdown<%= index %>-minutes">00</div>
+                <span class="card-text font-bold">:</span>
+                <div class="countdown-badge" id="today-countdown<%= index %>-seconds">00</div>
+              </div>
+            </div>
+          </div>
+          <% } %>
+
+          <!-- priZe listing -->
+          <% lottery.prizes.forEach(prize => { %>
+          <div class="flex items-center card-text-secondary">
+            <i class="fas fa-trophy text-yellow-300 mr-2"></i>
+            <span class="card-prize">
+              <% 
+               let rankStatus= 'th';
+                if(prize.rank === 1) rankStatus = 'st';
+                else if(prize.rank === 2) rankStatus = 'nd';
+                else if(prize.rank === 3) rankStatus = 'rd';
+                else rankStatus = 'th';
+               %>
+              <%= prize.rank %><%= rankStatus %> Prize: Nu. <%= prize.amount.toLocaleString('en-US') %>
+            </span><br>
+          </div>
+          <% }); %>
+          <!--  -->
+
+          <!-- Admin Actions -->
+          <div class="flex items-center mt-4">
+            <button onclick="editLottery('<%= lottery._id %>')" class="admin-btn edit-btn">
+              <i class="fas fa-edit mr-1"></i>
+              Edit
+            </button>
+            <button onclick="deleteLottery('<%= lottery._id %>')" class="admin-btn">
+              <i class="fas fa-trash mr-1"></i>
+              Delete
+            </button>
+          </div>
+
+        </div>
+        <div class="text-right ml-4">
+          <i id="arrow-today<%= index %>" class="fas fa-chevron-down card-text text-xl transition-transform duration-300"></i>
+        </div>
+      </div>
+
+      <!-- Step 3e: Expandable results -->
+      <div id="today<%= index %>" class="card-expand collapsed mt-6">
+        <div class="result-container space-y-4">
+          <!-- result card loop -->
+
+          <% const now2 = new Date(); // Get the current time
+
+  // Sort the 'lottery.winners' array to show upcoming events first
+  const sortedWinners = lottery.winners.slice().sort((a, b) => {
+    const dateA = new Date(a.resultTime);
+    const dateB = new Date(b.resultTime);
+
+    const isUpcomingA = dateA > now2;
+    const isUpcomingB = dateB > now2;
+
+    // Prioritize upcoming events.
+    if (isUpcomingA && !isUpcomingB) {
+      return -1; // 'a' (upcoming) comes before 'b' (past)
+    }
+    if (!isUpcomingA && isUpcomingB) {
+      return 1; // 'b' (upcoming) comes before 'a' (past)
+    }
+
+    // Sort within the same category.
+    if (isUpcomingA && isUpcomingB) {
+      // Both are upcoming, sort ascending (earliest first).
+      return dateA - dateB;
+    } else {
+      // Both are past, sort descending (most recent first).
+      return dateB - dateA;
+    }
+  });
+
+  // Now, loop through the newly sorted array
+  sortedWinners.forEach(winner => {
+   %>
+          <% 
+  // Convert to IST explicitly
+  const resultTime = new Date(winner.resultTime);
+
+  // Format with IST timezone
+  const options = { 
+    hour: 'numeric', 
+    minute: '2-digit', 
+    hour12: true, 
+    timeZone: 'Asia/Dubai' 
+  };
+
+  const formattedTime = resultTime.toLocaleString('en-IN', options);
+  
+  // Get first ticket number and its length
+  const firstTicketNumber = winner.winNumbers[0].ticketNumber;
+  const ticketLength = firstTicketNumber.toString().length;
+  
+  // Generate letters array based on ticket length
+  const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+  const ticketLetters = letters.slice(0, ticketLength);
+%>
+
+          <div class="result-card">
+            <div class="result-card-header">
+              <%= formattedTime %>
+            </div>
+            <div class="result-card-content">
+
+              <div class="letter-container">
+                <% ticketLetters.forEach((letter, index) => { %>
+                <div class="letter-box">
+                  <%= letter %>
+                </div>
+                <% }); %>
+              </div>
+
+              <!--  -->
+              <% 
+                let allResultPublished= false;
+                allResultPublished = winner.winNumbers.every(winNumber => winNumber.resultStatus === true);
+              %>
+              <% if(allResultPublished){ %>
+                <div class="winning-numbers-container">
+                <div class="winning-number-item">
+                  <div class="winning-number" data-ticket-number="<%= firstTicketNumber %>">
+                    <%= firstTicketNumber %>
+                  </div>
+                </div>
+              </div>
+              <% }else{ %>
+                  <div class="winning-numbers-container1" style="margin-top: 14px;">
+                    <img src="/images/dummy-counter-box.png" style="height: 78px; width: 235px ">
+                  </div>
+              <% } %>
+
+              <div class="otherPrizeContainer">
+                <% winner.winNumbers.forEach((winNumberObj, index) => { %>
+                <% 
+                  let rankStatus2= 'th';
+                  if(winNumberObj.prizeRank === 1) rankStatus2 = 'st';
+                  else if(winNumberObj.prizeRank === 2) rankStatus2 = 'nd';
+                  else if(winNumberObj.prizeRank === 3) rankStatus2 = 'rd';
+                  else rankStatus2 = 'th';
+                %>
+
+                <% if(index === 4) { %>
+                <div class="win-items">
+                  <span class="prize-Rank">🎖️5th Prize : <b>(Single number all series)</b></span>
+                </div>
+                <% }else if(index < 4){ %>
+                <% if (!winNumberObj.resultStatus ) { %>
+                <div class="win-items">
+                  <span class="prize-Rank">🎖️<%= winNumberObj.prizeRank %><%= rankStatus2 %> Prize :</span>
+                  <div class="result-winning-number result-winning-number_if_no_results underline-animated"></div>
+                </div>
+                <% }else{ %>
+                <div class="win-items">
+                  <span class="prize-Rank">🎖️<%= winNumberObj.prizeRank %><%= rankStatus2 %> Prize :</span>
+                  <div class="result-winning-number"><%= winNumberObj.ticketNumber %></div>
+                </div>
+                <% } %>
+                <% } %>
+                <% }); %>
+              </div>
+              <!--  -->
+            </div>
+          </div>
+          <% }); %>
+          <!-- END Result card loop -->
+        </div>
+      </div>
+    </div>
+    <% }); %>
+  </div>
+</section>
+<% } %>

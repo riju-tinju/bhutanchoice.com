@@ -1,31 +1,30 @@
 <script>
+  let todayDate = new Date().toISOString();
+  // alert(todayDate);
+  // alert(upcoming[0].drawDate)
   // Step 5a: Countdown management
   function updateCountdowns() {
-    // PRIORITY 1: Use sortedTodays if available
-    <% if (sortedTodays) { %>
-    <% sortedTodays.forEach((lottery, index) => { %>
-      <% if (lottery.showCountdown && lottery.nextDrawTime) { %>
-        // This matches the order in todays-results.ejs
-        updateSingleCountdown('today-countdown<%= index %>', '<%= lottery.nextDrawTime %>');
-      <% } %>
-    <% }); %>
-    <% } else if (todays) { %>
-    // FALLBACK: Use original todays array (for backward compatibility)
+
+    // Update today's lotteries countdowns
+    <% if (todays) { %>
     <% todays.forEach((lottery, index) => { %>
-      <% if (lottery.showCountdown && lottery.nextDrawTime) { %>
-        updateSingleCountdown('today-countdown<%= index %>', '<%= lottery.nextDrawTime %>');
-      <% } %>
+    // updateSingleCountdown(
+    //   'today-countdown<%= index %>',
+    //   moment('<%= lottery.nextDrawDate %>').tz('Asia/Dubai').format()
+    // );
+    console.log('Updating countdown for lottery <%= lottery.name %> with nextDrawDate: <%= lottery.nextDrawTime %>');
+    console.log('drawDate:', '<%= lottery.drawDate %>');
+     updateSingleCountdown('today-countdown<%= index %>', '<%= lottery.nextDrawTime %>');
     <% }); %>
     <% } %>
 
-    // Upcoming lotteries remain unchanged
     <% if (upcoming) { %>
     <% upcoming.forEach((lottery, index) => { %>
-    updateSingleCountdown('upcoming-countdown<%= index %>', '<%= lottery.drawDate %>');
+    updateSingleCountdown('upcoming-countdown<%= index %>',  moment('<%= lottery.drawDate %>').tz('Asia/Dubai').format());
     <% }); %>
     <% } %>
+
   }
-    
 
   function updateSingleCountdown(prefix, targetDateStr) {
     const now = new Date().getTime();
@@ -33,26 +32,20 @@
     const distance = targetDate - now;
 
     if (distance > 0) {
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
       const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
       const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
+      const daysEl = document.getElementById(prefix + '-days');
       const hoursEl = document.getElementById(prefix + '-hours');
       const minutesEl = document.getElementById(prefix + '-minutes');
       const secondsEl = document.getElementById(prefix + '-seconds');
 
+      if (daysEl) daysEl.textContent = days.toString().padStart(2, '0');
       if (hoursEl) hoursEl.textContent = hours.toString().padStart(2, '0');
       if (minutesEl) minutesEl.textContent = minutes.toString().padStart(2, '0');
       if (secondsEl) secondsEl.textContent = seconds.toString().padStart(2, '0');
-    } else {
-      // Countdown expired
-      const hoursEl = document.getElementById(prefix + '-hours');
-      const minutesEl = document.getElementById(prefix + '-minutes');
-      const secondsEl = document.getElementById(prefix + '-seconds');
-      
-      if (hoursEl) hoursEl.textContent = '00';
-      if (minutesEl) minutesEl.textContent = '00';
-      if (secondsEl) secondsEl.textContent = '00';
     }
   }
 
@@ -76,6 +69,7 @@
       const result = await response.json();
 
       if (result.success) {
+        // Reload page to show updated results
         window.location.reload();
       } else {
         throw new Error(result.message || 'Failed to refresh');
