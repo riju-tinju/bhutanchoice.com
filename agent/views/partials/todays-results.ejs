@@ -23,8 +23,11 @@
     const hasLiveResultTime = lottery.winners && lottery.winners.some(winner => {
         if (winner.resultTime) {
             const resultTime = new Date(winner.resultTime);
-            const timeDiff = Math.abs(now - resultTime);
-            return timeDiff <= (60 * 60 * 1000); // ±1 hour
+            //const timeDiff = Math.abs(now - resultTime);
+            //return timeDiff <= (60 * 60 * 1000); // ±1 hour
+            const timeDiff = now - resultTime; // REMOVED Math.abs()
+            // LIVE for exactly 1 hour AFTER result time (0 to 1 hour)
+            return timeDiff >= 0 && timeDiff <= (60 * 60 * 1000);
         }
         return false;
     });

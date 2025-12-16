@@ -2,10 +2,33 @@
 <html lang="en">
 
 <head>
+  <!-- Google analytics -->
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-E8GE6G21D5"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+
+    gtag('config', 'G-E8GE6G21D5');
+  </script>
+  <!--  -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex">
-  <title>Agent - Bhutan State Lotteries</title>
+  <title>Royal Government Of Bhutan</title>
+  <meta name="description" content="Check Bhutan Lottery Results live and past records." />
+  <link rel="icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfvxp4SnnjaYyFQDP8d5D660XMvy4nQfc08ScgqFq3IjufpC1OH-ykrQ6v-SkPsuVCt7w&usqp=CAU" />
+
+  <meta property="og:title" content="Royal Government Of Bhutan | Official lottery portel" />
+  <meta property="og:description" content="Official portal for accessing live and past lottery results with complete transparency." />
+  <meta property="og:image" content="https://bhutanlotteryresults.com/images/og.jpg" />
+  <meta property="og:image:secure_url" content="https://bhutanlotteryresults.com/images/og.jpg">
+  <!-- <meta property="og:url" content="https://bhutanlotteryresults.com" /> -->
+  <meta property="og:type" content="website" />
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -323,14 +346,9 @@
     }
 
     .upcoming-badge {
-      /* background: linear-gradient(45deg, #F59E0B, #FBBF24);
+      background: linear-gradient(45deg, #F59E0B, #FBBF24);
       color: white;
       animation: glow 2s infinite alternate;
-      font-size: 0.875rem;
-      font-weight: 800;
-      padding: 6px 12px; */
-      color:linear-gradient(45deg, #10B981, #34D399);
-      animation: blink-upcoming-badge .5s infinite;
       font-size: 0.875rem;
       font-weight: 800;
       padding: 6px 12px;
@@ -387,27 +405,8 @@
 
     }
 
-    @keyframes blink-upcoming-badge {
-      0% {
-        transform: scale(1);
-        opacity: 1;
-        background: white;
-        color: #10B981;
-        box-shadow: 0 0 0 rgba(16, 185, 129, 0);
-      }
-
-      100% {
-        transform: scale(1.03);
-        opacity: 1;
-        background: linear-gradient(45deg, #10B981, #34D399);
-        color: white;
-        box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
-      }
-
-    }
-
-
     @keyframes pulse {
+
       0%,
       100% {
         transform: scale(1);
@@ -1221,42 +1220,14 @@
       <div class="flex items-center justify-center">
         <div class="flex items-center space-x-3">
           <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfvxp4SnnjaYyFQDP8d5D660XMvy4nQfc08ScgqFq3IjufpC1OH-ykrQ6v-SkPsuVCt7w&usqp=CAU" style="height: 34px; width: 34px; border-radius: 50%;" alt="">
-          <h1 class="text-xl font-bold drop-shadow-lg tracking-wide">Agent - Bhutan State Lotteries</h1>
+          <h1 class="text-xl font-bold drop-shadow-lg tracking-wide">Bhutan State Lotteries</h1>
         </div>
       </div>
     </div>
   </header>
 
-  <main class="px-4 py-6 space-y-8 max-w-md mx-auto" >
-    <!-- Create New Lottery Button -->
-    <!-- <div class="text-center">
-      <button onclick="openCreateModal()" class="create-btn">
-        <i class="fas fa-plus mr-2"></i>
-        Create New Lottery
-      </button>
-    </div> -->
+  <main class="px-4 py-6 space-y-8 max-w-md mx-auto">
 
-    <!-- Create New Lottery Button -->
-    <!-- <div class="text-center">
-      <button onclick="openTicketChargesModal()" class="create-btn">
-        <i class="fas fa-coin mr-2"></i>
-        See Ticket Charges
-      </button>
-    </div> -->
-
-    <div class="text-center">
-      <button onclick="openBookPage()" class="create-btn">
-        <i class="fas fa-ticket mr-2"></i>
-        Book Tickets
-      </button>
-    </div>
-
-    <script>
-      function openBookPage() {
-
-        location.href = '/booking';
-      }
-    </script>
 
 
     <% 
@@ -1323,70 +1294,121 @@
     <%- include('partials/upcoming-lotteries') %>
     <%- include('partials/todays-results') %>
     <% } %>
-    <%- include('partials/indexScript') %>
+    <%- include('partials/indexScript',{ sortedTodays: sortedTodays }) %>
 
     <%- include('partials/past') %>
   </main>
 
-  <!-- Settings Button -->
-  <!-- <script>
-    // Settings Function
-    function goToSettings() {
-      window.location.href = '/setting';
-    }
-  </script> -->
-  <!-- <button onclick="goToSettings()" class="settings-btn">
-    <i class="fas fa-cog"></i>
-  </button> -->
 
-  <!-- Enhanced Create/Edit Lottery Modal -->
-  <%- include('partials/Edit-create-extention') %>
 
-  <!-- Enhanced Create/Edit Lottery Modal -->
-  <%- include('partials/ticketChargeExtention') %>
+  <!-- Disclaimer Modal -->
+  <div id="disclaimerModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full max-h-[80vh] overflow-y-auto shadow-2xl">
+      <!-- Modal Header -->
+      <div class="sticky top-0 bg-gradient-to-r from-red-500 to-pink-500 text-white p-4 rounded-t-2xl">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-bold">⚠️ DISCLAIMER</h3>
+          <button id="closeModal" class="text-white hover:text-gray-200 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Content -->
+      <div class="p-6 text-gray-700 leading-relaxed" style="max-height: 60vh;overflow: hidden; overflow-y: auto;">
+        <p class="mb-4">
+          We strictly recommend you to please visit and browse this site on your own risk. All the information
+          available here is strictly for informational purposes and based on astrology and numerology
+          calculations.
+        </p>
+        <p class="mb-4">
+          We are no way associated or affiliated with any illegal Matka or gambling business. We abide by
+          rules and regulations of the regions where you are accessing the website.
+        </p>
+        <p class="mb-4">
+          May be it is illegal or banned in your region. If you are using our website despite ban, you will be
+          solely responsible for the damage or loss occurred or legal action taken.
+        </p>
+        <p class="mb-4">
+          Please leave our website immediately if you dont like our disclaimer.
+        </p>
+        <p class="font-semibold text-red-600">
+          Copying any information / content posted on the website is strictly prohibited and against the law.
+        </p>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 bg-gray-50 rounded-b-2xl">
+        <button id="closeModalBtn" class="w-full bg-gradient-to-r from-gray-500 to-gray-600 text-white py-3 rounded-xl font-medium hover:from-gray-600 hover:to-gray-700 transition-all duration-300">
+          I Understand
+        </button>
+      </div>
+    </div>
+  </div>
+
 
   <!-- Toast Notification -->
   <div id="toast" class="toast"></div>
+
+  <!-- for disclimer -->
+  <script>
+    // Add bounce effect to cards when they appear
+    window.addEventListener('load', function() {
+      const cards = document.querySelectorAll('.lottery-card');
+      cards.forEach((card, index) => {
+        setTimeout(() => {
+          card.classList.add('bounce-in');
+        }, index * 100);
+      });
+    });
+
+    // Disclaimer Modal Functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const disclaimerBtn = document.getElementById('disclaimerBtn');
+      const disclaimerModal = document.getElementById('disclaimerModal');
+      const closeModal = document.getElementById('closeModal');
+      const closeModalBtn = document.getElementById('closeModalBtn');
+
+      // Show modal
+      disclaimerBtn.addEventListener('click', function() {
+        disclaimerModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden'; // Prevent background scroll
+      });
+
+      // Hide modal functions
+      function hideModal() {
+        disclaimerModal.classList.add('hidden');
+        document.body.style.overflow = 'auto'; // Restore scroll
+      }
+
+      // Close modal via X button
+      closeModal.addEventListener('click', hideModal);
+
+      // Close modal via "I Understand" button
+      closeModalBtn.addEventListener('click', hideModal);
+
+      // Close modal when clicking outside
+      disclaimerModal.addEventListener('click', function(e) {
+        if (e.target === disclaimerModal) {
+          hideModal();
+        }
+      });
+
+      // Close modal with Escape key
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && !disclaimerModal.classList.contains('hidden')) {
+          hideModal();
+        }
+      });
+    });
+  </script>
 
   <script>
     let currentEditId = null;
     let prizeCounter = 1;
     let winnerCounter = 1;
-
-    // Toggle result expansion
-    function toggleResult(resultId) {
-      const result = document.getElementById(resultId);
-      let arrowId = 'arrow-' + resultId;
-      const arrow = document.getElementById(arrowId);
-
-      // Close all other results
-      const allResults = document.querySelectorAll('.card-expand');
-      const allArrows = document.querySelectorAll('[id^="arrow"]');
-
-      allResults.forEach((el) => {
-        if (el.id !== resultId) {
-          el.classList.remove('expanded');
-          el.classList.add('collapsed');
-        }
-      });
-
-      allArrows.forEach((el) => {
-        if (el.id !== arrowId) {
-          el.style.transform = 'rotate(0deg)';
-        }
-      });
-
-      // Toggle current result
-      if (result.classList.contains('collapsed')) {
-        result.classList.remove('collapsed');
-        result.classList.add('expanded');
-        if (arrow) arrow.style.transform = 'rotate(180deg)';
-      } else {
-        result.classList.remove('expanded');
-        result.classList.add('collapsed');
-        if (arrow) arrow.style.transform = 'rotate(0deg)';
-      }
-    }
 
 
     // Helper Functions
@@ -1420,5 +1442,7 @@
     });
   </script>
 
+  
 
-  <%- include('partials/Footer') %>
+</body>
+</html>
