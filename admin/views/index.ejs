@@ -1621,6 +1621,18 @@
         </div>
       </div>
 
+      <!-- Admin Actions -->
+      <div class="flex items-center mt-4">
+        <button onclick="editLottery('${lottery._id}')" class="admin-btn edit-btn">
+          <i class="fas fa-edit mr-1"></i>
+          Edit
+        </button>
+        <button onclick="deleteLottery('${lottery._id}')" class="admin-btn">
+          <i class="fas fa-trash mr-1"></i>
+          Delete
+        </button>
+      </div>
+
       <!-- Expandable results -->
       <div id="${elementId}" class="card-expand collapsed mt-6">
         <div class="result-container space-y-4">
